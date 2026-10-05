@@ -86,7 +86,8 @@ def real_smoke(args, config):
                             camera_depths=True, render_gpu_device_id=args.device_id)
     report = {"mode": "restored_simulator_gt_rigid_hand_surface", "v03_root": str(root),
               "task": task.language, "selection": "first 10 manifest episodes, 5 evenly spaced frames each",
-              "no_control_steps": True, "anchor_source": "compiled gripper0_hand mesh triangle centroids, not depth backprojection",
+              "no_control_steps": True, "anchor_source": "compiled rigid-body mesh triangle centroids, not depth backprojection",
+              "anchor_body": config["method"]["visual_anchor"]["rigid_body_name"],
               "frames": []}
     offset = 0
     try:
@@ -100,7 +101,9 @@ def real_smoke(args, config):
                 # Fixed surface coordinates per episode; exclude nonrigid fingers.
                 obs = env.env._get_observations(force_update=True)
                 rotation = rotation_from_xyzw(obs["robot0_eef_quat"])
-                points = rigid_surface_points_from_sim(env.sim, obs["robot0_eef_pos"], rotation, max_points=512)
+                anchor_cfg = config["method"]["visual_anchor"]
+                points = rigid_surface_points_from_sim(env.sim, obs["robot0_eef_pos"], rotation,
+                    body_name=anchor_cfg["rigid_body_name"], max_points=anchor_cfg["max_surface_points"])
                 for frame in np.linspace(0, row["frames"]-1, args.frames_per_episode, dtype=int):
                     sample = dataset[offset+int(frame)]
                     env.sim.set_state_from_flattened(group["states"][sample["source_frame_index"]])
@@ -108,16 +111,20 @@ def real_smoke(args, config):
                     obs = env.env._get_observations(force_update=True)
                     # Audit same-state RGB/depth and exact rigid-surface/EE pose first.
                     np.testing.assert_array_equal(raster(obs["agentview_image"], "rot180"), sample["agentview_rgb"])
-                    raw_depth = get_real_depth_map(env.sim, np.asarray(obs["agentview_depth"]).squeeze(-1)).astype(np.float32)
+                    # Match frozen V0.3: promote the normalized buffer before
+                    # the near/far-plane division, then store metric float32.
+                    raw_depth = get_real_depth_map(env.sim, np.asarray(obs["agentview_depth"], dtype=np.float64).squeeze(-1)).astype(np.float32)
                     np.testing.assert_allclose(raster(raw_depth, "rot180"), sample["agentview_depth_m"], atol=2e-5, rtol=0)
                     np.testing.assert_allclose(obs["robot0_eef_pos"], sample["ee_world_m"], atol=2e-6, rtol=0)
                     np.testing.assert_allclose(obs["robot0_eef_quat"], sample["eef_quaternion_xyzw"], atol=2e-6, rtol=0)
                     record = check_frame(sample, config, points)
+                    record["depth_replay_max_error_m"] = float(np.max(np.abs(raster(raw_depth, "rot180") - sample["agentview_depth_m"])))
                     record.update(episode=row["episode_index"], frame=int(frame), source_frame=sample["source_frame_index"])
                     report["frames"].append(record)
                     args.output.parent.mkdir(parents=True, exist_ok=True)
                     args.output.with_suffix(".partial.json").write_text(json.dumps(report, indent=2)+"\n")
                 offset += row["frames"]
+                print(json.dumps({"episode": row["episode_index"], "frames_checked": len(report["frames"])}), flush=True)
     finally:
         env.close()
     return report

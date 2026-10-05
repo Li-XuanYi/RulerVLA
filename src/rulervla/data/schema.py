@@ -61,10 +61,14 @@ class CorrectedEEReference:
     accepted: bool
 
     def __post_init__(self):
-        finite(self.position_action_m, (3,), "EE world position")
-        finite(self.bias_xyz_m, (3,), "EE reference shared bias")
-        if not self.accepted and np.any(self.bias_xyz_m):
+        position = finite(self.position_action_m, (3,), "EE world position").copy()
+        bias = finite(self.bias_xyz_m, (3,), "EE reference shared bias").copy()
+        if not self.accepted and np.any(bias):
             raise ValueError("Rejected reference must not carry a correction")
+        position.setflags(write=False)
+        bias.setflags(write=False)
+        object.__setattr__(self, "position_action_m", position)
+        object.__setattr__(self, "bias_xyz_m", bias)
 
 
 def rotation_from_xyzw(quaternion):

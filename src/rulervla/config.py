@@ -23,6 +23,8 @@ def validate_method(method):
         raise ValueError("Unknown anchor backend")
     if not np.isfinite(anchor["occlusion_tolerance_m"]) or anchor["occlusion_tolerance_m"] <= 0:
         raise ValueError("Positive occlusion tolerance required")
+    if not anchor["rigid_body_name"] or anchor["max_surface_points"] < 3:
+        raise ValueError("A known robot rigid body and >=3 surface candidates are required")
     if method["correction"]["mode"] != "translation_huber":
         raise ValueError("Only shared translation Huber correction is implemented")
     CorrectionConfig(**{k: v for k, v in method["correction"].items() if k not in {"enabled", "mode"}})

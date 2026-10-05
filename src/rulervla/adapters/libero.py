@@ -37,7 +37,7 @@ class LiberoAdapter:
 
 
 def rigid_surface_points_from_sim(sim, ee_world_m, ee_rotation_world,
-                                  body_name="gripper0_hand", max_points=256):
+                                  body_name="gripper0_right_gripper", max_points=256):
     """Read deterministic triangle centroids from a rigid robot body's GT mesh.
 
     These points are independent of depth. Finger geoms are excluded because

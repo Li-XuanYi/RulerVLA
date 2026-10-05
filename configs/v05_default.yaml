@@ -6,6 +6,8 @@ method:
     enabled: true
     backend: simulator_gt
     occlusion_tolerance_m: 0.003
+    rigid_body_name: gripper0_right_gripper
+    max_surface_points: 512
   correction:
     enabled: true
     mode: translation_huber
