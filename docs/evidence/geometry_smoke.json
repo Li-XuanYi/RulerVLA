@@ -1,0 +1,43 @@
+{
+  "mode": "synthetic_independent_rigid_points",
+  "frames": [
+    {
+      "bias_gt_m": [
+        0.02,
+        -0.01,
+        0.005
+      ],
+      "bias_estimate_m": [
+        0.020000000000000004,
+        -0.010000000000000057,
+        0.004999999999999893
+      ],
+      "bias_error_m": 1.2112358075390057e-16,
+      "before": {
+        "mean_m": 0.022912878474779186,
+        "median_m": 0.022912878474779196,
+        "max_m": 0.022912878474779196,
+        "valid_pixels": 65536
+      },
+      "after": {
+        "mean_m": 2.1836443390633453e-17,
+        "median_m": 0.0,
+        "max_m": 6.397344083151129e-17,
+        "valid_pixels": 65536
+      },
+      "residual_median_m": 6.397344083151129e-17,
+      "accepted": true,
+      "reason": "accepted",
+      "anchors_used": 8
+    }
+  ],
+  "summary": {
+    "passed": true,
+    "frames": 1,
+    "accepted": 1,
+    "rejected": 0,
+    "max_bias_recovery_error_m": 1.2112358075390057e-16,
+    "mean_before_m": 0.022912878474779186,
+    "mean_after_m": 2.1836443390633453e-17
+  }
+}

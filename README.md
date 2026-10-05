@@ -19,3 +19,20 @@ python scripts/smoke_pipeline.py
 
 See `docs/ARCHITECTURE.md`, `docs/V03_PROVENANCE.md` and `docs/V05_METHOD.md`
 for geometry, integration and evidence boundaries.
+
+## Engineering validation
+
+- 40 CPU tests passed.
+- 50 real frames across R0-R3 match frozen V0.3 geometry and policy inputs
+  exactly, including the actual OpenPI third-slot transform.
+- 50 simulator states from ten task-2 episodes passed a geometry-only GT-anchor
+  smoke. Injected translation `[+0.020, -0.010, +0.005] m` produced mean map
+  error 22.913 mm before and 0.296 mm after correction; maximum bias recovery
+  error was 0.493 mm. No control steps or policy inference were performed.
+
+Per-frame JSON evidence and SHA-256 manifest are in `docs/evidence/`.
+The learned anchor detector remains an explicit stub. This result validates
+translation correction with oracle landmarks; it does not measure policy SR.
+
+Repository: https://github.com/Li-XuanYi/RulerVLA (private). Commit identity is
+`Lixuanyi`, using repository-local settings.

@@ -1,0 +1,518 @@
+{
+  "source_root": "/home/yqt/XuanyiLi/actioncoord/work/v03_sync_rgbd_20261003T164806",
+  "synthetic": {
+    "R0": 0.0,
+    "R1": 0.0,
+    "R2": 0.0,
+    "R3": 0.0
+  },
+  "real_frames": [
+    {
+      "episode": 1283,
+      "frame": 0,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1283,
+      "frame": 33,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1283,
+      "frame": 67,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1283,
+      "frame": 100,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1283,
+      "frame": 134,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1287,
+      "frame": 0,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1287,
+      "frame": 24,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1287,
+      "frame": 49,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1287,
+      "frame": 74,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1287,
+      "frame": 99,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1289,
+      "frame": 0,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1289,
+      "frame": 29,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1289,
+      "frame": 59,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1289,
+      "frame": 89,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1289,
+      "frame": 119,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1299,
+      "frame": 0,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1299,
+      "frame": 30,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1299,
+      "frame": 60,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1299,
+      "frame": 90,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1299,
+      "frame": 120,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1310,
+      "frame": 0,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1310,
+      "frame": 27,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1310,
+      "frame": 55,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1310,
+      "frame": 82,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1310,
+      "frame": 110,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1315,
+      "frame": 0,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1315,
+      "frame": 26,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1315,
+      "frame": 52,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1315,
+      "frame": 78,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1315,
+      "frame": 105,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1316,
+      "frame": 0,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1316,
+      "frame": 25,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1316,
+      "frame": 51,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1316,
+      "frame": 76,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1316,
+      "frame": 102,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1317,
+      "frame": 0,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1317,
+      "frame": 28,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1317,
+      "frame": 56,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1317,
+      "frame": 84,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1317,
+      "frame": 113,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1320,
+      "frame": 0,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1320,
+      "frame": 30,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1320,
+      "frame": 61,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1320,
+      "frame": 91,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1320,
+      "frame": 122,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1345,
+      "frame": 0,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1345,
+      "frame": 27,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1345,
+      "frame": 54,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1345,
+      "frame": 81,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    },
+    {
+      "episode": 1345,
+      "frame": 108,
+      "max_errors": {
+        "R0": 0.0,
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0
+      }
+    }
+  ],
+  "passed": true,
+  "frames": 50,
+  "third_slot_parity": true,
+  "source_dense_sha256": "414691d3a25221d28c05fedaf3b3b793bbbb4551c701c536199e8dcaf03b568e",
+  "rgb_resize_module": "/home/yqt/XuanyiLi/actioncoord/work/v03_sync_rgbd_20261003T164806/pi05_runtime/packages/openpi-client/src/openpi_client/image_tools.py",
+  "rgb_resize_default": 2,
+  "metadata_discrepancy": "Frozen JSON says Lanczos; actual frozen callable defaults to PIL BILINEAR enum=2. Executable behavior retained; JSON unchanged."
+}
