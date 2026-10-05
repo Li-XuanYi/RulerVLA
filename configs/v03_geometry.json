@@ -1,0 +1,32 @@
+{
+  "schema": "actioncoord_v03_geometry_contract_v1",
+  "frozen": true,
+  "action_axes": "world_xyz",
+  "ee_origin": "gripper0_grip_site",
+  "camera_axes": "optical x right, y down, z forward",
+  "depth": "metric optical z",
+  "source_resolution": [
+    256,
+    256
+  ],
+  "pixel_coordinates": "integer array-index pixel centres",
+  "principal_point_offset_pixels": [
+    -0.5,
+    -0.5
+  ],
+  "raw_to_canonical": "vflip",
+  "raw_to_stored": "rot180",
+  "stored_rgb_to_canonical": "hflip",
+  "stored_depth_to_canonical": "hflip",
+  "canonical_to_policy": "hflip",
+  "raw_to_policy": "rot180",
+  "policy_resolution": [
+    224,
+    224
+  ],
+  "spatial_resize": "nearest_after_geometry",
+  "rgb_resize": "locked OpenPI PIL Lanczos",
+  "evidence": "/home/Dataset2/yqt/actioncoord-v03-20261003T164806/preflight/geometry_probe_5/evidence.json",
+  "evidence_sha256": "6e3e793a7239b8c4720ba9a91c1fe588c3ba0a9d76a08f8b876b952c0514f8fd",
+  "generator_source_sha256": "1554f7ef59f9aa0ec2e6d6b1fd3c93ca9d9e8be09d2ed1cf06ff0e373c6f6dfb"
+}

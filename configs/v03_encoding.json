@@ -1,0 +1,26 @@
+{
+  "schema": "actioncoord_v03_shared_float_encoding_v1",
+  "frozen": true,
+  "radius_m": 3.25,
+  "formula": "clip(z / radius_m, -1, 1)",
+  "dtype": "float32",
+  "invalid_value": 0.0,
+  "neutral_value": 0.0,
+  "depth": "optical depth repeated on three channels; same radius",
+  "source_resolution": [
+    256,
+    256
+  ],
+  "policy_resolution": [
+    224,
+    224
+  ],
+  "spatial_resize": "nearest",
+  "image_augmentation": false,
+  "training_manifest_sha256": "aaa86cb99c073862ff71b089e2850df61188ea01cce201f2d5960782aa68a4ce",
+  "geometry_sha256": "f4ca974937f4e479adf396f7ad76e5ea305031103c12d6383ae8d38e8252e692",
+  "statistics": "/home/Dataset2/yqt/actioncoord-v03-20261003T164806/preflight/training_inputs_1/training_input_audit.json",
+  "statistics_sha256": "626609547c4cbc1c1bd1bd82a3cd376bd84f9dcfb0163ba1b49f5269da20f565",
+  "max_allowed_component_clip_ratio": 0.001,
+  "selection": "candidate 3.25m accepted using training geometry only; frozen before policy results"
+}
