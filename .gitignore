@@ -6,9 +6,9 @@ __pycache__/
 *.egg-info/
 build/
 dist/
-outputs/
-data/
-checkpoints/
+/outputs/
+/data/
+/checkpoints/
 *.npz
 *.hdf5
 *.h5
