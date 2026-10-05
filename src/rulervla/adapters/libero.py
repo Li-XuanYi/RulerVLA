@@ -1,0 +1,67 @@
+"""Same-state raw LIBERO to the frozen V0.3 stored sample convention."""
+import numpy as np
+
+from rulervla.data.schema import Camera, validate_sample
+from rulervla.geometry.action_coord import raster, validate_contract
+
+
+class LiberoAdapter:
+    def __init__(self, geometry_contract):
+        validate_contract(geometry_contract)
+        self.contract = geometry_contract
+
+    def from_observation(self, observation, *, depth_m, intrinsic, camera_to_world,
+                         state8, instruction):
+        """depth_m is already converted metric optical Z in raw simulator raster.
+
+        Conversion of the normalized MuJoCo depth buffer belongs to the simulator
+        caller. Language and wrist camera are carried through unchanged.
+        """
+        sample = dict(
+            agentview_rgb=raster(np.asarray(observation["agentview_image"]), "rot180"),
+            wrist_rgb=raster(np.asarray(observation["robot0_eye_in_hand_image"]), "rot180"),
+            agentview_depth_m=raster(np.asarray(depth_m), "rot180"),
+            intrinsic=np.asarray(intrinsic).copy(),
+            camera_to_world=np.asarray(camera_to_world).copy(),
+            ee_world_m=np.asarray(observation["robot0_eef_pos"]).copy(),
+            eef_quaternion_xyzw=np.asarray(observation["robot0_eef_quat"]).copy(),
+            state8=np.asarray(state8, dtype=np.float32).copy(), task=instruction,
+        )
+        validate_sample(sample)
+        return sample
+
+    def camera(self, sample):
+        intrinsic = np.array(sample["intrinsic"], dtype=np.float64, copy=True)
+        intrinsic[:2, 2] += self.contract["principal_point_offset_pixels"]
+        return Camera(intrinsic, sample["camera_to_world"], (256, 256))
+
+
+def rigid_surface_points_from_sim(sim, ee_world_m, ee_rotation_world,
+                                  body_name="gripper0_hand", max_points=256):
+    """Read deterministic triangle centroids from a rigid robot body's GT mesh.
+
+    These points are independent of depth. Finger geoms are excluded because
+    their motion is not rigid relative to the EE. No model or state is modified.
+    MuJoCo compiled vertices already include mesh scale/pose normalization.
+    """
+    if max_points < 3:
+        raise ValueError("At least three candidate surface points required")
+    body = sim.model.body_name2id(body_name)
+    collected = []
+    for geom in range(sim.model.ngeom):
+        mesh = int(sim.model.geom_dataid[geom])
+        if int(sim.model.geom_bodyid[geom]) != body or int(sim.model.geom_type[geom]) != 7 or mesh < 0:
+            continue
+        v0, nv = int(sim.model.mesh_vertadr[mesh]), int(sim.model.mesh_vertnum[mesh])
+        f0, nf = int(sim.model.mesh_faceadr[mesh]), int(sim.model.mesh_facenum[mesh])
+        vertices = np.asarray(sim.model.mesh_vert[v0:v0+nv], dtype=np.float64)
+        faces = np.asarray(sim.model.mesh_face[f0:f0+nf], dtype=int)
+        centres = vertices[faces].mean(axis=1)
+        rotation = np.asarray(sim.data.geom_xmat[geom]).reshape(3, 3)
+        world = centres @ rotation.T + sim.data.geom_xpos[geom]
+        collected.append((world - np.asarray(ee_world_m)) @ np.asarray(ee_rotation_world))
+    if not collected:
+        raise ValueError(f"No rigid triangle mesh found on {body_name}")
+    points = np.unique(np.round(np.concatenate(collected), 10), axis=0)
+    indices = np.linspace(0, len(points)-1, min(max_points, len(points)), dtype=int)
+    return points[indices]
