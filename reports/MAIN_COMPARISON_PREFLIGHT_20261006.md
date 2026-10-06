@@ -10,6 +10,10 @@
 - Design, suite episode manifests and 48 planned run configs are written.
 - 60 local tests passed, including forbidden Anchor/Correction/Reliability calls,
   unchanged wrist/state/actions, physical tick projection and auxiliary range checks.
+- ZJU regression also passed: 60 tests in 1.17 s. Input-only checks passed on all
+  50 frozen real frames: wrist/state/unscaled ActionCoord match exactly, nominal
+  ruler uses no anchor/correction/reliability. This does not test model forward,
+  backward, the actual four-slot runtime or optimizer/save/load.
 - Local official pi05_base exists with expected Orbax root structure. A model load
   is still a required smoke gate; filesystem presence is not a completed loader test.
 

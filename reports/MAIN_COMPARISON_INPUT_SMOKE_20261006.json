@@ -1,0 +1,261 @@
+{
+  "passed": true,
+  "frames": 50,
+  "training_started": false,
+  "policy_inference": false,
+  "actual_runtime_forward_tested": false,
+  "same_state_wrist_and_unscaled_actioncoord_exact": true,
+  "anchor_correction_reliability_used": false,
+  "records": [
+    {
+      "frame_key": "ep1283_f0000",
+      "passed": true,
+      "cue_changed_pixels": 410
+    },
+    {
+      "frame_key": "ep1283_f0033",
+      "passed": true,
+      "cue_changed_pixels": 428
+    },
+    {
+      "frame_key": "ep1283_f0067",
+      "passed": true,
+      "cue_changed_pixels": 415
+    },
+    {
+      "frame_key": "ep1283_f0100",
+      "passed": true,
+      "cue_changed_pixels": 442
+    },
+    {
+      "frame_key": "ep1283_f0134",
+      "passed": true,
+      "cue_changed_pixels": 462
+    },
+    {
+      "frame_key": "ep1287_f0000",
+      "passed": true,
+      "cue_changed_pixels": 418
+    },
+    {
+      "frame_key": "ep1287_f0024",
+      "passed": true,
+      "cue_changed_pixels": 434
+    },
+    {
+      "frame_key": "ep1287_f0049",
+      "passed": true,
+      "cue_changed_pixels": 459
+    },
+    {
+      "frame_key": "ep1287_f0074",
+      "passed": true,
+      "cue_changed_pixels": 475
+    },
+    {
+      "frame_key": "ep1287_f0099",
+      "passed": true,
+      "cue_changed_pixels": 446
+    },
+    {
+      "frame_key": "ep1289_f0000",
+      "passed": true,
+      "cue_changed_pixels": 465
+    },
+    {
+      "frame_key": "ep1289_f0029",
+      "passed": true,
+      "cue_changed_pixels": 432
+    },
+    {
+      "frame_key": "ep1289_f0059",
+      "passed": true,
+      "cue_changed_pixels": 402
+    },
+    {
+      "frame_key": "ep1289_f0089",
+      "passed": true,
+      "cue_changed_pixels": 519
+    },
+    {
+      "frame_key": "ep1289_f0119",
+      "passed": true,
+      "cue_changed_pixels": 431
+    },
+    {
+      "frame_key": "ep1299_f0000",
+      "passed": true,
+      "cue_changed_pixels": 402
+    },
+    {
+      "frame_key": "ep1299_f0030",
+      "passed": true,
+      "cue_changed_pixels": 434
+    },
+    {
+      "frame_key": "ep1299_f0060",
+      "passed": true,
+      "cue_changed_pixels": 388
+    },
+    {
+      "frame_key": "ep1299_f0090",
+      "passed": true,
+      "cue_changed_pixels": 439
+    },
+    {
+      "frame_key": "ep1299_f0120",
+      "passed": true,
+      "cue_changed_pixels": 453
+    },
+    {
+      "frame_key": "ep1310_f0000",
+      "passed": true,
+      "cue_changed_pixels": 358
+    },
+    {
+      "frame_key": "ep1310_f0027",
+      "passed": true,
+      "cue_changed_pixels": 409
+    },
+    {
+      "frame_key": "ep1310_f0055",
+      "passed": true,
+      "cue_changed_pixels": 463
+    },
+    {
+      "frame_key": "ep1310_f0082",
+      "passed": true,
+      "cue_changed_pixels": 442
+    },
+    {
+      "frame_key": "ep1310_f0110",
+      "passed": true,
+      "cue_changed_pixels": 467
+    },
+    {
+      "frame_key": "ep1315_f0000",
+      "passed": true,
+      "cue_changed_pixels": 438
+    },
+    {
+      "frame_key": "ep1315_f0026",
+      "passed": true,
+      "cue_changed_pixels": 410
+    },
+    {
+      "frame_key": "ep1315_f0052",
+      "passed": true,
+      "cue_changed_pixels": 418
+    },
+    {
+      "frame_key": "ep1315_f0078",
+      "passed": true,
+      "cue_changed_pixels": 465
+    },
+    {
+      "frame_key": "ep1315_f0105",
+      "passed": true,
+      "cue_changed_pixels": 436
+    },
+    {
+      "frame_key": "ep1316_f0000",
+      "passed": true,
+      "cue_changed_pixels": 435
+    },
+    {
+      "frame_key": "ep1316_f0025",
+      "passed": true,
+      "cue_changed_pixels": 474
+    },
+    {
+      "frame_key": "ep1316_f0051",
+      "passed": true,
+      "cue_changed_pixels": 448
+    },
+    {
+      "frame_key": "ep1316_f0076",
+      "passed": true,
+      "cue_changed_pixels": 476
+    },
+    {
+      "frame_key": "ep1316_f0102",
+      "passed": true,
+      "cue_changed_pixels": 453
+    },
+    {
+      "frame_key": "ep1317_f0000",
+      "passed": true,
+      "cue_changed_pixels": 416
+    },
+    {
+      "frame_key": "ep1317_f0028",
+      "passed": true,
+      "cue_changed_pixels": 506
+    },
+    {
+      "frame_key": "ep1317_f0056",
+      "passed": true,
+      "cue_changed_pixels": 389
+    },
+    {
+      "frame_key": "ep1317_f0084",
+      "passed": true,
+      "cue_changed_pixels": 490
+    },
+    {
+      "frame_key": "ep1317_f0113",
+      "passed": true,
+      "cue_changed_pixels": 414
+    },
+    {
+      "frame_key": "ep1320_f0000",
+      "passed": true,
+      "cue_changed_pixels": 450
+    },
+    {
+      "frame_key": "ep1320_f0030",
+      "passed": true,
+      "cue_changed_pixels": 459
+    },
+    {
+      "frame_key": "ep1320_f0061",
+      "passed": true,
+      "cue_changed_pixels": 463
+    },
+    {
+      "frame_key": "ep1320_f0091",
+      "passed": true,
+      "cue_changed_pixels": 448
+    },
+    {
+      "frame_key": "ep1320_f0122",
+      "passed": true,
+      "cue_changed_pixels": 448
+    },
+    {
+      "frame_key": "ep1345_f0000",
+      "passed": true,
+      "cue_changed_pixels": 465
+    },
+    {
+      "frame_key": "ep1345_f0027",
+      "passed": true,
+      "cue_changed_pixels": 397
+    },
+    {
+      "frame_key": "ep1345_f0054",
+      "passed": true,
+      "cue_changed_pixels": 408
+    },
+    {
+      "frame_key": "ep1345_f0081",
+      "passed": true,
+      "cue_changed_pixels": 474
+    },
+    {
+      "frame_key": "ep1345_f0108",
+      "passed": true,
+      "cue_changed_pixels": 433
+    }
+  ]
+}
