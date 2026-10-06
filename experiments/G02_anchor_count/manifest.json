@@ -1,0 +1,135 @@
+{
+  "base_manifest": "../base_frame_manifest.json",
+  "base_manifest_sha256": "74029f20cd2dd9ff06568bcac89a7a0f0b07708b485a17d462195117fe5f8706",
+  "protocol": "../g_series_protocol_lock.json",
+  "protocol_sha256": "7da25721ade32c6aeb5792a0bab2047b3d2eeb978f49468351fd7c3c9270cdaf",
+  "conditions": [
+    {
+      "experiment_id": "G02",
+      "condition": "n8_A",
+      "severity": 8,
+      "subset": "A",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n8_B",
+      "severity": 8,
+      "subset": "B",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n8_C",
+      "severity": 8,
+      "subset": "C",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n6_A",
+      "severity": 6,
+      "subset": "A",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n6_B",
+      "severity": 6,
+      "subset": "B",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n6_C",
+      "severity": 6,
+      "subset": "C",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n4_A",
+      "severity": 4,
+      "subset": "A",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n4_B",
+      "severity": 4,
+      "subset": "B",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n4_C",
+      "severity": 4,
+      "subset": "C",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n3_A",
+      "severity": 3,
+      "subset": "A",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n3_B",
+      "severity": 3,
+      "subset": "B",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n3_C",
+      "severity": 3,
+      "subset": "C",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n2_A",
+      "severity": 2,
+      "subset": "A",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n2_B",
+      "severity": 2,
+      "subset": "B",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n2_C",
+      "severity": 2,
+      "subset": "C",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n1_A",
+      "severity": 1,
+      "subset": "A",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n1_B",
+      "severity": 1,
+      "subset": "B",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n1_C",
+      "severity": 1,
+      "subset": "C",
+      "kind": "anchor_count"
+    }
+  ],
+  "expected_rows": 900
+}

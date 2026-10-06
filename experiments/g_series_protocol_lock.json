@@ -1,0 +1,699 @@
+{
+  "schema": "rulervla_g_series_protocol_lock_v1",
+  "frozen_before_outcomes": true,
+  "runner_commit": "639739103e527b881df3b56d0ace6509155d6b8c",
+  "design": {
+    "schema": "rulervla_g_series_v1",
+    "base_implementation_commit": "4cce5f08cadf92d89802e842019ea4624dbc48e5",
+    "v03_root": "/home/yqt/XuanyiLi/actioncoord/work/v03_sync_rgbd_20261003T164806",
+    "episodes": 10,
+    "frames_per_episode": 5,
+    "selection": "first ten manifest episodes; five evenly spaced frames; identical to prior GT smoke",
+    "seed": 20261006,
+    "bootstrap_seed": 20261007,
+    "bootstrap_repetitions": 2000,
+    "bootstrap_unit": "episode; preserve all frames and subsets within a cluster",
+    "mixed_direction": [
+      1.0,
+      -0.5,
+      0.25
+    ],
+    "translation_mm": [
+      2,
+      5,
+      10,
+      20
+    ],
+    "translation_directions": [
+      "x",
+      "y",
+      "z",
+      "mixed"
+    ],
+    "anchor_counts": [
+      8,
+      6,
+      4,
+      3,
+      2,
+      1
+    ],
+    "subsets": [
+      "A",
+      "B",
+      "C"
+    ],
+    "fixed_translation_mm": 10,
+    "outlier_counts": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "outlier_magnitude_mm": 20,
+    "outlier_directions": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        -1,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ],
+    "rotation_degrees": [
+      0.5,
+      1,
+      3
+    ],
+    "rotation_axes": [
+      "x",
+      "y",
+      "z"
+    ],
+    "rotation_convention": "right-multiply optical-camera rotation about fixed camera origin; translation unchanged",
+    "depth_noise_rms_mm": [
+      2,
+      5,
+      10
+    ],
+    "missing_fractions": [
+      0.1,
+      0.3
+    ],
+    "missing_modes": [
+      "random",
+      "block"
+    ],
+    "local_depth_bias_mm": [
+      5,
+      10
+    ],
+    "anchor_region_radius_px": 2,
+    "g2_bias_error_limit_mm": 2,
+    "scene_harm_margin_mm": 0.5,
+    "geometry_error_limit_mm": 2,
+    "scene_metric_mask": "clean valid nonrobot pixels; pairwise common measured-valid support",
+    "missing_metric": "report missing fraction and retained coverage separately; missing pixels are not accurate zeros",
+    "after_metric": "metric corrected map before encoding and reliability attenuation",
+    "accepted": "correction accepted AND reliability correction_valid",
+    "gate_decision": "report only; no automatic policy training"
+  },
+  "conditions": [
+    {
+      "experiment_id": "G01",
+      "condition": "clean_control",
+      "severity": 0,
+      "direction": "mixed",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "x_2mm",
+      "severity": 2,
+      "direction": "x",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "y_2mm",
+      "severity": 2,
+      "direction": "y",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "z_2mm",
+      "severity": 2,
+      "direction": "z",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "mixed_2mm",
+      "severity": 2,
+      "direction": "mixed",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "x_5mm",
+      "severity": 5,
+      "direction": "x",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "y_5mm",
+      "severity": 5,
+      "direction": "y",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "z_5mm",
+      "severity": 5,
+      "direction": "z",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "mixed_5mm",
+      "severity": 5,
+      "direction": "mixed",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "x_10mm",
+      "severity": 10,
+      "direction": "x",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "y_10mm",
+      "severity": 10,
+      "direction": "y",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "z_10mm",
+      "severity": 10,
+      "direction": "z",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "mixed_10mm",
+      "severity": 10,
+      "direction": "mixed",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "x_20mm",
+      "severity": 20,
+      "direction": "x",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "y_20mm",
+      "severity": 20,
+      "direction": "y",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "z_20mm",
+      "severity": 20,
+      "direction": "z",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "mixed_20mm",
+      "severity": 20,
+      "direction": "mixed",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n8_A",
+      "severity": 8,
+      "subset": "A",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n8_B",
+      "severity": 8,
+      "subset": "B",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n8_C",
+      "severity": 8,
+      "subset": "C",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n6_A",
+      "severity": 6,
+      "subset": "A",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n6_B",
+      "severity": 6,
+      "subset": "B",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n6_C",
+      "severity": 6,
+      "subset": "C",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n4_A",
+      "severity": 4,
+      "subset": "A",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n4_B",
+      "severity": 4,
+      "subset": "B",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n4_C",
+      "severity": 4,
+      "subset": "C",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n3_A",
+      "severity": 3,
+      "subset": "A",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n3_B",
+      "severity": 3,
+      "subset": "B",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n3_C",
+      "severity": 3,
+      "subset": "C",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n2_A",
+      "severity": 2,
+      "subset": "A",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n2_B",
+      "severity": 2,
+      "subset": "B",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n2_C",
+      "severity": 2,
+      "subset": "C",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n1_A",
+      "severity": 1,
+      "subset": "A",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n1_B",
+      "severity": 1,
+      "subset": "B",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G02",
+      "condition": "n1_C",
+      "severity": 1,
+      "subset": "C",
+      "kind": "anchor_count"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers0_A",
+      "severity": 0,
+      "subset": "A",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers0_B",
+      "severity": 0,
+      "subset": "B",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers0_C",
+      "severity": 0,
+      "subset": "C",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers1_A",
+      "severity": 1,
+      "subset": "A",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers1_B",
+      "severity": 1,
+      "subset": "B",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers1_C",
+      "severity": 1,
+      "subset": "C",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers2_A",
+      "severity": 2,
+      "subset": "A",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers2_B",
+      "severity": 2,
+      "subset": "B",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers2_C",
+      "severity": 2,
+      "subset": "C",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers3_A",
+      "severity": 3,
+      "subset": "A",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers3_B",
+      "severity": 3,
+      "subset": "B",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers3_C",
+      "severity": 3,
+      "subset": "C",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "x_0.5deg",
+      "severity": 0.5,
+      "axis": "x",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "y_0.5deg",
+      "severity": 0.5,
+      "axis": "y",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "z_0.5deg",
+      "severity": 0.5,
+      "axis": "z",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "x_1deg",
+      "severity": 1,
+      "axis": "x",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "y_1deg",
+      "severity": 1,
+      "axis": "y",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "z_1deg",
+      "severity": 1,
+      "axis": "z",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "x_3deg",
+      "severity": 3,
+      "axis": "x",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "y_3deg",
+      "severity": 3,
+      "axis": "y",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "z_3deg",
+      "severity": 3,
+      "axis": "z",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G05",
+      "condition": "noise_2mm",
+      "severity": 2,
+      "kind": "noise"
+    },
+    {
+      "experiment_id": "G05",
+      "condition": "noise_5mm",
+      "severity": 5,
+      "kind": "noise"
+    },
+    {
+      "experiment_id": "G05",
+      "condition": "noise_10mm",
+      "severity": 10,
+      "kind": "noise"
+    },
+    {
+      "experiment_id": "G05",
+      "condition": "missing_random_10pct",
+      "severity": 0.1,
+      "kind": "missing",
+      "mode": "random"
+    },
+    {
+      "experiment_id": "G05",
+      "condition": "missing_block_10pct",
+      "severity": 0.1,
+      "kind": "missing",
+      "mode": "block"
+    },
+    {
+      "experiment_id": "G05",
+      "condition": "missing_random_30pct",
+      "severity": 0.3,
+      "kind": "missing",
+      "mode": "random"
+    },
+    {
+      "experiment_id": "G05",
+      "condition": "missing_block_30pct",
+      "severity": 0.3,
+      "kind": "missing",
+      "mode": "block"
+    },
+    {
+      "experiment_id": "G06",
+      "condition": "anchor_bias_5mm",
+      "severity": 5,
+      "kind": "anchor_bias"
+    },
+    {
+      "experiment_id": "G06",
+      "condition": "anchor_bias_10mm",
+      "severity": 10,
+      "kind": "anchor_bias"
+    },
+    {
+      "experiment_id": "G07",
+      "condition": "target_bias_5mm",
+      "severity": 5,
+      "kind": "target_bias"
+    },
+    {
+      "experiment_id": "G07",
+      "condition": "target_bias_10mm",
+      "severity": 10,
+      "kind": "target_bias"
+    }
+  ],
+  "conditions_total": 67,
+  "expected_rows": 3350,
+  "base_manifest_sha256": "74029f20cd2dd9ff06568bcac89a7a0f0b07708b485a17d462195117fe5f8706",
+  "design_sha256": "beace167463cc71565e3d24e6e0b5ec680d9b55366d1dafaaeed9ffd6d30aadc",
+  "method_config_sha256": "14ca91981e9129b66da3f54145afa52996efe9408aa7fadd7f70c599cd94c91b",
+  "method_config": {
+    "geometry_contract": "v03_geometry.json",
+    "encoding": "v03_encoding.json",
+    "method": {
+      "representation": "actioncoord",
+      "visual_anchor": {
+        "enabled": true,
+        "backend": "simulator_gt",
+        "occlusion_tolerance_m": 0.003,
+        "rigid_body_name": "gripper0_right_gripper",
+        "max_surface_points": 512
+      },
+      "correction": {
+        "enabled": true,
+        "mode": "translation_huber",
+        "min_anchors": 3,
+        "min_confidence": 0.5,
+        "huber_delta_m": 0.002,
+        "max_fit_residual_m": 0.005,
+        "max_iterations": 50,
+        "convergence_m": 1e-08
+      },
+      "reliability": {
+        "enabled": true,
+        "patch_size": 16,
+        "residual_scale_m": 0.005,
+        "min_fit_score": 0.2,
+        "min_anchors": 3
+      },
+      "metric_ruler": {
+        "enabled": false,
+        "lengths_m": [
+          0.05,
+          0.1,
+          0.15
+        ],
+        "line_width": 2,
+        "tick_radius": 2
+      }
+    },
+    "geometry": {
+      "schema": "actioncoord_v03_geometry_contract_v1",
+      "frozen": true,
+      "action_axes": "world_xyz",
+      "ee_origin": "gripper0_grip_site",
+      "camera_axes": "optical x right, y down, z forward",
+      "depth": "metric optical z",
+      "source_resolution": [
+        256,
+        256
+      ],
+      "pixel_coordinates": "integer array-index pixel centres",
+      "principal_point_offset_pixels": [
+        -0.5,
+        -0.5
+      ],
+      "raw_to_canonical": "vflip",
+      "raw_to_stored": "rot180",
+      "stored_rgb_to_canonical": "hflip",
+      "stored_depth_to_canonical": "hflip",
+      "canonical_to_policy": "hflip",
+      "raw_to_policy": "rot180",
+      "policy_resolution": [
+        224,
+        224
+      ],
+      "spatial_resize": "nearest_after_geometry",
+      "rgb_resize": "locked OpenPI PIL Lanczos",
+      "evidence": "/home/Dataset2/yqt/actioncoord-v03-20261003T164806/preflight/geometry_probe_5/evidence.json",
+      "evidence_sha256": "6e3e793a7239b8c4720ba9a91c1fe588c3ba0a9d76a08f8b876b952c0514f8fd",
+      "generator_source_sha256": "1554f7ef59f9aa0ec2e6d6b1fd3c93ca9d9e8be09d2ed1cf06ff0e373c6f6dfb"
+    },
+    "encoding_config": {
+      "schema": "actioncoord_v03_shared_float_encoding_v1",
+      "frozen": true,
+      "radius_m": 3.25,
+      "formula": "clip(z / radius_m, -1, 1)",
+      "dtype": "float32",
+      "invalid_value": 0.0,
+      "neutral_value": 0.0,
+      "depth": "optical depth repeated on three channels; same radius",
+      "source_resolution": [
+        256,
+        256
+      ],
+      "policy_resolution": [
+        224,
+        224
+      ],
+      "spatial_resize": "nearest",
+      "image_augmentation": false,
+      "training_manifest_sha256": "aaa86cb99c073862ff71b089e2850df61188ea01cce201f2d5960782aa68a4ce",
+      "geometry_sha256": "f4ca974937f4e479adf396f7ad76e5ea305031103c12d6383ae8d38e8252e692",
+      "statistics": "/home/Dataset2/yqt/actioncoord-v03-20261003T164806/preflight/training_inputs_1/training_input_audit.json",
+      "statistics_sha256": "626609547c4cbc1c1bd1bd82a3cd376bd84f9dcfb0163ba1b49f5269da20f565",
+      "max_allowed_component_clip_ratio": 0.001,
+      "selection": "candidate 3.25m accepted using training geometry only; frozen before policy results"
+    }
+  },
+  "implementation_sha256": {
+    "src/rulervla/__init__.py": "084256fe97f08bc69606a0ceafc9c687ecf7ffbdaaeeaa2618090d7bc5b6984c",
+    "src/rulervla/adapters/__init__.py": "2f3ce5d47f8e956644b2183df9599f88ab7f066e66e535de84d6c8c02a3601ae",
+    "src/rulervla/adapters/libero.py": "3c90f23a853b25d404691d09a5a9d8da12c8d1d7b600fb09f3557bbab1cae9fa",
+    "src/rulervla/adapters/openpi.py": "0b19c130fe7a581775f725fae7eb38ae6f781866fff012cf9946690c8eb4c866",
+    "src/rulervla/config.py": "ee9d7b20043b7061027b9958bd6cd8909a202fbb5e3ff8cd9ea369c5ef44a20e",
+    "src/rulervla/cues/__init__.py": "7a99f091493c33b365ab3e467368844b70ad778675b721f1526be26dd5e5d5ee",
+    "src/rulervla/cues/metric_ruler.py": "ab8a36906d8709ce3aae1ea23612e688571e9ae310f9f1ab9310855c25705850",
+    "src/rulervla/data/__init__.py": "cf5991037133c6bcff51bfb9825ad1e81a25d47cd06718fe512fc4fa70fc9cdc",
+    "src/rulervla/data/schema.py": "f83c032d433dc2ad56d0db2047e556a58f553931201ce49c629c4b3c740460f2",
+    "src/rulervla/evaluation/__init__.py": "f87d1ccb27e9969fa57b0cca39d8119cc9488d0e90fe9f1063bfedbd2528efc8",
+    "src/rulervla/evaluation/corruption.py": "46b39c97a45cace3db9f379874dbc1d99d6f377d8790f4aca34adad480c9d4e9",
+    "src/rulervla/evaluation/geometry_metrics.py": "d31fe04de596316b2e77c627f9099f525de5939a481478b72bc77bcc5d46e6de",
+    "src/rulervla/geometry/__init__.py": "6c14bc5b6f9151c24afcde9aa95699445d703a277aec56c0a896e8bcda29067e",
+    "src/rulervla/geometry/action_coord.py": "e046fa1b4b001b7bf309fdc8ef544ec77f625379338d47980702f94b54e29463",
+    "src/rulervla/geometry/correction.py": "607f05f97b7144d558db7614046d1886fdafd5660aac50ed61c9009fd06292b4",
+    "src/rulervla/geometry/dense.py": "414691d3a25221d28c05fedaf3b3b793bbbb4551c701c536199e8dcaf03b568e",
+    "src/rulervla/geometry/reliability.py": "6c76d7a56f44a809a40116ab7a6ee88d25e84ef7874c857ff9304297b729bd65",
+    "src/rulervla/geometry/visual_anchor.py": "74183062bd2e476a359e5910bf0c0f2ffa673d35ea1a9878e532e9e7b726ad71"
+  },
+  "runner_sha256": "b0f35962e6bc4d1d390629288600c6bf94e18988cf2e8e259c11fa3b461a6682",
+  "evaluator_sha256": "09e3a63b31c22eaaef555fcd5c05b5f50d8ffdf4757d5e7aae7a615691c43796"
+}

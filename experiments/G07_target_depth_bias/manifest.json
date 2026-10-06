@@ -1,0 +1,21 @@
+{
+  "base_manifest": "../base_frame_manifest.json",
+  "base_manifest_sha256": "74029f20cd2dd9ff06568bcac89a7a0f0b07708b485a17d462195117fe5f8706",
+  "protocol": "../g_series_protocol_lock.json",
+  "protocol_sha256": "7da25721ade32c6aeb5792a0bab2047b3d2eeb978f49468351fd7c3c9270cdaf",
+  "conditions": [
+    {
+      "experiment_id": "G07",
+      "condition": "target_bias_5mm",
+      "severity": 5,
+      "kind": "target_bias"
+    },
+    {
+      "experiment_id": "G07",
+      "condition": "target_bias_10mm",
+      "severity": 10,
+      "kind": "target_bias"
+    }
+  ],
+  "expected_rows": 100
+}

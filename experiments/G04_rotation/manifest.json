@@ -1,0 +1,72 @@
+{
+  "base_manifest": "../base_frame_manifest.json",
+  "base_manifest_sha256": "74029f20cd2dd9ff06568bcac89a7a0f0b07708b485a17d462195117fe5f8706",
+  "protocol": "../g_series_protocol_lock.json",
+  "protocol_sha256": "7da25721ade32c6aeb5792a0bab2047b3d2eeb978f49468351fd7c3c9270cdaf",
+  "conditions": [
+    {
+      "experiment_id": "G04",
+      "condition": "x_0.5deg",
+      "severity": 0.5,
+      "axis": "x",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "y_0.5deg",
+      "severity": 0.5,
+      "axis": "y",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "z_0.5deg",
+      "severity": 0.5,
+      "axis": "z",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "x_1deg",
+      "severity": 1,
+      "axis": "x",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "y_1deg",
+      "severity": 1,
+      "axis": "y",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "z_1deg",
+      "severity": 1,
+      "axis": "z",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "x_3deg",
+      "severity": 3,
+      "axis": "x",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "y_3deg",
+      "severity": 3,
+      "axis": "y",
+      "kind": "rotation"
+    },
+    {
+      "experiment_id": "G04",
+      "condition": "z_3deg",
+      "severity": 3,
+      "axis": "z",
+      "kind": "rotation"
+    }
+  ],
+  "expected_rows": 450
+}

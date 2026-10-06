@@ -1,0 +1,128 @@
+{
+  "base_manifest": "../base_frame_manifest.json",
+  "base_manifest_sha256": "74029f20cd2dd9ff06568bcac89a7a0f0b07708b485a17d462195117fe5f8706",
+  "protocol": "../g_series_protocol_lock.json",
+  "protocol_sha256": "7da25721ade32c6aeb5792a0bab2047b3d2eeb978f49468351fd7c3c9270cdaf",
+  "conditions": [
+    {
+      "experiment_id": "G01",
+      "condition": "clean_control",
+      "severity": 0,
+      "direction": "mixed",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "x_2mm",
+      "severity": 2,
+      "direction": "x",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "y_2mm",
+      "severity": 2,
+      "direction": "y",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "z_2mm",
+      "severity": 2,
+      "direction": "z",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "mixed_2mm",
+      "severity": 2,
+      "direction": "mixed",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "x_5mm",
+      "severity": 5,
+      "direction": "x",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "y_5mm",
+      "severity": 5,
+      "direction": "y",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "z_5mm",
+      "severity": 5,
+      "direction": "z",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "mixed_5mm",
+      "severity": 5,
+      "direction": "mixed",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "x_10mm",
+      "severity": 10,
+      "direction": "x",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "y_10mm",
+      "severity": 10,
+      "direction": "y",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "z_10mm",
+      "severity": 10,
+      "direction": "z",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "mixed_10mm",
+      "severity": 10,
+      "direction": "mixed",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "x_20mm",
+      "severity": 20,
+      "direction": "x",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "y_20mm",
+      "severity": 20,
+      "direction": "y",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "z_20mm",
+      "severity": 20,
+      "direction": "z",
+      "kind": "translation"
+    },
+    {
+      "experiment_id": "G01",
+      "condition": "mixed_20mm",
+      "severity": 20,
+      "direction": "mixed",
+      "kind": "translation"
+    }
+  ],
+  "expected_rows": 850
+}

@@ -1,0 +1,93 @@
+{
+  "base_manifest": "../base_frame_manifest.json",
+  "base_manifest_sha256": "74029f20cd2dd9ff06568bcac89a7a0f0b07708b485a17d462195117fe5f8706",
+  "protocol": "../g_series_protocol_lock.json",
+  "protocol_sha256": "7da25721ade32c6aeb5792a0bab2047b3d2eeb978f49468351fd7c3c9270cdaf",
+  "conditions": [
+    {
+      "experiment_id": "G03",
+      "condition": "outliers0_A",
+      "severity": 0,
+      "subset": "A",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers0_B",
+      "severity": 0,
+      "subset": "B",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers0_C",
+      "severity": 0,
+      "subset": "C",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers1_A",
+      "severity": 1,
+      "subset": "A",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers1_B",
+      "severity": 1,
+      "subset": "B",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers1_C",
+      "severity": 1,
+      "subset": "C",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers2_A",
+      "severity": 2,
+      "subset": "A",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers2_B",
+      "severity": 2,
+      "subset": "B",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers2_C",
+      "severity": 2,
+      "subset": "C",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers3_A",
+      "severity": 3,
+      "subset": "A",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers3_B",
+      "severity": 3,
+      "subset": "B",
+      "kind": "outlier"
+    },
+    {
+      "experiment_id": "G03",
+      "condition": "outliers3_C",
+      "severity": 3,
+      "subset": "C",
+      "kind": "outlier"
+    }
+  ],
+  "expected_rows": 600
+}

@@ -1,0 +1,134 @@
+experiment_id: G04
+conditions:
+- experiment_id: G04
+  condition: x_0.5deg
+  severity: 0.5
+  axis: x
+  kind: rotation
+- experiment_id: G04
+  condition: y_0.5deg
+  severity: 0.5
+  axis: y
+  kind: rotation
+- experiment_id: G04
+  condition: z_0.5deg
+  severity: 0.5
+  axis: z
+  kind: rotation
+- experiment_id: G04
+  condition: x_1deg
+  severity: 1
+  axis: x
+  kind: rotation
+- experiment_id: G04
+  condition: y_1deg
+  severity: 1
+  axis: y
+  kind: rotation
+- experiment_id: G04
+  condition: z_1deg
+  severity: 1
+  axis: z
+  kind: rotation
+- experiment_id: G04
+  condition: x_3deg
+  severity: 3
+  axis: x
+  kind: rotation
+- experiment_id: G04
+  condition: y_3deg
+  severity: 3
+  axis: y
+  kind: rotation
+- experiment_id: G04
+  condition: z_3deg
+  severity: 3
+  axis: z
+  kind: rotation
+design:
+  schema: rulervla_g_series_v1
+  base_implementation_commit: 4cce5f08cadf92d89802e842019ea4624dbc48e5
+  v03_root: /home/yqt/XuanyiLi/actioncoord/work/v03_sync_rgbd_20261003T164806
+  episodes: 10
+  frames_per_episode: 5
+  selection: first ten manifest episodes; five evenly spaced frames; identical to
+    prior GT smoke
+  seed: 20261006
+  bootstrap_seed: 20261007
+  bootstrap_repetitions: 2000
+  bootstrap_unit: episode; preserve all frames and subsets within a cluster
+  mixed_direction:
+  - 1.0
+  - -0.5
+  - 0.25
+  translation_mm:
+  - 2
+  - 5
+  - 10
+  - 20
+  translation_directions:
+  - x
+  - y
+  - z
+  - mixed
+  anchor_counts:
+  - 8
+  - 6
+  - 4
+  - 3
+  - 2
+  - 1
+  subsets:
+  - A
+  - B
+  - C
+  fixed_translation_mm: 10
+  outlier_counts:
+  - 0
+  - 1
+  - 2
+  - 3
+  outlier_magnitude_mm: 20
+  outlier_directions:
+  - - 1
+    - 0
+    - 0
+  - - 0
+    - -1
+    - 0
+  - - 0
+    - 0
+    - 1
+  rotation_degrees:
+  - 0.5
+  - 1
+  - 3
+  rotation_axes:
+  - x
+  - y
+  - z
+  rotation_convention: right-multiply optical-camera rotation about fixed camera origin;
+    translation unchanged
+  depth_noise_rms_mm:
+  - 2
+  - 5
+  - 10
+  missing_fractions:
+  - 0.1
+  - 0.3
+  missing_modes:
+  - random
+  - block
+  local_depth_bias_mm:
+  - 5
+  - 10
+  anchor_region_radius_px: 2
+  g2_bias_error_limit_mm: 2
+  scene_harm_margin_mm: 0.5
+  geometry_error_limit_mm: 2
+  scene_metric_mask: clean valid nonrobot pixels; pairwise common measured-valid support
+  missing_metric: report missing fraction and retained coverage separately; missing
+    pixels are not accurate zeros
+  after_metric: metric corrected map before encoding and reliability attenuation
+  accepted: correction accepted AND reliability correction_valid
+  gate_decision: report only; no automatic policy training

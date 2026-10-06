@@ -1,0 +1,55 @@
+{
+  "base_manifest": "../base_frame_manifest.json",
+  "base_manifest_sha256": "74029f20cd2dd9ff06568bcac89a7a0f0b07708b485a17d462195117fe5f8706",
+  "protocol": "../g_series_protocol_lock.json",
+  "protocol_sha256": "7da25721ade32c6aeb5792a0bab2047b3d2eeb978f49468351fd7c3c9270cdaf",
+  "conditions": [
+    {
+      "experiment_id": "G05",
+      "condition": "noise_2mm",
+      "severity": 2,
+      "kind": "noise"
+    },
+    {
+      "experiment_id": "G05",
+      "condition": "noise_5mm",
+      "severity": 5,
+      "kind": "noise"
+    },
+    {
+      "experiment_id": "G05",
+      "condition": "noise_10mm",
+      "severity": 10,
+      "kind": "noise"
+    },
+    {
+      "experiment_id": "G05",
+      "condition": "missing_random_10pct",
+      "severity": 0.1,
+      "kind": "missing",
+      "mode": "random"
+    },
+    {
+      "experiment_id": "G05",
+      "condition": "missing_block_10pct",
+      "severity": 0.1,
+      "kind": "missing",
+      "mode": "block"
+    },
+    {
+      "experiment_id": "G05",
+      "condition": "missing_random_30pct",
+      "severity": 0.3,
+      "kind": "missing",
+      "mode": "random"
+    },
+    {
+      "experiment_id": "G05",
+      "condition": "missing_block_30pct",
+      "severity": 0.3,
+      "kind": "missing",
+      "mode": "block"
+    }
+  ],
+  "expected_rows": 350
+}
