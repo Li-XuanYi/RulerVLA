@@ -33,9 +33,22 @@ def main():
         assert tuple(result.images) == keys
         for key in keys:
             np.testing.assert_array_equal(result.images[key], images[key])
+    # Trace the real full architecture without allocating model weights. This
+    # checks that all four slots reach the prefix and flow-matching loss, but
+    # is explicitly not a loaded-weight numeric forward/backward smoke.
+    def forward_shape(rng, obs, labels):
+        policy = config.create(rng)
+        prefix, _, _ = policy.embed_prefix(obs)
+        loss = policy.compute_loss(rng, obs, labels, train=True)
+        return prefix, loss
+    prefix_spec, loss_spec = jax.eval_shape(forward_shape, jax.random.key(42), spec, actions)
+    assert prefix_spec.shape[1] == 4 * 256 + config.max_token_len
+    assert loss_spec.shape == (1, 10)
     report = {'passed': True, 'actual_openpi_preprocessing': True,
         'actual_inputs_spec': True, 'four_slots_retained': True,
         'train_and_inference_values_unchanged': True, 'image_keys': list(keys),
+        'actual_full_model_forward_shape_trace': True,
+        'prefix_shape': list(prefix_spec.shape), 'loss_shape': list(loss_spec.shape),
         'action_shape': list(actions.shape), 'full_weight_loader_tested': False,
         'model_forward_backward_tested': False, 'optimizer_updates': 0,
         'formal_training_started': False, 'runtime': str(args.runtime.resolve())}
