@@ -56,6 +56,30 @@ def check_rgb(actual, expected, out, episode, frame, view):
     return evidence
 
 
+def capture_frame(env, sim_state, state_adapter):
+    """Shared exact-state RGB-D replay, including moving wrist calibration."""
+    from robosuite.utils.camera_utils import get_real_depth_map, get_camera_intrinsic_matrix, get_camera_extrinsic_matrix
+    env.sim.set_state_from_flattened(sim_state)
+    env.sim.forward()
+    observation = env.env._get_observations(force_update=True)
+    np.testing.assert_array_equal(env.sim.get_state().flatten(), sim_state)
+    state = state_adapter(observation)
+    result = {'state8': state, 'ee_world_m': state[:3].copy(),
+        'eef_quaternion_xyzw': np.asarray(observation['robot0_eef_quat'], np.float32),
+        'sim_state_sha256': hashlib.sha256(sim_state.tobytes()).hexdigest()}
+    for camera, rgb_key, depth_key, k_key, t_key in [
+            ('agentview', 'agentview_rgb', 'agentview_depth_m', 'intrinsic', 'camera_to_world'),
+            ('robot0_eye_in_hand', 'wrist_rgb', 'wrist_depth_m', 'wrist_intrinsic', 'wrist_camera_to_world')]:
+        depth = get_real_depth_map(env.sim, np.asarray(observation[camera+'_depth'], np.float64).squeeze())
+        if not np.isfinite(depth).all() or depth.min() <= 0:
+            raise ValueError('Invalid optical-Z depth: '+camera)
+        result[rgb_key] = np.ascontiguousarray(observation[camera+'_image'][::-1, ::-1])
+        result[depth_key] = np.ascontiguousarray(depth[::-1, ::-1], np.float32)
+        result[k_key] = get_camera_intrinsic_matrix(env.sim, camera, 256, 256)
+        result[t_key] = get_camera_extrinsic_matrix(env.sim, camera)
+    return observation, result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--v03-root', required=True, type=Path)
@@ -141,10 +165,7 @@ def main():
                     rgb_quantization = []
                     for frame in chosen:
                         sim_state = np.asarray(group['states'][indices[frame]], dtype=np.float64)
-                        env.sim.set_state_from_flattened(sim_state)
-                        env.sim.forward()
-                        observation = env.env._get_observations(force_update=True)
-                        np.testing.assert_array_equal(env.sim.get_state().flatten(), sim_state)
+                        observation, captured = capture_frame(env, sim_state, state8_from_observation)
                         # Match the frozen generator's float64 intermediate exactly.
                         actual_depth = get_real_depth_map(env.sim, np.asarray(observation['agentview_depth'], dtype=np.float64).squeeze())
                         np.testing.assert_array_equal(actual_depth[::-1, ::-1].astype(np.float32), depth[frame])

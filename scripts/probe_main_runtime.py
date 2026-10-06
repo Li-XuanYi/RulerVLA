@@ -17,6 +17,8 @@ def main():
     import numpy as np
     from openpi.models import model
     from openpi.models.pi0_config import Pi0Config
+    from openpi.models.pi0 import Pi0
+    from types import SimpleNamespace
 
     config = Pi0Config(pi05=True, action_horizon=10, discrete_state_input=False)
     spec, actions = config.inputs_spec(batch_size=1)
@@ -33,6 +35,15 @@ def main():
         assert tuple(result.images) == keys
         for key in keys:
             np.testing.assert_array_equal(result.images[key], images[key])
+    # Exercise the actual prefix method across a JIT dictionary round trip.
+    # Tags identify views independently of token shapes and input dict order.
+    fake = SimpleNamespace(PaliGemma=SimpleNamespace(img=lambda pixels, train:
+        (pixels[:, :1, :1, :1].reshape(1, 1, 1), None)))
+    tagged = dataclasses.replace(observation,
+        images={key: jnp.full((1,224,224,3), float(i), jnp.float32) for i, key in enumerate(keys)},
+        tokenized_prompt=None, tokenized_prompt_mask=None)
+    prefix_values = jax.jit(lambda obs: Pi0.embed_prefix(fake, obs)[0])(tagged)
+    np.testing.assert_array_equal(prefix_values.reshape(-1), np.arange(4))
     # Trace the real full architecture without allocating model weights. This
     # checks that all four slots reach the prefix and flow-matching loss, but
     # is explicitly not a loaded-weight numeric forward/backward smoke.
@@ -47,6 +58,7 @@ def main():
     report = {'passed': True, 'actual_openpi_preprocessing': True,
         'actual_inputs_spec': True, 'four_slots_retained': True,
         'train_and_inference_values_unchanged': True, 'image_keys': list(keys),
+        'actual_prefix_order_after_jit_verified': True,
         'actual_full_model_forward_shape_trace': True,
         'prefix_shape': list(prefix_spec.shape), 'loss_shape': list(loss_spec.shape),
         'action_shape': list(actions.shape), 'full_weight_loader_tested': False,

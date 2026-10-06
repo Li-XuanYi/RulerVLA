@@ -132,7 +132,7 @@ def main():
                 entries.append(transform(prepared))
         data = jax.tree.map(lambda *values: np.stack(values).reshape((args.accumulation, args.micro_batch)+values[0].shape), *entries)
         batch = (model.Observation.from_dict(data), data['actions'])
-        assert tuple(batch[0].images) == MAIN_IMAGE_KEYS
+        assert set(batch[0].images) == set(MAIN_IMAGE_KEYS)
         assert batch[1].shape == (args.accumulation, args.micro_batch, 10, 32)
         mesh = sharding.make_mesh(args.fsdp_devices)
         replicated = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec())

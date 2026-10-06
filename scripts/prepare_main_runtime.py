@@ -29,6 +29,15 @@ def patch_spec(source):
         marker + 'image_mask_spec,', marker + 'image_mask_spec,\n                    "aux_wrist_cue_rgb": image_mask_spec,')
 
 
+def patch_prefix(source):
+    marker = '        for name in obs.images:\n'
+    if source.count(marker) != 1:
+        raise ValueError('Unexpected Pi0 image prefix loop')
+    # JAX flattens ordinary dictionaries in sorted-key order. Keep the RGB
+    # views in their original positions and put both auxiliaries after them.
+    return source.replace(marker, '        for name in _model.IMAGE_KEYS:\n')
+
+
 def prepare(source, output):
     source, output = Path(source).resolve(), Path(output).resolve()
     if source == output or source in output.parents:
@@ -39,16 +48,17 @@ def prepare(source, output):
         raise ValueError('Missing source OpenPI runtime')
     shutil.copytree(source, output, ignore=shutil.ignore_patterns('.git', '__pycache__', '*.pyc', '.venv', 'checkpoints', '.pytest_cache'))
     modifications = {}
-    for name, patch in [('model.py', patch_model), ('pi0_config.py', patch_spec)]:
+    for name, patch in [('model.py', patch_model), ('pi0_config.py', patch_spec), ('pi0.py', patch_prefix)]:
         relative = 'src/openpi/models/' + name
         original = source / relative
         target = output / relative
         target.write_text(patch(original.read_text()), encoding='utf-8', newline='\n')
         modifications[relative] = {'source_sha256': sha(original), 'snapshot_sha256': sha(target)}
-    manifest = {'schema': 'rulervla_main_runtime_v1', 'source_runtime': str(source),
+    manifest = {'schema': 'rulervla_main_runtime_v2', 'source_runtime': str(source),
                 'snapshot_runtime': str(output), 'changes': modifications,
                 'parameter_architecture_changed': False, 'training_started': False,
                 'image_slots': 4, 'image_augmentation': False,
+                'prefix_order': ['base_0_rgb', 'left_wrist_0_rgb', 'right_wrist_0_rgb', 'aux_wrist_cue_rgb'],
                 'source_files_sha256': {p.relative_to(source).as_posix(): sha(p)
                     for p in sorted(source.rglob('*.py')) if '__pycache__' not in p.parts}}
     (output / 'RULERVLA_RUNTIME_MANIFEST.json').write_text(json.dumps(manifest, indent=2) + '\n')

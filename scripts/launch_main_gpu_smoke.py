@@ -46,7 +46,7 @@ if __name__ == '__main__':
     out.mkdir(parents=True, exist_ok=False)
     log = out/'train.log'
     command = [sys.executable, str(root/'scripts/main_gpu_smoke.py'),
-        '--runtime', str(root/'outputs/main_comparison/runtime_v1'), '--v03-root', v03,
+        '--runtime', str(root/'outputs/main_comparison/runtime_v2'), '--v03-root', v03,
         '--rgbd-root', '/home/Dataset2/yqt/openpi-aimbot/spatialcue_depth_source/regenerated_rgbd_v02',
         '--geometry-root', '/home/Dataset2/yqt/rulervla/main_comparison_v1/data_preparation/spatial_geometry',
         '--out', str(out), '--method', 'RulerVLA-main', '--save-restore',
