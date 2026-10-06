@@ -17,7 +17,7 @@ SIM_PYTHON = '/home/yqt/XuanyiLi/openpi/examples/libero/.venv/bin/python'
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--worker', choices=('spatial', 'sources'), required=True)
+    parser.add_argument('--worker', choices=('spatial', 'sources', 'rgbd'), required=True)
     parser.add_argument('--device-id', type=int, default=3)
     args = parser.parse_args()
     import fcntl
@@ -41,11 +41,19 @@ def main():
                     '--status', str(ROOT / 'outputs/main_comparison/spatial_probe_status.json')]),
                   ('spatial_all_432_geometry', common + ['--out', str(STORE / 'spatial_geometry'),
                     '--status', str(ROOT / 'outputs/main_comparison/spatial_geometry_status.json')])]
-    else:
+    elif args.worker == 'sources':
         stages = [(suite, [sys.executable, str(ROOT / 'scripts/prepare_main_source_coverage.py'),
             '--suite', suite, '--lerobot', '/home/Dataset2/yqt/openpi/huggingface/lerobot/physical-intelligence/libero',
             '--task-map', str(V03 / 'repo/third_party/libero/libero/libero/benchmark/libero_suite_task_map.py'),
             '--store', str(STORE / 'source_hdf5'), '--out', str(STORE / 'coverage' / suite)])
+            for suite in ('libero_object', 'libero_goal', 'libero_10')]
+    else:
+        stages = [(suite+'_rgbd', [SIM_PYTHON, str(ROOT/'scripts/prepare_main_suite_rgbd.py'),
+            '--v03-root', str(V03), '--suite', suite, '--device-id', str(args.device_id),
+            '--coverage', str(STORE/'coverage'/suite/'coverage.json'),
+            '--suite-manifest', str(ROOT/'experiments/main_comparison_v1/suite_manifests'/(suite+'.json')),
+            '--out', str(STORE/'suite_rgbd'/suite),
+            '--status', str(ROOT/'outputs/main_comparison'/(suite+'_rgbd_status.json'))])
             for suite in ('libero_object', 'libero_goal', 'libero_10')]
     env = dict(os.environ, PYTHONDONTWRITEBYTECODE='1', OPENBLAS_NUM_THREADS='1', OMP_NUM_THREADS='1',
         MUJOCO_GL='egl', PYOPENGL_PLATFORM='egl', MUJOCO_EGL_DEVICE_ID=str(args.device_id),
