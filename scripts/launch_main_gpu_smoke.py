@@ -13,6 +13,7 @@ if __name__ == '__main__':
     parser.add_argument('--gpus', default='3,5')
     parser.add_argument('--attempt', type=int, default=1)
     parser.add_argument('--wait-for-resources', action='store_true')
+    parser.add_argument('--max-utilization', type=int, default=10)
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     name = 'rulervla_main' if args.attempt == 1 else 'rulervla_main_attempt%d' % args.attempt
@@ -36,7 +37,7 @@ if __name__ == '__main__':
     while True:
         query = subprocess.check_output(['nvidia-smi', '--query-gpu=index,memory.free,utilization.gpu', '--format=csv,noheader,nounits'], text=True)
         devices = {int(line.split(',')[0]): [int(value) for value in line.split(',')[1:]] for line in query.strip().splitlines()}
-        occupied = [gpu for gpu in selected if devices[gpu][0] < 50000 or devices[gpu][1] > 10]
+        occupied = [gpu for gpu in selected if devices[gpu][0] < 50000 or devices[gpu][1] > args.max_utilization]
         if not occupied:
             break
         if not args.wait_for_resources:
