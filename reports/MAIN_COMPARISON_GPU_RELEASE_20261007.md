@@ -62,6 +62,15 @@ Each worker executes six models sequentially. At initial release both children
 entered their first full forward/backward; consult live status for completed
 optimizer updates. Launching a process is not evidence of a finished 30k run.
 
+Subsequent live verification confirmed both first optimizer updates completed:
+Baseline loss 0.11090676, grad norm 0.92200625; AimBot loss 0.11004496,
+grad norm 0.97927660. Both used the identical 32 shuffled training frames,
+sample-index SHA-256
+`328d2790815245f05f14dab8b61aa66ef2133822c9b4de9db2cf74b62d24dc27`.
+Both remained running in the next forward/backward without a reported error.
+First-update timings (130.52 / 97.89 seconds) include initialization of compiled
+kernels and initial episode reads and should not be extrapolated as steady speed.
+
 Root: `/home/yqt/XuanyiLi/RulerVLA`.
 
 Status files:
