@@ -75,7 +75,8 @@ def prepare(args, design, config):
     geom_type = int(mujoco.mjtObj.mjOBJ_GEOM)
     try:
         for row in dataset.episodes[:design["episodes"]]:
-            target_id = env.sim.model.body_name2id(row["target_body_name"])
+            # Manifest names the task object; LIBERO resolves its model root body.
+            target_id = env.env.obj_body_id[row["target_body_name"]]
             target_bodies = descendant_body_ids(env.sim.model, target_id)
             target_geoms = [i for i in range(env.sim.model.ngeom) if int(env.sim.model.geom_bodyid[i]) in target_bodies]
             with h5py.File(row["source"], "r") as h5:
@@ -141,7 +142,8 @@ def prepare(args, design, config):
                                        confidence=anchors.confidence.tolist(), visible=anchors.visible.tolist()),
                         pool=pool.tolist(), subsets=spread_subsets(anchors.uv, pool), distance_tertiles_m=thresholds.tolist(),
                         num_unique_visible_anchors=len(pool), target_visible_pixels=int(target_mask.sum()), target_roi_pixels=int(target_roi.sum()),
-                        target_geom_ids=target_geoms, target_body_name=row["target_body_name"], robot_geom_ids=robot_geoms,
+                        target_geom_ids=target_geoms, target_object_name=row["target_body_name"],
+                        target_body_name=env.sim.model.body_id2name(target_id), robot_geom_ids=robot_geoms,
                         target_roi_sha256=array_hash(target_roi), robot_mask_sha256=array_hash(robot_mask), anchor_roi_sha256=array_hash(anchor_roi),
                         anchor_roi_pixels=int(anchor_roi.sum()), target_distance_to_ee_m=float(np.linalg.norm(env.sim.data.body_xpos[target_id]-sample["ee_world_m"])),
                         cache_path=str(cache_path.relative_to(ROOT)), cache_sha256=file_hash(cache_path)))
