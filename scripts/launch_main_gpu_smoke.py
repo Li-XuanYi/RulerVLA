@@ -12,6 +12,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--gpus', default='3,5')
     parser.add_argument('--attempt', type=int, default=1)
+    parser.add_argument('--wait-for-resources', action='store_true')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     name = 'rulervla_main' if args.attempt == 1 else 'rulervla_main_attempt%d' % args.attempt
@@ -32,12 +33,19 @@ if __name__ == '__main__':
     selected = [int(value) for value in args.gpus.split(',')]
     if len(selected) != 2 or len(set(selected)) != 2:
         raise ValueError('Two distinct GPUs required')
-    query = subprocess.check_output(['nvidia-smi', '--query-gpu=index,memory.free,utilization.gpu', '--format=csv,noheader,nounits'], text=True)
-    devices = {int(line.split(',')[0]): [int(value) for value in line.split(',')[1:]] for line in query.strip().splitlines()}
-    for gpu in selected:
-        free, utilization = devices[gpu]
-        if free < 50000 or utilization > 10:
-            raise RuntimeError('GPU %d is occupied: free=%dMiB utilization=%d%%' % (gpu, free, utilization))
+    while True:
+        query = subprocess.check_output(['nvidia-smi', '--query-gpu=index,memory.free,utilization.gpu', '--format=csv,noheader,nounits'], text=True)
+        devices = {int(line.split(',')[0]): [int(value) for value in line.split(',')[1:]] for line in query.strip().splitlines()}
+        occupied = [gpu for gpu in selected if devices[gpu][0] < 50000 or devices[gpu][1] > 10]
+        if not occupied:
+            break
+        if not args.wait_for_resources:
+            raise RuntimeError('Selected GPUs are occupied: '+str({gpu: devices[gpu] for gpu in occupied}))
+        waiting = out.parent/(name+'_waiting.json')
+        waiting.parent.mkdir(parents=True, exist_ok=True)
+        waiting.write_text(json.dumps(dict(state='waiting_for_idle_gpus', pid=os.getpid(),
+            gpus=selected, snapshot=devices, updated_at_unix=time.time(), formal_training_started=False), indent=2)+'\n')
+        time.sleep(5)
     env = os.environ.copy()
     env.update(CUDA_VISIBLE_DEVICES=args.gpus, XLA_PYTHON_CLIENT_PREALLOCATE='false',
         OPENBLAS_NUM_THREADS='1', OMP_NUM_THREADS='1', PYTHONDONTWRITEBYTECODE='1',
