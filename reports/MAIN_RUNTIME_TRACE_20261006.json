@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "actual_openpi_preprocessing": true,
+  "actual_inputs_spec": true,
+  "four_slots_retained": true,
+  "train_and_inference_values_unchanged": true,
+  "image_keys": [
+    "base_0_rgb",
+    "left_wrist_0_rgb",
+    "right_wrist_0_rgb",
+    "aux_wrist_cue_rgb"
+  ],
+  "actual_full_model_forward_shape_trace": true,
+  "prefix_shape": [
+    1,
+    1224,
+    2048
+  ],
+  "loss_shape": [
+    1,
+    10
+  ],
+  "action_shape": [
+    1,
+    10,
+    32
+  ],
+  "full_weight_loader_tested": false,
+  "model_forward_backward_tested": false,
+  "optimizer_updates": 0,
+  "formal_training_started": false,
+  "runtime": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/runtime_v1"
+}

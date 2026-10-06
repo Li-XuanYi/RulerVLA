@@ -1,0 +1,18 @@
+{
+  "schema": "rulervla_main_spatial_geometry_v1",
+  "state": "complete",
+  "pid": 1745290,
+  "gpu_render_device": 3,
+  "probe": true,
+  "expected_episodes": 10,
+  "expected_frames": 30,
+  "completed_episodes": 10,
+  "completed_frames": 30,
+  "current_episode": null,
+  "started_at_unix": 1791288712.0671706,
+  "source_manifest_sha256": "02e428d9a3735bb959cdc29c1ca415cde73c2b9f6763ce1545603f385b8e127c",
+  "output_dir": "/home/Dataset2/yqt/rulervla/main_comparison_v1/data_preparation/spatial_probe",
+  "training_started": false,
+  "policy_rollouts": 0,
+  "finished_at_unix": 1791288712.2779143
+}
