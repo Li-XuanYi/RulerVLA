@@ -34,6 +34,7 @@ def main():
     parser.add_argument('--accumulation', type=int, default=32)
     parser.add_argument('--fsdp-devices', type=int, default=2)
     parser.add_argument('--save-restore', action='store_true')
+    parser.add_argument('--cpu-optimizer', action='store_true')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     sys.path.insert(0, str(root / 'src'))
@@ -48,6 +49,7 @@ def main():
         'gpu_ids': os.environ.get('CUDA_VISIBLE_DEVICES'), 'optimizer_updates': 0,
         'micro_batch': args.micro_batch, 'gradient_accumulation': args.accumulation,
         'effective_batch': args.micro_batch * args.accumulation, 'fsdp_devices': args.fsdp_devices,
+        'optimizer_and_ema_on_cpu': args.cpu_optimizer,
         'started_at_unix': time.time(), 'formal_training_started': False}
     write_json(args.out / 'status.json', status)
     try:
@@ -152,7 +154,12 @@ def main():
         spec.loader.exec_module(train)
         status.update(stage='loading_pi05_base')
         write_json(args.out/'status.json', status)
-        state, state_sharding = train.init_train_state(training_config, jax.random.key(42), mesh, resume=False)
+        optimizer_mesh = mesh
+        init_rng = jax.random.key(42)
+        if args.cpu_optimizer:
+            optimizer_mesh = jax.sharding.Mesh(np.array(jax.devices('cpu')).reshape(1,1), ('batch', 'fsdp'))
+            init_rng = jax.device_put(init_rng, jax.sharding.NamedSharding(optimizer_mesh, jax.sharding.PartitionSpec()))
+        state, state_sharding = train.init_train_state(training_config, init_rng, optimizer_mesh, resume=False)
         jax.block_until_ready(state)
         assert not jax.tree.leaves(state.params.filter(training_config.freeze_filter))
         assert len(jax.tree.leaves(state.params.filter(training_config.trainable_filter))) == len(jax.tree.leaves(state.params))
@@ -163,10 +170,11 @@ def main():
             four_real_input_slots=True, batch_source_episode=row['episode_index'], batch_source_frames=list(range(32)))
         write_json(args.out/'status.json', status)
         graph = state.model_def
+        gradient_sharding = sharding.fsdp_sharding(jax.eval_shape(lambda: state.params), mesh)
         gradient = jax.jit(lambda rng, step, params, values:
             accumulated_gradients(training_config, rng, graph, params, step, values),
-            in_shardings=(replicated, replicated, state_sharding.params, batch_sharding),
-            out_shardings=(state_sharding.params, replicated))
+            in_shardings=(replicated, replicated, gradient_sharding, batch_sharding),
+            out_shardings=(gradient_sharding, replicated))
         update = jax.jit(lambda current, gradients: apply_gradients(training_config, current, gradients),
             in_shardings=(state_sharding, state_sharding.params), out_shardings=state_sharding,
             donate_argnums=(0, 1))
@@ -175,9 +183,17 @@ def main():
         with sharding.set_mesh(mesh):
             for index in range(2):
                 started = time.time()
-                gradients, info = gradient(jax.random.key(42), state.step, state.params, batch)
+                gpu_params = jax.device_put(state.params, gradient_sharding)
+                gradients, info = gradient(jax.random.key(42), jax.device_put(state.step, replicated), gpu_params, batch)
                 jax.block_until_ready(gradients)
-                state, info = update(state, gradients), info
+                if args.cpu_optimizer:
+                    gradients_cpu = jax.device_put(gradients, state_sharding.params)
+                    jax.block_until_ready(gradients_cpu)
+                    del gradients, gpu_params
+                    state = update(state, gradients_cpu)
+                else:
+                    del gpu_params
+                    state = update(state, gradients)
                 jax.block_until_ready(state)
                 info = {key: float(value) for key, value in jax.device_get(info).items()}
                 assert all(np.isfinite(value) for value in info.values()) and info['grad_norm'] > 0
@@ -209,7 +225,7 @@ def main():
             status.update(stage='restoring_checkpoint', checkpoint_saved=True, checkpoint=str(archive),
                 checkpoint_archive_sha_verified=True)
             write_json(args.out/'status.json', status)
-            shapes, shards = train.init_train_state(training_config, jax.random.key(42), mesh, resume=True)
+            shapes, shards = train.init_train_state(training_config, init_rng, optimizer_mesh, resume=True)
             shapes = jax.tree.map(lambda shape, shard: jax.ShapeDtypeStruct(shape.shape, shape.dtype, sharding=shard), shapes, shards)
             del state
             import gc

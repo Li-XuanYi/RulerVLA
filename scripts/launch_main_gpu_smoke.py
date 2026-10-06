@@ -14,6 +14,7 @@ if __name__ == '__main__':
     parser.add_argument('--attempt', type=int, default=1)
     parser.add_argument('--wait-for-resources', action='store_true')
     parser.add_argument('--max-utilization', type=int, default=10)
+    parser.add_argument('--cpu-optimizer', action='store_true')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     name = 'rulervla_main' if args.attempt == 1 else 'rulervla_main_attempt%d' % args.attempt
@@ -32,8 +33,9 @@ if __name__ == '__main__':
                 pass
         raise RuntimeError('Inspect existing smoke status; refusing overwrite: '+str(status_file))
     selected = [int(value) for value in args.gpus.split(',')]
-    if len(selected) != 2 or len(set(selected)) != 2:
-        raise ValueError('Two distinct GPUs required')
+    expected = 1 if args.cpu_optimizer else 2
+    if len(selected) != expected or len(set(selected)) != expected:
+        raise ValueError('Unexpected GPU count for selected optimizer placement')
     while True:
         query = subprocess.check_output(['nvidia-smi', '--query-gpu=index,memory.free,utilization.gpu', '--format=csv,noheader,nounits'], text=True)
         devices = {int(line.split(',')[0]): [int(value) for value in line.split(',')[1:]] for line in query.strip().splitlines()}
@@ -62,6 +64,8 @@ if __name__ == '__main__':
         '--out', str(out), '--method', 'RulerVLA-main', '--save-restore',
         '--aimbot-source', '/home/yqt/XuanyiLi/openpi0-aimbot/third_party/AimBot/src',
         '--axisguide-source', '/home/yqt/XuanyiLi/AxisGuide-code/src/lerobot/datasets/visual_cue_utils.py']
+    if args.cpu_optimizer:
+        command.extend(['--cpu-optimizer', '--fsdp-devices', '1'])
     with log.open('a') as stream:
         process = subprocess.Popen(command, cwd=root, env=env, stdin=subprocess.DEVNULL,
             stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
@@ -69,6 +73,7 @@ if __name__ == '__main__':
         'log': str(log), 'status': str(status_file), 'command': command,
         'stage': 'full_finetuning_smoke', 'formal_training_started': False,
         'micro_batch': 1, 'gradient_accumulation': 32, 'effective_batch': 32,
+        'optimizer_and_ema_on_cpu': args.cpu_optimizer,
         'launched_at_unix': time.time()}
     (out/'launch.json').write_text(json.dumps(receipt, indent=2)+'\n')
     print(json.dumps(receipt, indent=2))
