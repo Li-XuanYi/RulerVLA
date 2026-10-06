@@ -50,7 +50,8 @@ if __name__ == '__main__':
     env = os.environ.copy()
     env.update(CUDA_VISIBLE_DEVICES=args.gpus, XLA_PYTHON_CLIENT_PREALLOCATE='false',
         OPENBLAS_NUM_THREADS='1', OMP_NUM_THREADS='1', PYTHONDONTWRITEBYTECODE='1',
-        WANDB_MODE='disabled', TF_CPP_MIN_LOG_LEVEL='2')
+        WANDB_MODE='disabled', TF_CPP_MIN_LOG_LEVEL='2', NCCL_P2P_DISABLE='1',
+        NCCL_IB_DISABLE='1', NCCL_SHM_DISABLE='1', NCCL_SOCKET_IFNAME='lo', NCCL_CUMEM_HOST_ENABLE='0')
     v03 = '/home/yqt/XuanyiLi/actioncoord/work/v03_sync_rgbd_20261003T164806'
     out.mkdir(parents=True, exist_ok=False)
     log = out/'train.log'

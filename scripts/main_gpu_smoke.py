@@ -67,6 +67,17 @@ def main():
         assert status['effective_batch'] == 32
         assert jax.device_count() == args.fsdp_devices
         status['devices'] = [str(device) for device in jax.devices()]
+        status.update(stage='checking_gpu_collectives', nccl_transport={key: os.environ.get(key) for key in
+            ('NCCL_P2P_DISABLE', 'NCCL_IB_DISABLE', 'NCCL_SHM_DISABLE', 'NCCL_SOCKET_IFNAME', 'NCCL_CUMEM_HOST_ENABLE')})
+        write_json(args.out/'status.json', status)
+        mesh = sharding.make_mesh(args.fsdp_devices)
+        replicated = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec())
+        weight_sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec('fsdp'))
+        collective = jax.jit(lambda value: value.sum(axis=0),
+            in_shardings=weight_sharding, out_shardings=replicated)
+        warmup = np.arange(16, dtype=np.float32).reshape(4,4)
+        np.testing.assert_array_equal(jax.device_get(collective(warmup)), warmup.sum(axis=0))
+        status['gpu_collective_passed'] = True
         base_params = '/home/Dataset2/yqt/openpi/checkpoints/Official/pi05_base/params'
         policy_config = Pi0Config(pi05=True, action_horizon=10, discrete_state_input=False)
         training_config = dataclasses.replace(config.get_config('pi05_libero'), model=policy_config,
@@ -192,7 +203,7 @@ def main():
                     return config.DataConfig(asset_id='physical-intelligence/libero', norm_stats=norm_stats)
             checkpoints.save_state(manager, snapshot, LoaderAssets(), 1)
             manager.wait_until_finished()
-            archive = args.out/'checkpoint/1'
+            archive = Path('/home/Dataset2/yqt/rulervla/main_comparison_v1/smoke_checkpoints')/args.out.name/'1'
             publish_checkpoint(stage/'1', archive, completed_updates=2)
             verify_checkpoint(archive, expected_updates=2)
             status.update(stage='restoring_checkpoint', checkpoint_saved=True, checkpoint=str(archive),
