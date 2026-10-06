@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import numpy as np
 from PIL import Image, ImageDraw
 
-from rulervla.data.schema import Camera, CorrectedEEReference, finite
+from rulervla.data.schema import Camera, CorrectedEEReference, NominalEEReference, finite
 
 
 @dataclass(frozen=True)
@@ -16,10 +16,18 @@ class RulerProjection:
     valid: np.ndarray
 
 
-def project_metric_ruler(corrected_ee_reference: CorrectedEEReference, camera: Camera,
+def _reference_camera(reference, camera):
+    if isinstance(reference, NominalEEReference):
+        return camera
+    if not isinstance(reference, CorrectedEEReference) or not reference.accepted:
+        raise ValueError("Corrected ruler requires an accepted visually anchored EE reference")
+    return camera.remove_bias(reference.bias_xyz_m)
+
+
+def project_metric_ruler(corrected_ee_reference: CorrectedEEReference | NominalEEReference, camera: Camera,
                          lengths_m=(0.05, 0.10, 0.15)):
-    if not corrected_ee_reference.accepted:
-        raise ValueError("Metric ruler requires an accepted visually anchored EE reference")
+    """Project a nominal EE ruler or an explicitly accepted anchored ruler."""
+    reference_camera = _reference_camera(corrected_ee_reference, camera)
     lengths = np.asarray(lengths_m, dtype=np.float64)
     if (lengths.ndim != 1 or len(lengths) == 0 or not np.isfinite(lengths).all()
             or np.any(lengths <= 0) or np.any(np.diff(lengths) <= 0)):
@@ -27,9 +35,8 @@ def project_metric_ruler(corrected_ee_reference: CorrectedEEReference, camera: C
     origin = finite(corrected_ee_reference.position_action_m, (3,), "EE origin")
     # Physical action axes remain world XYZ, never the rotated EE body frame.
     points = origin[None, None, :] + np.eye(3)[:, None, :] * lengths[None, :, None]
-    corrected_camera = camera.remove_bias(corrected_ee_reference.bias_xyz_m)
-    origin_uv, origin_depth = corrected_camera.project(origin[None])
-    uv, depth = corrected_camera.project(points)
+    origin_uv, origin_depth = reference_camera.project(origin[None])
+    uv, depth = reference_camera.project(points)
     h, w = camera.resolution
     visible = (depth > 0) & np.isfinite(uv).all(axis=-1)
     visible &= (uv[..., 0] >= 0) & (uv[..., 0] <= w - 1)
@@ -47,12 +54,13 @@ def render_metric_ruler(rgb, corrected_ee_reference, camera,
     if line_width < 1 or tick_radius < 1:
         raise ValueError("Ruler line width and tick radius must be positive")
     projection = project_metric_ruler(corrected_ee_reference, camera, lengths_m)
+    reference_camera = _reference_camera(corrected_ee_reference, camera)
     image = Image.fromarray(rgb.copy())
     draw = ImageDraw.Draw(image)
     colors = ((255, 48, 48), (48, 220, 48), (48, 100, 255))
     for axis, color in enumerate(colors):
         previous = projection.origin_uv
-        previous_z = camera.remove_bias(corrected_ee_reference.bias_xyz_m).project(
+        previous_z = reference_camera.project(
             corrected_ee_reference.position_action_m[None])[1][0]
         for i, uv in enumerate(projection.ticks_uv[axis]):
             current_z = projection.optical_depth_m[axis, i]

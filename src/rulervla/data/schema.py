@@ -55,6 +55,18 @@ class Camera:
 
 
 @dataclass(frozen=True)
+class NominalEEReference:
+    """Same-observation proprioceptive EE; no visual anchor or correction."""
+
+    position_action_m: np.ndarray
+
+    def __post_init__(self):
+        position = finite(self.position_action_m, (3,), "EE world position").copy()
+        position.setflags(write=False)
+        object.__setattr__(self, "position_action_m", position)
+
+
+@dataclass(frozen=True)
 class CorrectedEEReference:
     position_action_m: np.ndarray
     bias_xyz_m: np.ndarray

@@ -1,0 +1,59 @@
+{
+  "run_id": "libero_spatial_aimbot_seed42",
+  "suite": "libero_spatial",
+  "method": "AimBot",
+  "seed": 42,
+  "shared_training": {
+    "backbone": "pi0.5",
+    "paligemma_variant": "gemma_2b",
+    "action_expert_variant": "gemma_300m",
+    "finetuning": "full",
+    "lora": false,
+    "freeze_backbone": false,
+    "dtype": "bfloat16",
+    "initial_checkpoint": "/home/Dataset2/yqt/openpi/checkpoints/Official/pi05_base/params",
+    "optimizer_updates": 30000,
+    "effective_batch": 32,
+    "micro_batch": null,
+    "gradient_accumulation": null,
+    "data_parallel_replicas": null,
+    "memory_configuration_status": "pending_common_worst_case_smoke",
+    "optimizer": {
+      "name": "AdamW",
+      "beta1": 0.9,
+      "beta2": 0.95,
+      "eps": 1e-08,
+      "weight_decay": 1e-10,
+      "clip_gradient_norm": 1.0
+    },
+    "scheduler": {
+      "name": "warmup_cosine",
+      "warmup_updates": 1000,
+      "peak_lr": 5e-05,
+      "end_lr": 5e-06,
+      "decay_updates": 30000
+    },
+    "ema_decay": 0.999,
+    "action_horizon": 10,
+    "action_dim": 32,
+    "discrete_state_input": false,
+    "supervised_libero_components": 7,
+    "random_image_augmentation": false,
+    "extra_delta_transform": false,
+    "checkpoint_updates": [
+      10000,
+      20000,
+      30000
+    ],
+    "formal_checkpoint_index": 29999,
+    "training_seeds": [
+      42,
+      43,
+      44
+    ]
+  },
+  "suite_manifest": "suite_manifests/libero_spatial.json",
+  "checkpoint_root": "/home/Dataset2/yqt/rulervla/main_comparison_v1/checkpoints/libero_spatial_aimbot_seed42",
+  "execution_ready": false,
+  "status": "planned"
+}

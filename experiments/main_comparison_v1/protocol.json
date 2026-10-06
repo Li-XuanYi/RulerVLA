@@ -1,0 +1,192 @@
+{
+  "schema": "rulervla_main_comparison_v1",
+  "status": "design_fixed_execution_not_ready",
+  "training_started": false,
+  "run_count": 48,
+  "methods": [
+    "Baseline",
+    "AimBot",
+    "AxisGuide-adapted",
+    "RulerVLA-main"
+  ],
+  "suites": [
+    "libero_spatial",
+    "libero_object",
+    "libero_goal",
+    "libero_10"
+  ],
+  "shared_training": {
+    "backbone": "pi0.5",
+    "paligemma_variant": "gemma_2b",
+    "action_expert_variant": "gemma_300m",
+    "finetuning": "full",
+    "lora": false,
+    "freeze_backbone": false,
+    "dtype": "bfloat16",
+    "initial_checkpoint": "/home/Dataset2/yqt/openpi/checkpoints/Official/pi05_base/params",
+    "optimizer_updates": 30000,
+    "effective_batch": 32,
+    "micro_batch": null,
+    "gradient_accumulation": null,
+    "data_parallel_replicas": null,
+    "memory_configuration_status": "pending_common_worst_case_smoke",
+    "optimizer": {
+      "name": "AdamW",
+      "beta1": 0.9,
+      "beta2": 0.95,
+      "eps": 1e-08,
+      "weight_decay": 1e-10,
+      "clip_gradient_norm": 1.0
+    },
+    "scheduler": {
+      "name": "warmup_cosine",
+      "warmup_updates": 1000,
+      "peak_lr": 5e-05,
+      "end_lr": 5e-06,
+      "decay_updates": 30000
+    },
+    "ema_decay": 0.999,
+    "action_horizon": 10,
+    "action_dim": 32,
+    "discrete_state_input": false,
+    "supervised_libero_components": 7,
+    "random_image_augmentation": false,
+    "extra_delta_transform": false,
+    "checkpoint_updates": [
+      10000,
+      20000,
+      30000
+    ],
+    "formal_checkpoint_index": 29999,
+    "training_seeds": [
+      42,
+      43,
+      44
+    ]
+  },
+  "image_keys": [
+    "base_0_rgb",
+    "left_wrist_0_rgb",
+    "right_wrist_0_rgb",
+    "aux_wrist_cue_rgb"
+  ],
+  "all_image_masks_active": true,
+  "neutral_auxiliary": 0.0,
+  "anchor": false,
+  "correction": false,
+  "reliability": false,
+  "ruler_lengths_m": [
+    0.05,
+    0.1,
+    0.15
+  ],
+  "actioncoord_encoding_radius_m": 3.25,
+  "standard_eval": {
+    "tasks_per_suite": 10,
+    "trials_per_task": 50,
+    "planned_rollouts": 24000,
+    "initial_state_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49
+    ],
+    "scene_seed_base": 20261006,
+    "same_scene_seeds_all_methods_and_training_seeds": true
+  },
+  "libero_plus_eval": {
+    "difficulty_level": 2,
+    "conditions_per_training_seed": 2202,
+    "trials_per_condition": 1,
+    "planned_rollouts": 26424,
+    "same_condition_ids_all_methods": true,
+    "avg": "equal_category_macro"
+  },
+  "required_pending_gates": [
+    "full_suite_same_state_rgbd_and_state8",
+    "both_view_calibration",
+    "official_renderer_parity",
+    "four_slot_runtime_retention_and_no_metric_augmentation",
+    "full_weight_loader_and_trainable_filter_evidence",
+    "gradient_accumulation_equivalence",
+    "common_memory_smoke",
+    "checkpoint_save_load_resume",
+    "eval_scene_and_runtime_lock"
+  ],
+  "source_sha256": {
+    "episodes_metadata": {
+      "path": "/home/Dataset2/yqt/openpi/huggingface/lerobot/physical-intelligence/libero/meta/episodes.jsonl",
+      "sha256": "0479a2ced6117700e4638a1da54dccd9f60ae5f47485ea6d91390c869befcf08"
+    },
+    "tasks_metadata": {
+      "path": "/home/Dataset2/yqt/openpi/huggingface/lerobot/physical-intelligence/libero/meta/tasks.jsonl",
+      "sha256": "e72ef3cf7ca7a3abe70b3e142a0d1acf2719d2a3f27598869092cc4f1762bb99"
+    },
+    "suite_task_map": {
+      "path": "/home/yqt/XuanyiLi/openpi0-aimbot/third_party/libero/libero/libero/benchmark/libero_suite_task_map.py",
+      "sha256": "0c950df0a785aa55de968bb38ccd865d2017f71ddbe6f48cfd05ac0742b6d62d"
+    },
+    "libero_plus_classification": {
+      "path": "/home/yqt/XuanyiLi/LIBERO-plus/libero/libero/benchmark/task_classification.json",
+      "sha256": "faa87cce3e3ba434da01df7c77523a391b5f2912e4774330b0aa1be5f6a999e6"
+    },
+    "axisguide_renderer": {
+      "path": "/home/yqt/XuanyiLi/AxisGuide-code/src/lerobot/datasets/visual_cue_utils.py",
+      "sha256": "9b80dea501b63049a4f67201e98411927a6c32a0b6e5b099ae4cff6ab953822b"
+    },
+    "aimbot_renderer": {
+      "path": "/home/yqt/XuanyiLi/openpi0-aimbot/third_party/AimBot/src/crosshair/reticle_builder.py",
+      "sha256": "d1f6b85d585b23c080cc082d48ad754bcf3eeede61850161c8e5bea085701992"
+    },
+    "aimbot_configuration": {
+      "path": "/home/yqt/XuanyiLi/openpi0-aimbot/third_party/AimBot/src/crosshair/config.py",
+      "sha256": "5ad6fefbc0fa5bf6858c6e240aa8b1206166dd822a1e4e4356e5f4bac64ce43b"
+    }
+  }
+}

@@ -32,9 +32,17 @@ def validate_method(method):
     correction = method["correction"]["enabled"]
     if correction and (not anchor["enabled"] or method["representation"] != "actioncoord"):
         raise ValueError("Correction requires anchors and ActionCoord")
-    if (method["reliability"]["enabled"] or method["metric_ruler"]["enabled"]) and not correction:
-        raise ValueError("Reliability and anchored ruler require reference correction")
+    if method["reliability"]["enabled"] and not correction:
+        raise ValueError("Reliability requires reference correction")
     ruler = method["metric_ruler"]
+    reference = ruler.get("reference", "corrected_ee")
+    if reference not in {"nominal_ee", "corrected_ee"}:
+        raise ValueError("Unknown ruler EE reference")
+    if ruler["enabled"]:
+        if reference == "corrected_ee" and not correction:
+            raise ValueError("Anchored ruler requires reference correction")
+        if reference == "nominal_ee" and (correction or anchor["enabled"] or method["reliability"]["enabled"]):
+            raise ValueError("Nominal ruler must be independent of anchors, correction and reliability")
     lengths = np.asarray(ruler["lengths_m"], dtype=float)
     if (lengths.ndim != 1 or len(lengths) == 0 or not np.isfinite(lengths).all()
             or np.any(lengths <= 0) or np.any(np.diff(lengths) <= 0)
@@ -58,7 +66,8 @@ def load_config(path):
 
 def profile(config, name):
     flags = {"V03": (False, False, False), "V05-C": (True, False, False),
-             "V05-CR": (True, True, False), "V05-Full": (True, True, True)}
+             "V05-CR": (True, True, False), "V05-Full": (True, True, True),
+             "RulerVLA-main": (False, False, True)}
     if name not in flags:
         raise ValueError("Unknown controlled profile")
     out = deepcopy(config)
@@ -67,5 +76,6 @@ def profile(config, name):
     out["method"]["correction"]["enabled"] = correction
     out["method"]["reliability"]["enabled"] = reliability
     out["method"]["metric_ruler"]["enabled"] = ruler
+    out["method"]["metric_ruler"]["reference"] = "nominal_ee" if name == "RulerVLA-main" else "corrected_ee"
     validate_method(out["method"])
     return out

@@ -1,0 +1,34 @@
+geometry_contract: v03_geometry.json
+encoding: v03_encoding.json
+method:
+  representation: actioncoord
+  visual_anchor:
+    enabled: false
+    backend: simulator_gt
+    occlusion_tolerance_m: 0.003
+    rigid_body_name: gripper0_right_gripper
+    max_surface_points: 512
+  correction:
+    enabled: false
+    mode: translation_huber
+    min_anchors: 3
+    min_confidence: 0.5
+    huber_delta_m: 0.002
+    max_fit_residual_m: 0.005
+    max_iterations: 50
+    convergence_m: 1.0e-08
+  reliability:
+    enabled: false
+    patch_size: 16
+    residual_scale_m: 0.005
+    min_fit_score: 0.2
+    min_anchors: 3
+  metric_ruler:
+    enabled: true
+    lengths_m:
+    - 0.05
+    - 0.1
+    - 0.15
+    line_width: 2
+    tick_radius: 2
+    reference: nominal_ee

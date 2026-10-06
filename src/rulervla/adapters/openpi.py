@@ -9,7 +9,7 @@ from PIL import Image
 from rulervla.adapters.libero import LiberoAdapter
 from rulervla.config import validate_method
 from rulervla.cues.metric_ruler import render_metric_ruler
-from rulervla.data.schema import CorrectedEEReference, rotation_from_xyzw, validate_sample
+from rulervla.data.schema import CorrectedEEReference, NominalEEReference, rotation_from_xyzw, validate_sample
 from rulervla.geometry.action_coord import canonical_geometry, encode, raster
 from rulervla.geometry.correction import CorrectionConfig, apply_correction, correct_from_anchors
 from rulervla.geometry.reliability import ReliabilityConfig, geometry_reliability, raster_weights
@@ -79,10 +79,15 @@ class OpenPIAdapter:
                 ref_valid = reliability.correction_valid
             reference = CorrectedEEReference(np.asarray(sample["ee_world_m"]),
                                              result.bias_xyz_m if ref_valid else np.zeros(3), ref_valid)
-            if method["metric_ruler"]["enabled"] and reference.accepted:
-                ruler = method["metric_ruler"]
-                rgb = render_metric_ruler(rgb, reference, nominal_camera, ruler["lengths_m"],
+        ruler = method["metric_ruler"]
+        ruler_rendered = False
+        if ruler["enabled"]:
+            if ruler.get("reference", "corrected_ee") == "nominal_ee":
+                reference = NominalEEReference(sample["ee_world_m"])
+            if reference is not None and (isinstance(reference, NominalEEReference) or reference.accepted):
+                rgb = render_metric_ruler(rgb, reference, self.libero.camera(sample), ruler["lengths_m"],
                                           line_width=ruler["line_width"], tick_radius=ruler["tick_radius"])
+                ruler_rendered = True
         spatial = encode(spatial_m, maps["valid"], self.config["encoding_config"])
         if reliability is not None:
             weights = raster_weights(reliability, spatial.shape[:2], method["reliability"]["patch_size"])
@@ -103,8 +108,8 @@ class OpenPIAdapter:
             output["actions"] = actions.copy()
         self.last_diagnostics = {"correction": result, "reliability": reliability,
                                  "reference": reference, "corrected_actioncoord_m": spatial_m,
-                                 "ruler_rendered": bool(method["metric_ruler"]["enabled"]
-                                                       and reference is not None and reference.accepted)}
+                                 "ruler_rendered": ruler_rendered,
+                                 "reference_source": ruler.get("reference", "corrected_ee") if ruler_rendered else None}
         validate_prepared(output)
         return output
 
