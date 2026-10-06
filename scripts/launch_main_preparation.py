@@ -4,9 +4,14 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import argparse
+import time
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--resume', action='store_true', help='after inspecting a failed/stale worker')
+    args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     logs = root / 'outputs/main_comparison/logs'
     logs.mkdir(parents=True, exist_ok=True)
@@ -28,7 +33,12 @@ if __name__ == '__main__':
                         continue
                 except ProcessLookupError:
                     pass
-            raise RuntimeError('Existing incomplete preparation requires inspection: ' + str(status_path))
+            if not args.resume:
+                raise RuntimeError('Existing incomplete preparation requires inspection: ' + str(status_path))
+            saved_status = status_path.with_name(status_path.stem + '_previous_%d_%d.json' % (int(time.time()), status['pid']))
+            if saved_status.exists():
+                raise FileExistsError('Existing failure audit receipt')
+            status_path.rename(saved_status)
         with (logs / (worker + '_queue.log')).open('a') as stream:
             process = subprocess.Popen([sys.executable, str(root / 'scripts/run_main_data_preparation.py'),
                 '--worker', worker, '--device-id', '3'], cwd=root, stdin=subprocess.DEVNULL,

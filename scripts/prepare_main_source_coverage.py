@@ -13,7 +13,6 @@ from pathlib import Path
 import re
 import subprocess
 import time
-from urllib.request import urlopen
 
 
 def write_json(path, value):
@@ -29,8 +28,11 @@ def normal(name):
 
 def listing(repo, revision, directory):
     url = 'https://hf-mirror.com/api/datasets/%s/tree/%s/%s' % (repo, revision, directory)
-    with urlopen(url, timeout=30) as response:
-        rows = json.load(response)
+    # Mirror rejects the default Python urllib User-Agent; curl is also used
+    # by the previously verified source downloader.
+    rows = json.loads(subprocess.check_output(['curl', '--fail', '--location',
+        '--silent', '--show-error', '--connect-timeout', '15', '--max-time', '60',
+        '--retry', '2', '--retry-delay', '5', url], text=True))
     return {row['path']: row for row in rows if row['type'] == 'file'}
 
 

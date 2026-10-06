@@ -121,11 +121,12 @@ def main():
                         np.testing.assert_array_equal(env.sim.get_state().flatten(), sim_state)
                         np.testing.assert_array_equal(observation['agentview_image'][::-1, ::-1], rgb[frame])
                         np.testing.assert_array_equal(observation['robot0_eye_in_hand_image'][::-1, ::-1], wrist[frame])
-                        actual_depth = get_real_depth_map(env.sim, np.asarray(observation['agentview_depth']).squeeze())
+                        # Match the frozen generator's float64 intermediate exactly.
+                        actual_depth = get_real_depth_map(env.sim, np.asarray(observation['agentview_depth'], dtype=np.float64).squeeze())
                         np.testing.assert_array_equal(actual_depth[::-1, ::-1].astype(np.float32), depth[frame])
                         state = state8_from_observation(observation)
                         np.testing.assert_array_equal(state[:3], ee[frame])
-                        wrist_depth = get_real_depth_map(env.sim, np.asarray(observation['robot0_eye_in_hand_depth']).squeeze())
+                        wrist_depth = get_real_depth_map(env.sim, np.asarray(observation['robot0_eye_in_hand_depth'], dtype=np.float64).squeeze())
                         if not np.isfinite(wrist_depth).all() or wrist_depth.min() <= 0:
                             raise ValueError('Invalid wrist optical-Z depth')
                         payload['state8'].append(state)
