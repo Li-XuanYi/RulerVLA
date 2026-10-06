@@ -10,7 +10,7 @@ nnx = pytest.importorskip('flax.nnx')
 optax = pytest.importorskip('optax')
 import jax.numpy as jnp
 from flax import struct
-from rulervla.training.accumulation import accumulated_step
+from rulervla.training.accumulation import accumulated_step, accumulated_gradients, apply_gradients
 
 
 class Regression(nnx.Module):
@@ -33,7 +33,8 @@ class State:
     ema_decay: object = struct.field(pytree_node=False)
 
 
-def test_accumulation_matches_full_batch_with_one_schedule_adam_and_ema_update():
+@pytest.mark.parametrize('split_compilation', [False, True])
+def test_accumulation_matches_full_batch_with_one_schedule_adam_and_ema_update(split_compilation):
     model = Regression()
     graph, params = nnx.split(model)
     # Nonconstant schedule and active clipping expose accidental micro-updates.
@@ -52,7 +53,12 @@ def test_accumulation_matches_full_batch_with_one_schedule_adam_and_ema_update()
         reference_updates, reference_opt = reference_tx.update(reference_gradient, reference_opt, reference_weight)
         reference_weight = optax.apply_updates(reference_weight, reference_updates)
         reference_ema = .9*reference_ema + .1*reference_weight
-        state, info = accumulated_step(config, jax.random.key(42), state, (x, y))
+        if split_compilation:
+            gradients, info = jax.jit(lambda params, step: accumulated_gradients(config,
+                jax.random.key(42), graph, params, step, (x, y)))(state.params, state.step)
+            state = jax.jit(lambda current, grad: apply_gradients(config, current, grad))(state, gradients)
+        else:
+            state, info = accumulated_step(config, jax.random.key(42), state, (x, y))
         assert int(state.step) == update+1
         np.testing.assert_allclose(state.params['weight'].value, reference_weight, rtol=1e-6, atol=1e-7)
         np.testing.assert_allclose(state.ema_params['weight'].value, reference_ema, rtol=1e-6, atol=1e-7)

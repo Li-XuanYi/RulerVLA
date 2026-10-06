@@ -32,6 +32,8 @@ def main():
     selected = [next(row for row in rows if row['task'] == task) for task in sorted({row['task'] for row in rows})]
     sheet = Image.new('RGB', (224*8, 248*10), 'white')
     draw = ImageDraw.Draw(sheet)
+    wrist_sheet = Image.new('RGB', (224*8, 248*10), 'white')
+    wrist_draw = ImageDraw.Draw(wrist_sheet)
     results = []
     for task_index, row in enumerate(selected):
         with np.load(row['npz']) as rgbd, np.load(geometry[row['episode_index']]['geometry_npz']) as geo:
@@ -89,9 +91,15 @@ def main():
                 x, y = (method_index*2+view_index)*224, task_index*248
                 sheet.paste(Image.fromarray(image), (x,y+24))
                 draw.text((x+2,y+3), name + (' RGB' if view_index == 0 else ' aux'), fill='black')
+            for view_index, key in enumerate(('observation/wrist_image', 'observation/wrist_cue')):
+                image = value[key] if view_index == 0 else np.round((value[key]+1)*127.5).astype(np.uint8)
+                x, y = (method_index*2+view_index)*224, task_index*248
+                wrist_sheet.paste(Image.fromarray(image), (x,y+24))
+                wrist_draw.text((x+2,y+3), name + (' wrist' if view_index == 0 else ' wrist aux'), fill='black')
         results.append(dict(task=row['task'], episode_index=row['episode_index'], shared_state_actions_prompt=True,
             max_axis_projection_error_px=max(projection_errors), agent_rgb_changed_channels=changes))
     sheet.save(args.out/'contact_sheet.png')
+    wrist_sheet.save(args.out/'wrist_contact_sheet.png')
     from crosshair.config import CONFIG_DICT
     import dataclasses
     settings = CONFIG_DICT['large_crosshair_dynamic_default_color']
