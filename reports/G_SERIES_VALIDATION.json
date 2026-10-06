@@ -1,0 +1,298 @@
+{
+  "passed": true,
+  "rows": 3350,
+  "base_frames": 50,
+  "conditions": 67,
+  "figure_pairs": 7,
+  "required_metrics_present": true,
+  "unique_paired_matrix": true,
+  "cache_roi_isolation_verified": true,
+  "production_geometry_estimators_thresholds_unchanged": true,
+  "base_manifest_sha256": "74029f20cd2dd9ff06568bcac89a7a0f0b07708b485a17d462195117fe5f8706",
+  "protocol_sha256": "7da25721ade32c6aeb5792a0bab2047b3d2eeb978f49468351fd7c3c9270cdaf",
+  "frozen_v03_unchanged": true,
+  "historical_status_sha256": {
+    "/home/yqt/XuanyiLi/openpi0-aimbot": "250fd3aa511fd92535f329618373bbb93320fcdb47a3ae8c262df47852da0bcd",
+    "/home/yqt/XuanyiLi/actioncoord/repo": "9cd4d799c7335fd46bca0ab786828a582d39b7aa7828b2a69b8e007878430415"
+  },
+  "regression_command": [
+    "/home/yqt/XuanyiLi/openpi/.venv/bin/python",
+    "-B",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "regression_output": "..................................................                       [100%]\n50 passed in 1.04s",
+  "g6_g7_visual_review": "Actual first-frame ROI and error figures reviewed; robot anchor region and table-centre black bowl correctly located",
+  "analysis_narrative_revision": "Explicitly report G2 partial support and failed accuracy gate; all raw CSVs, thresholds and decision rules unchanged",
+  "git_gate": "Verify clean committed tree and remote HEAD after publication; recorded in outputs/g_series/COMPLETE.json",
+  "frames": [
+    {
+      "frame_key": "ep1283_f0000",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1283_f0033",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1283_f0067",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1283_f0100",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1283_f0134",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1287_f0000",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1287_f0024",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1287_f0049",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1287_f0074",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1287_f0099",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1289_f0000",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1289_f0029",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1289_f0059",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1289_f0089",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1289_f0119",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1299_f0000",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1299_f0030",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1299_f0060",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1299_f0090",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1299_f0120",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1310_f0000",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1310_f0027",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1310_f0055",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1310_f0082",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1310_f0110",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1315_f0000",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1315_f0026",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1315_f0052",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1315_f0078",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1315_f0105",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1316_f0000",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1316_f0025",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1316_f0051",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1316_f0076",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1316_f0102",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1317_f0000",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1317_f0028",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1317_f0056",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1317_f0084",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1317_f0113",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1320_f0000",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1320_f0030",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1320_f0061",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1320_f0091",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1320_f0122",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1345_f0000",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1345_f0027",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1345_f0054",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1345_f0081",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    },
+    {
+      "frame_key": "ep1345_f0108",
+      "cache_verified": true,
+      "rgb_depth_roi_verified": true
+    }
+  ],
+  "figures": [
+    "experiments/G01_translation/figures/G01_boundary.png",
+    "experiments/G01_translation/figures/G01_boundary.pdf",
+    "experiments/G02_anchor_count/figures/G02_boundary.png",
+    "experiments/G02_anchor_count/figures/G02_boundary.pdf",
+    "experiments/G03_anchor_outlier/figures/G03_boundary.png",
+    "experiments/G03_anchor_outlier/figures/G03_boundary.pdf",
+    "experiments/G04_rotation/figures/G04_boundary.png",
+    "experiments/G04_rotation/figures/G04_boundary.pdf",
+    "experiments/G05_depth/figures/G05_boundary.png",
+    "experiments/G05_depth/figures/G05_boundary.pdf",
+    "experiments/G06_anchor_depth_bias/figures/G06_boundary.png",
+    "experiments/G06_anchor_depth_bias/figures/G06_boundary.pdf",
+    "experiments/G07_target_depth_bias/figures/G07_boundary.png",
+    "experiments/G07_target_depth_bias/figures/G07_boundary.pdf"
+  ],
+  "policy_training_started": false
+}

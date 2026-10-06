@@ -1,0 +1,2399 @@
+{
+  "rows": 450,
+  "eligible_rows": 450,
+  "n_episodes": 10,
+  "metrics": {
+    "accepted": {
+      "mean": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "correction_accepted": {
+      "mean": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "bias_error_mm": {
+      "mean": null,
+      "ci95": [
+        null,
+        null
+      ],
+      "n_rows": 0,
+      "n_episodes": 0
+    },
+    "estimated_bias_norm_mm": {
+      "mean": 16.792103804399357,
+      "ci95": [
+        16.681954402794254,
+        16.907862304336746
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "scene_rms_before_mm": {
+      "mean": 35.544854689002364,
+      "ci95": [
+        35.43853897074695,
+        35.65631233274009
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "scene_rms_after_mm": {
+      "mean": 25.505940883084655,
+      "ci95": [
+        25.40319310073133,
+        25.616078605561636
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "scene_p95_before_mm": {
+      "mean": 64.16403485316292,
+      "ci95": [
+        64.12995998959981,
+        64.20497105002646
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "scene_p95_after_mm": {
+      "mean": 50.17130139040791,
+      "ci95": [
+        50.08392290808455,
+        50.27378150557387
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "near_rms_after_mm": {
+      "mean": 6.764542186414007,
+      "ci95": [
+        6.7198961380938504,
+        6.813455195254817
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "middle_rms_after_mm": {
+      "mean": 10.01850153761422,
+      "ci95": [
+        9.941706790970015,
+        10.097750228732846
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "far_rms_after_mm": {
+      "mean": 42.162133790640276,
+      "ci95": [
+        41.99090595332372,
+        42.352484767928
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "target_rms_before_mm": {
+      "mean": 17.821258143978305,
+      "ci95": [
+        17.755635500868472,
+        17.877518611096992
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "target_rms_after_mm": {
+      "mean": 4.5567154349304975,
+      "ci95": [
+        4.517084172008499,
+        4.604232910216231
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "anchor_residual_median_mm": {
+      "mean": 1.588856878988841,
+      "ci95": [
+        1.5439575325434056,
+        1.6296812851350448
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "anchor_residual_p95_mm": {
+      "mean": 4.234618862976857,
+      "ci95": [
+        4.180951664526614,
+        4.278158577482557
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "reliability_score": {
+      "mean": 0.7018342711209039,
+      "ci95": [
+        0.6953381060570011,
+        0.7094025682119327
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "scene_valid_coverage": {
+      "mean": 1.0,
+      "ci95": [
+        1.0,
+        1.0
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "mean_patch_weight": {
+      "mean": 0.7018342771132786,
+      "ci95": [
+        0.6953381147169404,
+        0.7094025708784659
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "num_anchor_used": {
+      "mean": 108.9,
+      "ci95": [
+        102.39750000000001,
+        115.5815
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "anchor_spatial_spread_px": {
+      "mean": 24.93441945784905,
+      "ci95": [
+        24.305466054397378,
+        25.48051248054225
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "measured_depth_missing_fraction": {
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "silent_wrong_correction": {
+      "mean": 0.13999999999999999,
+      "ci95": [
+        0.13333333333333333,
+        0.1488888888888889
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "scene_harmed": {
+      "mean": 0.13999999999999999,
+      "ci95": [
+        0.13333333333333333,
+        0.1488888888888889
+      ],
+      "n_rows": 450,
+      "n_episodes": 10
+    },
+    "mean_bias_error_mm": {
+      "mean": null,
+      "ci95": [
+        null,
+        null
+      ],
+      "n_rows": 0,
+      "n_episodes": 0
+    },
+    "mean_scene_rms_after_mm": {
+      "mean": null,
+      "ci95": [
+        null,
+        null
+      ],
+      "n_rows": 0,
+      "n_episodes": 0
+    }
+  },
+  "accepted_bias_error_mm": {
+    "mean": null,
+    "ci95": [
+      null,
+      null
+    ],
+    "n_rows": 0,
+    "n_episodes": 0
+  },
+  "failure_reasons": {},
+  "conditions": {
+    "x_0.5deg": {
+      "rows": 50,
+      "metrics": {
+        "accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "correction_accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "estimated_bias_norm_mm": {
+          "mean": 7.464496872504097,
+          "ci95": [
+            7.425123371640549,
+            7.50391533646008
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_before_mm": {
+          "mean": 15.08372941591153,
+          "ci95": [
+            15.038146145163655,
+            15.1286949319072
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_after_mm": {
+          "mean": 9.816642212072802,
+          "ci95": [
+            9.789305734636072,
+            9.846073478316528
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_before_mm": {
+          "mean": 26.22346518174232,
+          "ci95": [
+            26.213209089992866,
+            26.23730897281991
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_after_mm": {
+          "mean": 18.90508274293945,
+          "ci95": [
+            18.855221463184733,
+            18.95435133472981
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "near_rms_after_mm": {
+          "mean": 2.404730255613797,
+          "ci95": [
+            2.3656760617897685,
+            2.4423302310335453
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "middle_rms_after_mm": {
+          "mean": 2.9580241613470832,
+          "ci95": [
+            2.9304854924157864,
+            2.9872865754080196
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "far_rms_after_mm": {
+          "mean": 16.535402909233234,
+          "ci95": [
+            16.480798318122293,
+            16.593150632354213
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_before_mm": {
+          "mean": 8.343272882423584,
+          "ci95": [
+            8.317695613866862,
+            8.367850438270521
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_after_mm": {
+          "mean": 1.7990783342893237,
+          "ci95": [
+            1.7589375376527494,
+            1.8316246205339943
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_median_mm": {
+          "mean": 1.0835472521270346,
+          "ci95": [
+            1.0407255763644585,
+            1.1242331529764473
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_p95_mm": {
+          "mean": 2.7282990105030853,
+          "ci95": [
+            2.688287275350673,
+            2.7672656757689498
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "reliability_score": {
+          "mean": 0.8053851194736101,
+          "ci95": [
+            0.7987674289970371,
+            0.8123521386486612
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_valid_coverage": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_patch_weight": {
+          "mean": 0.8053851366043091,
+          "ci95": [
+            0.7987674405574798,
+            0.8123521755337715
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "num_anchor_used": {
+          "mean": 108.9,
+          "ci95": [
+            102.39750000000001,
+            115.5815
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_spatial_spread_px": {
+          "mean": 24.934419457849053,
+          "ci95": [
+            24.305466054397378,
+            25.48051248054225
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "measured_depth_missing_fraction": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "silent_wrong_correction": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_harmed": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "mean_scene_rms_after_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        }
+      },
+      "accepted_bias_error_mm": {
+        "mean": null,
+        "ci95": [
+          null,
+          null
+        ],
+        "n_rows": 0,
+        "n_episodes": 0
+      }
+    },
+    "y_0.5deg": {
+      "rows": 50,
+      "metrics": {
+        "accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "correction_accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "estimated_bias_norm_mm": {
+          "mean": 7.516680737325561,
+          "ci95": [
+            7.473786527049687,
+            7.5604590483004595
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_before_mm": {
+          "mean": 15.070148894358496,
+          "ci95": [
+            15.02534207918173,
+            15.116080347901368
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_after_mm": {
+          "mean": 10.006777988530727,
+          "ci95": [
+            9.959070684682073,
+            10.054977332118401
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_before_mm": {
+          "mean": 26.747247204211043,
+          "ci95": [
+            26.727581925617965,
+            26.769296339497657
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_after_mm": {
+          "mean": 20.006277709666044,
+          "ci95": [
+            19.981765240832882,
+            20.031348992828367
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "near_rms_after_mm": {
+          "mean": 2.0877704732312226,
+          "ci95": [
+            2.0495820376380482,
+            2.124409056035652
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "middle_rms_after_mm": {
+          "mean": 3.432185967285219,
+          "ci95": [
+            3.3760949154105027,
+            3.485836111376904
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "far_rms_after_mm": {
+          "mean": 16.845109901019416,
+          "ci95": [
+            16.776394207193697,
+            16.915359643366624
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_before_mm": {
+          "mean": 8.369318548049574,
+          "ci95": [
+            8.34029542324802,
+            8.397467530654607
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_after_mm": {
+          "mean": 1.4160134599887417,
+          "ci95": [
+            1.391964312707457,
+            1.4409257179656096
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_median_mm": {
+          "mean": 1.2249358062045497,
+          "ci95": [
+            1.1789546569370648,
+            1.2683123487336514
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_p95_mm": {
+          "mean": 3.0169707496038587,
+          "ci95": [
+            2.959528538428617,
+            3.0750654601013485
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "reliability_score": {
+          "mean": 0.7831952240085938,
+          "ci95": [
+            0.776290059987477,
+            0.7906015487954952
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_valid_coverage": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_patch_weight": {
+          "mean": 0.7831952261924743,
+          "ci95": [
+            0.7762900757789613,
+            0.7906015462577343
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "num_anchor_used": {
+          "mean": 108.9,
+          "ci95": [
+            102.39750000000001,
+            115.5815
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_spatial_spread_px": {
+          "mean": 24.934419457849053,
+          "ci95": [
+            24.305466054397378,
+            25.48051248054225
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "measured_depth_missing_fraction": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "silent_wrong_correction": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_harmed": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "mean_scene_rms_after_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        }
+      },
+      "accepted_bias_error_mm": {
+        "mean": null,
+        "ci95": [
+          null,
+          null
+        ],
+        "n_rows": 0,
+        "n_episodes": 0
+      }
+    },
+    "z_0.5deg": {
+      "rows": 50,
+      "metrics": {
+        "accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "correction_accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "estimated_bias_norm_mm": {
+          "mean": 1.7446142461846197,
+          "ci95": [
+            1.7056598384556019,
+            1.7904625285467881
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_before_mm": {
+          "mean": 5.393683395897934,
+          "ci95": [
+            5.3735067615968575,
+            5.415148435617467
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_after_mm": {
+          "mean": 5.699495259026803,
+          "ci95": [
+            5.663214700019808,
+            5.736173963161371
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_before_mm": {
+          "mean": 11.198209057555113,
+          "ci95": [
+            11.189953697385837,
+            11.205730921693883
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_after_mm": {
+          "mean": 11.281552643224932,
+          "ci95": [
+            11.229630709489205,
+            11.335565816543644
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "near_rms_after_mm": {
+          "mean": 2.3819367996690017,
+          "ci95": [
+            2.365826450769734,
+            2.3975347714267516
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "middle_rms_after_mm": {
+          "mean": 3.6988805834456513,
+          "ci95": [
+            3.664111455082555,
+            3.735717482880445
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "far_rms_after_mm": {
+          "mean": 8.800621864052504,
+          "ci95": [
+            8.742164495365623,
+            8.864056175135579
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_before_mm": {
+          "mean": 1.1100239409331458,
+          "ci95": [
+            1.0880716020703327,
+            1.1314740539249035
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_after_mm": {
+          "mean": 1.4655932284969664,
+          "ci95": [
+            1.447068128409354,
+            1.4830560993998128
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_median_mm": {
+          "mean": 1.1974820702994684,
+          "ci95": [
+            1.16158824984509,
+            1.2288960696536495
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_p95_mm": {
+          "mean": 2.6960068134730895,
+          "ci95": [
+            2.6534418376352518,
+            2.7384599967968155
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "reliability_score": {
+          "mean": 0.7872768327663604,
+          "ci95": [
+            0.7822273857104393,
+            0.7930999151787135
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_valid_coverage": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_patch_weight": {
+          "mean": 0.7872768473625184,
+          "ci95": [
+            0.7822273907661437,
+            0.7930999516546727
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "num_anchor_used": {
+          "mean": 108.9,
+          "ci95": [
+            102.39750000000001,
+            115.5815
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_spatial_spread_px": {
+          "mean": 24.934419457849053,
+          "ci95": [
+            24.305466054397378,
+            25.48051248054225
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "measured_depth_missing_fraction": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "silent_wrong_correction": {
+          "mean": 0.4,
+          "ci95": [
+            0.4,
+            0.4
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_harmed": {
+          "mean": 0.4,
+          "ci95": [
+            0.4,
+            0.4
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "mean_scene_rms_after_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        }
+      },
+      "accepted_bias_error_mm": {
+        "mean": null,
+        "ci95": [
+          null,
+          null
+        ],
+        "n_rows": 0,
+        "n_episodes": 0
+      }
+    },
+    "x_1deg": {
+      "rows": 50,
+      "metrics": {
+        "accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "correction_accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "estimated_bias_norm_mm": {
+          "mean": 14.92720258633662,
+          "ci95": [
+            14.848329965589267,
+            15.005071512962404
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_before_mm": {
+          "mean": 30.167171659357543,
+          "ci95": [
+            30.076005985701563,
+            30.257101835270273
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_after_mm": {
+          "mean": 19.62426050025463,
+          "ci95": [
+            19.566657525561553,
+            19.690495401251844
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_before_mm": {
+          "mean": 52.44643110650786,
+          "ci95": [
+            52.425919118270166,
+            52.47411842509719
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_after_mm": {
+          "mean": 37.83388832573796,
+          "ci95": [
+            37.74362378460238,
+            37.92468671203919
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "near_rms_after_mm": {
+          "mean": 4.605566388813788,
+          "ci95": [
+            4.5379107154075315,
+            4.670060519483806
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "middle_rms_after_mm": {
+          "mean": 5.757790156056769,
+          "ci95": [
+            5.713053010482099,
+            5.806738026335337
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "far_rms_after_mm": {
+          "mean": 33.11526984802627,
+          "ci95": [
+            32.99955709012823,
+            33.24378938939791
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_before_mm": {
+          "mean": 16.68638692095797,
+          "ci95": [
+            16.63523287079885,
+            16.735541564730607
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_after_mm": {
+          "mean": 3.3822402951685318,
+          "ci95": [
+            3.307915129915227,
+            3.447899868806606
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_median_mm": {
+          "mean": 1.190836993599947,
+          "ci95": [
+            1.1490621529703766,
+            1.2291457509003403
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_p95_mm": {
+          "mean": 2.8880814807959934,
+          "ci95": [
+            2.8545726837284073,
+            2.9207186181412856
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "reliability_score": {
+          "mean": 0.7883073888174411,
+          "ci95": [
+            0.7822554671469572,
+            0.7948739586365459
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_valid_coverage": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_patch_weight": {
+          "mean": 0.7883073925971986,
+          "ci95": [
+            0.7822554891705514,
+            0.7948739496469497
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "num_anchor_used": {
+          "mean": 108.9,
+          "ci95": [
+            102.39750000000001,
+            115.5815
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_spatial_spread_px": {
+          "mean": 24.934419457849053,
+          "ci95": [
+            24.305466054397378,
+            25.48051248054225
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "measured_depth_missing_fraction": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "silent_wrong_correction": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_harmed": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "mean_scene_rms_after_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        }
+      },
+      "accepted_bias_error_mm": {
+        "mean": null,
+        "ci95": [
+          null,
+          null
+        ],
+        "n_rows": 0,
+        "n_episodes": 0
+      }
+    },
+    "y_1deg": {
+      "rows": 50,
+      "metrics": {
+        "accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "correction_accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "estimated_bias_norm_mm": {
+          "mean": 15.050723064310437,
+          "ci95": [
+            14.965483528220327,
+            15.136103403360334
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_before_mm": {
+          "mean": 30.14001087480519,
+          "ci95": [
+            30.05039809750883,
+            30.23187290742227
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_after_mm": {
+          "mean": 19.958019357615328,
+          "ci95": [
+            19.873690617266032,
+            20.045442238165062
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_before_mm": {
+          "mean": 53.49398517939062,
+          "ci95": [
+            53.454654996603,
+            53.53808303018009
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_after_mm": {
+          "mean": 39.93448758352075,
+          "ci95": [
+            39.88760490662166,
+            39.98083157191616
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "near_rms_after_mm": {
+          "mean": 4.081355888223838,
+          "ci95": [
+            4.023677353363451,
+            4.136171969714377
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "middle_rms_after_mm": {
+          "mean": 6.77324999262589,
+          "ci95": [
+            6.68841298203218,
+            6.858281326163642
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "far_rms_after_mm": {
+          "mean": 33.62327221267625,
+          "ci95": [
+            33.49938171471448,
+            33.75733874990599
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_before_mm": {
+          "mean": 16.738477756338103,
+          "ci95": [
+            16.680432059293455,
+            16.794775185632115
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_after_mm": {
+          "mean": 2.666139458936306,
+          "ci95": [
+            2.6260201232686757,
+            2.7077236049107096
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_median_mm": {
+          "mean": 1.4846820573003612,
+          "ci95": [
+            1.429704549655697,
+            1.5363288921048863
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_p95_mm": {
+          "mean": 3.720042842555263,
+          "ci95": [
+            3.6264450747671395,
+            3.8139753483714176
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "reliability_score": {
+          "mean": 0.7396756772371699,
+          "ci95": [
+            0.7315192452012688,
+            0.7486483956803494
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_valid_coverage": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_patch_weight": {
+          "mean": 0.739675680398941,
+          "ci95": [
+            0.7315192559957505,
+            0.7486483905017375
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "num_anchor_used": {
+          "mean": 108.9,
+          "ci95": [
+            102.39750000000001,
+            115.5815
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_spatial_spread_px": {
+          "mean": 24.934419457849053,
+          "ci95": [
+            24.305466054397378,
+            25.48051248054225
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "measured_depth_missing_fraction": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "silent_wrong_correction": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_harmed": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "mean_scene_rms_after_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        }
+      },
+      "accepted_bias_error_mm": {
+        "mean": null,
+        "ci95": [
+          null,
+          null
+        ],
+        "n_rows": 0,
+        "n_episodes": 0
+      }
+    },
+    "z_1deg": {
+      "rows": 50,
+      "metrics": {
+        "accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "correction_accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "estimated_bias_norm_mm": {
+          "mean": 3.4756409788341416,
+          "ci95": [
+            3.402020827739754,
+            3.567836338054896
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_before_mm": {
+          "mean": 10.787264103838837,
+          "ci95": [
+            10.746911219370716,
+            10.830193774614486
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_after_mm": {
+          "mean": 11.384631306786932,
+          "ci95": [
+            11.314220784562794,
+            11.457756481559775
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_before_mm": {
+          "mean": 22.396204917351625,
+          "ci95": [
+            22.37969435418323,
+            22.411248502423756
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_after_mm": {
+          "mean": 22.528499033616093,
+          "ci95": [
+            22.426550061902976,
+            22.634608383353914
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "near_rms_after_mm": {
+          "mean": 4.783315024546332,
+          "ci95": [
+            4.7510002634379855,
+            4.814250256123138
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "middle_rms_after_mm": {
+          "mean": 7.418478127189294,
+          "ci95": [
+            7.348427354242581,
+            7.492075958050838
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "far_rms_after_mm": {
+          "mean": 17.559014822115525,
+          "ci95": [
+            17.445202631725675,
+            17.681827684984178
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_before_mm": {
+          "mean": 2.2200267486105205,
+          "ci95": [
+            2.1761224888257824,
+            2.2629265662148037
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_after_mm": {
+          "mean": 2.9403456572433555,
+          "ci95": [
+            2.908710464372253,
+            2.968741860404327
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_median_mm": {
+          "mean": 1.5547672454741621,
+          "ci95": [
+            1.5173377175507181,
+            1.5919814074675553
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_p95_mm": {
+          "mean": 2.980257344537558,
+          "ci95": [
+            2.9321151686702285,
+            3.029185515565317
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "reliability_score": {
+          "mean": 0.7332346337298151,
+          "ci95": [
+            0.7275545888915196,
+            0.7390423207263919
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_valid_coverage": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_patch_weight": {
+          "mean": 0.7332346355915069,
+          "ci95": [
+            0.7275545897185803,
+            0.7390423220098019
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "num_anchor_used": {
+          "mean": 108.9,
+          "ci95": [
+            102.39750000000001,
+            115.5815
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_spatial_spread_px": {
+          "mean": 24.934419457849053,
+          "ci95": [
+            24.305466054397378,
+            25.48051248054225
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "measured_depth_missing_fraction": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "silent_wrong_correction": {
+          "mean": 0.4,
+          "ci95": [
+            0.4,
+            0.4
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_harmed": {
+          "mean": 0.4,
+          "ci95": [
+            0.4,
+            0.4
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "mean_scene_rms_after_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        }
+      },
+      "accepted_bias_error_mm": {
+        "mean": null,
+        "ci95": [
+          null,
+          null
+        ],
+        "n_rows": 0,
+        "n_episodes": 0
+      }
+    },
+    "x_3deg": {
+      "rows": 50,
+      "metrics": {
+        "accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "correction_accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "estimated_bias_norm_mm": {
+          "mean": 44.72648386133915,
+          "ci95": [
+            44.49279377855423,
+            44.95604716229647
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_before_mm": {
+          "mean": 90.49232576534959,
+          "ci95": [
+            90.21885651432898,
+            90.76208889948504
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_after_mm": {
+          "mean": 58.885703757634715,
+          "ci95": [
+            58.699631012677045,
+            59.096889439456895
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_before_mm": {
+          "mean": 157.32331762854938,
+          "ci95": [
+            157.26178791198652,
+            157.4063711504919
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_after_mm": {
+          "mean": 113.58316451540934,
+          "ci95": [
+            113.32015782773271,
+            113.84142384463509
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "near_rms_after_mm": {
+          "mean": 13.51382123973841,
+          "ci95": [
+            13.303957400818621,
+            13.714611530944646
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "middle_rms_after_mm": {
+          "mean": 17.03620021826356,
+          "ci95": [
+            16.909128071745982,
+            17.167780434327618
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "far_rms_after_mm": {
+          "mean": 99.45746843529807,
+          "ci95": [
+            99.09554918495415,
+            99.86694993042525
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_before_mm": {
+          "mean": 50.05407792777336,
+          "ci95": [
+            49.90063135931522,
+            50.20152688611061
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_after_mm": {
+          "mean": 9.848577490877148,
+          "ci95": [
+            9.620969752386262,
+            10.071244174964814
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_median_mm": {
+          "mean": 1.704292211713056,
+          "ci95": [
+            1.643613698726853,
+            1.756895918534764
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_p95_mm": {
+          "mean": 3.96602165213359,
+          "ci95": [
+            3.8539932774986796,
+            4.0814234824393045
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "reliability_score": {
+          "mean": 0.7038552737118653,
+          "ci95": [
+            0.6967602331155869,
+            0.7114266306645902
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_valid_coverage": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_patch_weight": {
+          "mean": 0.7038552737236023,
+          "ci95": [
+            0.6967602465450763,
+            0.7114266339242459
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "num_anchor_used": {
+          "mean": 108.9,
+          "ci95": [
+            102.39750000000001,
+            115.5815
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_spatial_spread_px": {
+          "mean": 24.934419457849053,
+          "ci95": [
+            24.305466054397378,
+            25.48051248054225
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "measured_depth_missing_fraction": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "silent_wrong_correction": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_harmed": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "mean_scene_rms_after_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        }
+      },
+      "accepted_bias_error_mm": {
+        "mean": null,
+        "ci95": [
+          null,
+          null
+        ],
+        "n_rows": 0,
+        "n_episodes": 0
+      }
+    },
+    "y_3deg": {
+      "rows": 50,
+      "metrics": {
+        "accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "correction_accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "estimated_bias_norm_mm": {
+          "mean": 45.21247622029505,
+          "ci95": [
+            44.96512537277906,
+            45.458298975271184
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_before_mm": {
+          "mean": 90.41085168513027,
+          "ci95": [
+            90.14204065016125,
+            90.68640980091646
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_after_mm": {
+          "mean": 59.887217089289564,
+          "ci95": [
+            59.64145565293652,
+            60.14871323592273
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_before_mm": {
+          "mean": 160.46566075207835,
+          "ci95": [
+            160.3476821840702,
+            160.59794087181413
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_after_mm": {
+          "mean": 119.80664542127074,
+          "ci95": [
+            119.66900953186078,
+            119.94963251387912
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "near_rms_after_mm": {
+          "mean": 12.31062315969388,
+          "ci95": [
+            12.146852961317514,
+            12.47857095100944
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "middle_rms_after_mm": {
+          "mean": 20.41114480692293,
+          "ci95": [
+            20.160554427497754,
+            20.665738366586236
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "far_rms_after_mm": {
+          "mean": 100.86330787566807,
+          "ci95": [
+            100.4921962577616,
+            101.26506165702223
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_before_mm": {
+          "mean": 50.21033456654046,
+          "ci95": [
+            50.03621515668815,
+            50.37920970568017
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_after_mm": {
+          "mean": 8.091898747150706,
+          "ci95": [
+            7.951493765647561,
+            8.233659494912672
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_median_mm": {
+          "mean": 2.3374273561892602,
+          "ci95": [
+            2.2476052024343103,
+            2.432736195136232
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_p95_mm": {
+          "mean": 8.521214495096807,
+          "ci95": [
+            8.231978944576516,
+            8.746664898934897
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "reliability_score": {
+          "mean": 0.4907399010621837,
+          "ci95": [
+            0.47739039367936437,
+            0.5058317948193616
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_valid_coverage": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_patch_weight": {
+          "mean": 0.4907399064302444,
+          "ci95": [
+            0.47739041803777227,
+            0.5058317830264568
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "num_anchor_used": {
+          "mean": 108.9,
+          "ci95": [
+            102.39750000000001,
+            115.5815
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_spatial_spread_px": {
+          "mean": 24.934419457849053,
+          "ci95": [
+            24.305466054397378,
+            25.48051248054225
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "measured_depth_missing_fraction": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "silent_wrong_correction": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_harmed": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "mean_scene_rms_after_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        }
+      },
+      "accepted_bias_error_mm": {
+        "mean": null,
+        "ci95": [
+          null,
+          null
+        ],
+        "n_rows": 0,
+        "n_episodes": 0
+      }
+    },
+    "z_3deg": {
+      "rows": 50,
+      "metrics": {
+        "accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "correction_accepted": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "estimated_bias_norm_mm": {
+          "mean": 11.010615672464553,
+          "ci95": [
+            10.778428282697815,
+            11.297002643234013
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_before_mm": {
+          "mean": 32.358506406371895,
+          "ci95": [
+            32.23746004484705,
+            32.487282341905264
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_rms_after_mm": {
+          "mean": 34.290720476550376,
+          "ci95": [
+            34.07723208628848,
+            34.51920837409776
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_before_mm": {
+          "mean": 67.18179265108006,
+          "ci95": [
+            67.13226599085243,
+            67.22691882387477
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_p95_after_mm": {
+          "mean": 67.66211453828592,
+          "ci95": [
+            67.34694473154053,
+            68.00008516240551
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "near_rms_after_mm": {
+          "mean": 14.71176044819579,
+          "ci95": [
+            14.585161288315218,
+            14.837124790329668
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "middle_rms_after_mm": {
+          "mean": 22.680559825391587,
+          "ci95": [
+            22.43974723559618,
+            22.93997726121858
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "far_rms_after_mm": {
+          "mean": 52.65973624767317,
+          "ci95": [
+            52.31614607933056,
+            53.03555691252232
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_before_mm": {
+          "mean": 6.659404004178045,
+          "ci95": [
+            6.527704598486673,
+            6.788090389290872
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "target_rms_after_mm": {
+          "mean": 9.400552242223396,
+          "ci95": [
+            9.284810928153899,
+            9.492439975181163
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_median_mm": {
+          "mean": 2.5217409179917323,
+          "ci95": [
+            2.446839682995452,
+            2.6096253849321656
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_residual_p95_mm": {
+          "mean": 7.594675378092464,
+          "ci95": [
+            7.426110092849097,
+            7.750623429466957
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "reliability_score": {
+          "mean": 0.4848383892810961,
+          "ci95": [
+            0.47295618029624953,
+            0.49754687778495027
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_valid_coverage": {
+          "mean": 1.0,
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_patch_weight": {
+          "mean": 0.48483839511871335,
+          "ci95": [
+            0.47295618563890457,
+            0.4975468734204769
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "num_anchor_used": {
+          "mean": 108.9,
+          "ci95": [
+            102.39750000000001,
+            115.5815
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "anchor_spatial_spread_px": {
+          "mean": 24.934419457849053,
+          "ci95": [
+            24.305466054397378,
+            25.48051248054225
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "measured_depth_missing_fraction": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "silent_wrong_correction": {
+          "mean": 0.4600000000000001,
+          "ci95": [
+            0.4,
+            0.5400000000000001
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "scene_harmed": {
+          "mean": 0.4600000000000001,
+          "ci95": [
+            0.4,
+            0.5400000000000001
+          ],
+          "n_rows": 50,
+          "n_episodes": 10
+        },
+        "mean_bias_error_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        },
+        "mean_scene_rms_after_mm": {
+          "mean": null,
+          "ci95": [
+            null,
+            null
+          ],
+          "n_rows": 0,
+          "n_episodes": 0
+        }
+      },
+      "accepted_bias_error_mm": {
+        "mean": null,
+        "ci95": [
+          null,
+          null
+        ],
+        "n_rows": 0,
+        "n_episodes": 0
+      }
+    }
+  },
+  "base_manifest_sha256": "74029f20cd2dd9ff06568bcac89a7a0f0b07708b485a17d462195117fe5f8706",
+  "protocol_sha256": "7da25721ade32c6aeb5792a0bab2047b3d2eeb978f49468351fd7c3c9270cdaf",
+  "csv_sha256": "caae14c172210201662fc04a9dd9873595e0057970ac3dcc07922803f2149ccf",
+  "analysis": "episode-cluster bootstrap; 2000 draws; deterministic seed; descriptive CI"
+}

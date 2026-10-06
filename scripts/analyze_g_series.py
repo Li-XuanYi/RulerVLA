@@ -179,10 +179,11 @@ def conclusion(group, rows, summary, design):
     elif group == "G02":
         small = [r for r in rows if r["severity"] <= 2]
         wrong = sum(r["silent_wrong_correction"] for r in rows)
-        result.append(f"- Accepted with <=2 anchors: {sum(r['accepted'] for r in small)}/{len(small)}; silent wrong correction: {wrong}/{len(rows)}.")
-        interpretation = "The fixed minimum-three rule provides an explicit insufficiency boundary; spread and fit still matter above this count."
+        accepted_count = sum(r["accepted"] for r in rows)
+        result.append(f"- Accepted with <=2 anchors: {sum(r['accepted'] for r in small)}/{len(small)}; accepted recovery errors >2 mm: {wrong}/{accepted_count} accepted records ({wrong}/{len(rows)} total).")
+        interpretation = "Insufficient-anchor rejection is supported, but accepted 3/4-anchor recovery can exceed the predeclared 2 mm accuracy limit despite a small fit residual. Consistency does not guarantee accuracy. These cases still improve the original 10 mm error; they are not necessarily scene-harming corrections."
         boundary = "Subset A/B/C are deterministic spatial selections, not an exhaustive occlusion distribution. Rejected bias error uses zero correction and must not be described as accepted recovery."
-        decision = "continue if insufficiency rejects; no detector visibility-performance claim"
+        decision = "modify hypothesis: retain the accepted low-count accuracy boundary" if wrong else "continue within tested scope"
     elif group == "G03":
         comparison = [dict(r, robust_minus_mean_mm=r["bias_error_mm"]-r["mean_bias_error_mm"]) for r in rows if r["severity"] > 0]
         effect = metric(comparison, "robust_minus_mean_mm", design)
@@ -287,6 +288,10 @@ cluster CI [{fmt(effect['ci95'][0])}, {fmt(effect['ci95'][1])}].
 
 With one or two retained anchors, {sum(r['accepted'] for r in g2small)}/{len(g2small)}
 conditions accept; insufficient evidence falls back to zero correction.
+However, G2 contains {gates['g2_silent_wrong']} accepted 3/4-anchor recoveries above
+the fixed 2 mm accuracy limit. Their small fit residual and high score do not
+certify recovery accuracy. They improve the original 10 mm error but fail the
+predeclared accuracy gate, rather than necessarily worsening the scene.
 Depth-noise and missing-depth acceptance/coverage are reported condition by
 condition in G05. Anchor-centred block missing can remove reference evidence;
 random missing can reduce patch weights without changing the global fit score.
@@ -310,6 +315,11 @@ are excluded from retained-support RMS and their lost coverage is reported.
 ## Q4 — Is the mechanism ready for a policy-level pilot?
 
 **{decision}**. This is a scope-limited research decision, not training authorization.
+The analysis code committed before outcomes uses a strict zero-exceedance G2
+gate at 2 mm; it remains unchanged. The observed G2 exceedances are not erased
+by changing thresholds after reviewing outcomes. NO-GO blocks automatic pilot
+progress under this protocol; it does not imply shared-translation correction
+is ineffective.
 
 1. Require the G1 recovery, G2 insufficiency and G3 robustness gates in the JSON summary.
 2. Restrict any later pilot to a declared shared-translation regime with GT anchors;
@@ -337,8 +347,9 @@ Protocol SHA-256: `{file_hash(ROOT/'experiments/g_series_protocol_lock.json')}`.
             s = summaries[group]
             writer.writerow(dict(ID=group, Question=question, IndependentVariable="; ".join(s["conditions"]), Status="done",
                 MainMetric="scene_rms_after_mm", MainResult=estimate(s, "scene_rms_after_mm"),
-                Conclusion="supported within tested scope" if group in {"G01", "G02", "G03"} else "failure boundary documented",
-                Decision="continue" if group in {"G01", "G02", "G03", "G05"} else "modify hypothesis", Commit=lock["runner_commit"]))
+                Conclusion=("partial support; accepted low-count accuracy boundary" if group == "G02" and gates["g2_silent_wrong"]
+                            else "supported within tested scope" if group in {"G01", "G02", "G03"} else "failure boundary documented"),
+                Decision="continue" if group in {"G01", "G03", "G05"} else "modify hypothesis", Commit=lock["runner_commit"]))
     print(json.dumps({"analysis_complete": True, "rows": combined["rows_total"], "decision": decision,
                       "gates": gates, "g3_paired_effect": effect, "g7_reliability_change": g7_score_change}), flush=True)
 
