@@ -76,7 +76,6 @@ def main():
             lr_schedule=optimizer.CosineDecaySchedule(warmup_steps=1000, peak_lr=5e-5,
                 decay_steps=30000, decay_lr=5e-6), ema_decay=.999,
             weight_loader=weight_loaders.CheckpointWeightLoader(base_params), wandb_enabled=False)
-        assert training_config.freeze_filter == nnx.Nothing
         status.update(stage='preparing_real_batch', initial_checkpoint=base_params,
             full_finetuning=True, lora=False, supervised_components=7, action_horizon=10)
         write_json(args.out / 'status.json', status)
@@ -145,6 +144,8 @@ def main():
         write_json(args.out/'status.json', status)
         state, state_sharding = train.init_train_state(training_config, jax.random.key(42), mesh, resume=False)
         jax.block_until_ready(state)
+        assert not jax.tree.leaves(state.params.filter(training_config.freeze_filter))
+        assert len(jax.tree.leaves(state.params.filter(training_config.trainable_filter))) == len(jax.tree.leaves(state.params))
         assert all(not isinstance(value, jax.ShapeDtypeStruct) for value in jax.tree.leaves(state.params))
         assert not any('lora' in jax.tree_util.keystr(path).lower() for path, _ in jax.tree_util.tree_flatten_with_path(state.params)[0])
         status.update(stage='compiling_forward_backward', official_weights_loaded=True,

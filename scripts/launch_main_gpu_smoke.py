@@ -11,9 +11,11 @@ import time
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--gpus', default='3,5')
+    parser.add_argument('--attempt', type=int, default=1)
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
-    out = root / 'outputs/main_comparison/gpu_smoke_20261006/rulervla_main'
+    name = 'rulervla_main' if args.attempt == 1 else 'rulervla_main_attempt%d' % args.attempt
+    out = root / 'outputs/main_comparison/gpu_smoke_20261006' / name
     status_file = out/'status.json'
     if status_file.exists():
         status = json.loads(status_file.read_text())
