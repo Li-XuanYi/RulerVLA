@@ -26,10 +26,13 @@ def test_snapshot_retains_input_values_and_original_source():
     config = 'images={\n                    "right_wrist_0_rgb": image_spec,\n},\nmasks={\n                    "right_wrist_0_rgb": image_mask_spec,\n}\n'
     (directory / 'model.py').write_text(model)
     (directory / 'pi0_config.py').write_text(config)
+    prefix = 'def embed_prefix(obs):\n        for name in obs.images:\n            pass\n'
+    (directory / 'pi0.py').write_text(prefix)
     output = tmp_path / 'snapshot'
     m.prepare(source, output)
     assert (directory / 'model.py').read_text() == model
     assert (directory / 'pi0_config.py').read_text() == config
+    assert (directory / 'pi0.py').read_text() == prefix
     patched = (output / 'src/openpi/models/model.py').read_text()
     assert 'aux_wrist_cue_rgb' in patched and 'distort(image)' not in patched
     assert 'out_images[key] = image' in patched
