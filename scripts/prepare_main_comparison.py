@@ -13,7 +13,7 @@ from rulervla.config import load_config, profile
 
 def write_json(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf-8', newline='\n')
 
 
 def main():
@@ -74,7 +74,7 @@ def main():
     write_json(folder / 'preflight_readonly.json', audit)
     main_method = yaml.safe_load((root / 'configs/v05_default.yaml').read_text())
     main_method['method'] = profile(load_config(root / 'configs/v05_default.yaml'), 'RulerVLA-main')['method']
-    (root / 'configs/rulervla_main.yaml').write_text(yaml.safe_dump(main_method, sort_keys=False), encoding='utf-8')
+    (root / 'configs/rulervla_main.yaml').write_text(yaml.safe_dump(main_method, sort_keys=False), encoding='utf-8', newline='\n')
     rows = []
     for suite, data in audit['suites'].items():
         manifest = {'suite': suite, 'episodes': data['episodes'], 'frames': data['frames'],
@@ -92,13 +92,13 @@ def main():
                 rows.append({k: run[k] for k in ('run_id', 'suite', 'method', 'seed', 'checkpoint_root', 'status')})
     assert len(rows) == 48
     with (folder / 'run_matrix.csv').open('w', newline='', encoding='utf-8') as stream:
-        writer = csv.DictWriter(stream, fieldnames=list(rows[0]))
+        writer = csv.DictWriter(stream, fieldnames=list(rows[0]), lineterminator='\n')
         writer.writeheader()
         writer.writerows(rows)
     files = [p for p in folder.rglob('*') if p.is_file()]
     files += [root / 'docs/MAIN_COMPARISON_PROTOCOL_V1.md', root / 'configs/rulervla_main.yaml']
-    entries = [(str(p.relative_to(root)), hashlib.sha256(p.read_bytes()).hexdigest()) for p in sorted(files)]
-    (folder / 'DESIGN_MANIFEST.sha256').write_text(''.join('%s  %s\n' % (digest, path) for path, digest in entries), encoding='utf-8')
+    entries = [(p.relative_to(root).as_posix(), hashlib.sha256(p.read_bytes()).hexdigest()) for p in sorted(files)]
+    (folder / 'DESIGN_MANIFEST.sha256').write_text(''.join('%s  %s\n' % (digest, path) for path, digest in entries), encoding='utf-8', newline='\n')
     print(json.dumps({'planned_runs': len(rows), 'training_started': False,
                       'design': str(folder), 'execution_ready': False}))
 
