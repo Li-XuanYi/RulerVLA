@@ -31,6 +31,25 @@ def write_json(path, value):
     os.replace(temporary, path)
 
 
+def check_rgb(actual, expected, out, episode, frame, view):
+    if np.array_equal(actual, expected):
+        return
+    from PIL import Image
+    difference = actual.astype(np.int16) - expected.astype(np.int16)
+    a224 = np.asarray(Image.fromarray(actual).resize((224, 224), Image.BILINEAR))
+    b224 = np.asarray(Image.fromarray(expected).resize((224, 224), Image.BILINEAR))
+    pixels = np.argwhere(difference != 0)
+    write_json(out / ('rgb_mismatch_ep%d_f%d_%s.json' % (episode, frame, view)),
+        {'episode': episode, 'filtered_frame': frame, 'view': view,
+         'mismatched_channels': len(pixels), 'signed_max_abs_delta': int(np.abs(difference).max()),
+         'resized_policy_rgb_exact': bool(np.array_equal(a224, b224)),
+         'policy_rgb_max_abs_delta': int(np.abs(a224.astype(np.int16)-b224.astype(np.int16)).max()),
+         'examples': [{'index': index.tolist(), 'actual': int(actual[tuple(index)]),
+                       'expected': int(expected[tuple(index)])} for index in pixels[:10]]})
+    # No tolerance is silently introduced here; retain evidence for diagnosis.
+    raise ValueError('Raw RGB mismatch; signed/policy-raster diagnostic recorded')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--v03-root', required=True, type=Path)
@@ -119,13 +138,13 @@ def main():
                         env.sim.forward()
                         observation = env.env._get_observations(force_update=True)
                         np.testing.assert_array_equal(env.sim.get_state().flatten(), sim_state)
-                        np.testing.assert_array_equal(observation['agentview_image'][::-1, ::-1], rgb[frame])
-                        np.testing.assert_array_equal(observation['robot0_eye_in_hand_image'][::-1, ::-1], wrist[frame])
                         # Match the frozen generator's float64 intermediate exactly.
                         actual_depth = get_real_depth_map(env.sim, np.asarray(observation['agentview_depth'], dtype=np.float64).squeeze())
                         np.testing.assert_array_equal(actual_depth[::-1, ::-1].astype(np.float32), depth[frame])
                         state = state8_from_observation(observation)
                         np.testing.assert_array_equal(state[:3], ee[frame])
+                        check_rgb(observation['agentview_image'][::-1, ::-1], rgb[frame], args.out, ep, frame, 'agent')
+                        check_rgb(observation['robot0_eye_in_hand_image'][::-1, ::-1], wrist[frame], args.out, ep, frame, 'wrist')
                         wrist_depth = get_real_depth_map(env.sim, np.asarray(observation['robot0_eye_in_hand_depth'], dtype=np.float64).squeeze())
                         if not np.isfinite(wrist_depth).all() or wrist_depth.min() <= 0:
                             raise ValueError('Invalid wrist optical-Z depth')
