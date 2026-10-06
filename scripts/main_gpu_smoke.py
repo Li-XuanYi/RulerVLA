@@ -63,7 +63,7 @@ def main():
         from rulervla.adapters.main_comparison import MainComparisonInputs, MAIN_IMAGE_KEYS
         from rulervla.adapters.main_cues import MainCueAdapter
         from rulervla.config import load_config
-        from rulervla.training.accumulation import accumulated_step
+        from rulervla.training.accumulation import accumulated_gradients, apply_gradients
         assert status['effective_batch'] == 32
         assert jax.device_count() == args.fsdp_devices
         status['devices'] = [str(device) for device in jax.devices()]
@@ -151,15 +151,22 @@ def main():
             parameter_count=int(sum(np.prod(value.shape) for value in jax.tree.leaves(state.params))),
             four_real_input_slots=True, batch_source_episode=row['episode_index'], batch_source_frames=list(range(32)))
         write_json(args.out/'status.json', status)
-        update = jax.jit(lambda rng, current, values: accumulated_step(training_config, rng, current, values),
-            in_shardings=(replicated, state_sharding, batch_sharding), out_shardings=(state_sharding, replicated),
-            donate_argnums=(1,))
+        graph = state.model_def
+        gradient = jax.jit(lambda rng, step, params, values:
+            accumulated_gradients(training_config, rng, graph, params, step, values),
+            in_shardings=(replicated, replicated, state_sharding.params, batch_sharding),
+            out_shardings=(state_sharding.params, replicated))
+        update = jax.jit(lambda current, gradients: apply_gradients(training_config, current, gradients),
+            in_shardings=(state_sharding, state_sharding.params), out_shardings=state_sharding,
+            donate_argnums=(0, 1))
         batch = jax.device_put(batch, batch_sharding)
         metrics = []
         with sharding.set_mesh(mesh):
             for index in range(2):
                 started = time.time()
-                state, info = update(jax.random.key(42), state, batch)
+                gradients, info = gradient(jax.random.key(42), state.step, state.params, batch)
+                jax.block_until_ready(gradients)
+                state, info = update(state, gradients), info
                 jax.block_until_ready(state)
                 info = {key: float(value) for key, value in jax.device_get(info).items()}
                 assert all(np.isfinite(value) for value in info.values()) and info['grad_norm'] > 0
