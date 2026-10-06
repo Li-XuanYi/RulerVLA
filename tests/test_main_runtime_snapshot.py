@@ -28,6 +28,9 @@ def test_snapshot_retains_input_values_and_original_source():
     (directory / 'pi0_config.py').write_text(config)
     prefix = 'def embed_prefix(obs):\n        for name in obs.images:\n            pass\n'
     (directory / 'pi0.py').write_text(prefix)
+    training = source/'src/openpi/training'
+    training.mkdir()
+    (training/'sharding.py').write_text('return jax.sharding.PartitionSpec(DATA_AXIS)\n')
     output = tmp_path / 'snapshot'
     m.prepare(source, output)
     assert (directory / 'model.py').read_text() == model

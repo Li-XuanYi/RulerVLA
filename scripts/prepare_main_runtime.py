@@ -38,6 +38,16 @@ def patch_prefix(source):
     return source.replace(marker, '        for name in _model.IMAGE_KEYS:\n')
 
 
+def patch_activation_sharding(source):
+    marker = 'jax.sharding.PartitionSpec(DATA_AXIS)'
+    if source.count(marker) != 1:
+        raise ValueError('Unexpected activation sharding source')
+    # FSDP weights remain split; a global microbatch of one is replicated
+    # along the parameter-sharding axis, rather than divided into zero-sized
+    # per-device batches. This does not multiply effective batch by FSDP size.
+    return source.replace(marker, 'jax.sharding.PartitionSpec(BATCH_AXIS)')
+
+
 def prepare(source, output):
     source, output = Path(source).resolve(), Path(output).resolve()
     if source == output or source in output.parents:
@@ -54,11 +64,16 @@ def prepare(source, output):
         target = output / relative
         target.write_text(patch(original.read_text()), encoding='utf-8', newline='\n')
         modifications[relative] = {'source_sha256': sha(original), 'snapshot_sha256': sha(target)}
-    manifest = {'schema': 'rulervla_main_runtime_v2', 'source_runtime': str(source),
+    relative = 'src/openpi/training/sharding.py'
+    original, target = source/relative, output/relative
+    target.write_text(patch_activation_sharding(original.read_text()), encoding='utf-8', newline='\n')
+    modifications[relative] = {'source_sha256': sha(original), 'snapshot_sha256': sha(target)}
+    manifest = {'schema': 'rulervla_main_runtime_v3', 'source_runtime': str(source),
                 'snapshot_runtime': str(output), 'changes': modifications,
                 'parameter_architecture_changed': False, 'training_started': False,
                 'image_slots': 4, 'image_augmentation': False,
                 'prefix_order': ['base_0_rgb', 'left_wrist_0_rgb', 'right_wrist_0_rgb', 'aux_wrist_cue_rgb'],
+                'fsdp_activation_data_axis': 'batch (replicated along fsdp)',
                 'source_files_sha256': {p.relative_to(source).as_posix(): sha(p)
                     for p in sorted(source.rglob('*.py')) if '__pycache__' not in p.parts}}
     (output / 'RULERVLA_RUNTIME_MANIFEST.json').write_text(json.dumps(manifest, indent=2) + '\n')

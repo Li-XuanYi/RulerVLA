@@ -93,8 +93,14 @@ def main():
                                 comparison = {'filtered_frame': frame, 'source_frame': int(source_frame)}
                                 for view, key in [('agentview_rgb', 'agentview_rgb'), ('eye_in_hand_rgb', 'wrist_rgb')]:
                                     reference = np.asarray(demo['obs'][view][source_frame])[::-1, ::-1]
-                                    difference = capture[key].astype(np.int16)-reference.astype(np.int16)
-                                    comparison[view] = dict(mae=float(np.abs(difference).mean()), max_abs=int(np.abs(difference).max()))
+                                    actual = capture[key]
+                                    if actual.shape != reference.shape:
+                                        from PIL import Image
+                                        actual = np.asarray(Image.fromarray(actual).resize(
+                                            (reference.shape[1], reference.shape[0]), Image.BILINEAR))
+                                    difference = actual.astype(np.int16)-reference.astype(np.int16)
+                                    comparison[view] = dict(mae=float(np.abs(difference).mean()), max_abs=int(np.abs(difference).max()),
+                                        native_reference_shape=list(reference.shape), rendered_training_shape=list(capture[key].shape))
                                 comparisons.append(comparison)
                         payload = {key: np.asarray(value) for key, value in payload.items()}
                         payload['actions'] = np.asarray(demo['actions'][indices], np.float32)

@@ -30,8 +30,8 @@ def main():
     parser.add_argument('--method', choices=['Baseline', 'AimBot', 'AxisGuide-adapted', 'RulerVLA-main'], required=True)
     parser.add_argument('--aimbot-source', type=Path, required=True)
     parser.add_argument('--axisguide-source', type=Path, required=True)
-    parser.add_argument('--micro-batch', type=int, default=2)
-    parser.add_argument('--accumulation', type=int, default=16)
+    parser.add_argument('--micro-batch', type=int, default=1)
+    parser.add_argument('--accumulation', type=int, default=32)
     parser.add_argument('--fsdp-devices', type=int, default=2)
     parser.add_argument('--save-restore', action='store_true')
     args = parser.parse_args()
@@ -66,7 +66,6 @@ def main():
         from rulervla.training.accumulation import accumulated_step
         assert status['effective_batch'] == 32
         assert jax.device_count() == args.fsdp_devices
-        assert args.micro_batch % jax.device_count() == 0
         status['devices'] = [str(device) for device in jax.devices()]
         base_params = '/home/Dataset2/yqt/openpi/checkpoints/Official/pi05_base/params'
         policy_config = Pi0Config(pi05=True, action_horizon=10, discrete_state_input=False)
@@ -136,7 +135,7 @@ def main():
         assert batch[1].shape == (args.accumulation, args.micro_batch, 10, 32)
         mesh = sharding.make_mesh(args.fsdp_devices)
         replicated = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec())
-        batch_sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec(None, sharding.DATA_AXIS))
+        batch_sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec(None, sharding.BATCH_AXIS))
         spec = importlib.util.spec_from_file_location('main_stock_train', args.runtime/'scripts/train.py')
         train = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(train)

@@ -46,7 +46,7 @@ if __name__ == '__main__':
     out.mkdir(parents=True, exist_ok=False)
     log = out/'train.log'
     command = [sys.executable, str(root/'scripts/main_gpu_smoke.py'),
-        '--runtime', str(root/'outputs/main_comparison/runtime_v2'), '--v03-root', v03,
+        '--runtime', str(root/'outputs/main_comparison/runtime_v3'), '--v03-root', v03,
         '--rgbd-root', '/home/Dataset2/yqt/openpi-aimbot/spatialcue_depth_source/regenerated_rgbd_v02',
         '--geometry-root', '/home/Dataset2/yqt/rulervla/main_comparison_v1/data_preparation/spatial_geometry',
         '--out', str(out), '--method', 'RulerVLA-main', '--save-restore',
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     receipt = {'pid': process.pid, 'session': process.pid, 'gpus': selected,
         'log': str(log), 'status': str(status_file), 'command': command,
         'stage': 'full_finetuning_smoke', 'formal_training_started': False,
-        'micro_batch': 2, 'gradient_accumulation': 16, 'effective_batch': 32,
+        'micro_batch': 1, 'gradient_accumulation': 32, 'effective_batch': 32,
         'launched_at_unix': time.time()}
     (out/'launch.json').write_text(json.dumps(receipt, indent=2)+'\n')
     print(json.dumps(receipt, indent=2))
