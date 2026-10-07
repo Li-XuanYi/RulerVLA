@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 import numpy as np
+from rulervla.training.storage_io import retry_io
 
 
 def update_indices(frame_count, seed, update, batch_size=32):
@@ -50,20 +51,23 @@ class SpatialDataset:
         frame = int(index - (self.ends[number-1] if number else 0))
         ep = row['episode_index']
         if ep not in self.cache:
-            geometry = self.geometry[ep]
-            assert file_sha(row['npz']) == row['npz_sha256']
-            assert file_sha(geometry['geometry_npz']) == geometry['geometry_sha256']
-            with np.load(row['npz'], allow_pickle=False) as z:
-                arrays = {key: z[key] for key in ('agentview_rgb','wrist_rgb','agentview_depth_m','ee_world_m','actions')}
-            with np.load(geometry['geometry_npz'], allow_pickle=False) as z:
-                arrays.update({key: z[key] for key in ('state8','eef_quaternion_xyzw','wrist_depth_m','intrinsic',
-                    'camera_to_world','wrist_intrinsic','wrist_camera_to_world')})
-            assert all(len(value) == row['frames'] for value in arrays.values())
-            for value in arrays.values():
-                value.setflags(write=False)
-            self.cache[ep] = arrays
+            self.cache[ep] = retry_io(lambda: self._load_episode(row, self.geometry[ep]))
         arrays = self.cache[ep]
         sample = {key: value[frame].copy() for key,value in arrays.items() if key != 'actions'}
         indices = np.minimum(frame+np.arange(10), row['frames']-1)
         sample.update(actions=arrays['actions'][indices].copy(), task=row['task'])
         return sample
+
+    @staticmethod
+    def _load_episode(row, geometry):
+        assert file_sha(row['npz']) == row['npz_sha256']
+        assert file_sha(geometry['geometry_npz']) == geometry['geometry_sha256']
+        with np.load(row['npz'], allow_pickle=False) as z:
+            arrays = {key: z[key] for key in ('agentview_rgb','wrist_rgb','agentview_depth_m','ee_world_m','actions')}
+        with np.load(geometry['geometry_npz'], allow_pickle=False) as z:
+            arrays.update({key: z[key] for key in ('state8','eef_quaternion_xyzw','wrist_depth_m','intrinsic',
+                'camera_to_world','wrist_intrinsic','wrist_camera_to_world')})
+        assert all(len(value) == row['frames'] for value in arrays.values())
+        for value in arrays.values():
+            value.setflags(write=False)
+        return arrays

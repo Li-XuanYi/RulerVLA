@@ -55,6 +55,7 @@ def main():
     from rulervla.config import load_config
     from rulervla.training.accumulation import accumulated_gradients, apply_gradients
     from rulervla.training.main_data import SpatialDataset, update_indices, file_sha
+    from rulervla.training.storage_io import RunRecords, retry_io, publish_with_retry
     from actioncoord.integration.v03_checkpoint_snapshot import host_snapshot
     from actioncoord.integration.v03_storage import publish_checkpoint, verify_checkpoint
     for source, expected_sha in cue['official_sources_sha256'].items():
@@ -70,6 +71,9 @@ def main():
         optimizer_and_ema_on_cpu=True,full_finetuning=True,lora=False,formal_training_started=True,
         initial_checkpoint=shared['initial_checkpoint'],started_at_unix=time.time(),checkpoint_root=str(output))
     status_path=output/'status.json'
+    records=RunRecords(root/'outputs/main_comparison/train_records'/run['run_id'],output)
+    write_json=records.write
+    status['local_record_root']=str(records.local)
     write_json(status_path,status)
     try:
         rgbd=Path('/home/Dataset2/yqt/openpi-aimbot/spatialcue_depth_source/regenerated_rgbd_v02')
@@ -142,7 +146,7 @@ def main():
         execution['data_manifest_sha256'] = {'rgbd':file_sha(rgbd/'regen_manifest.json'),
             'geometry':file_sha(geometry/'manifest.json')}
         write_json(output/('resume_execution_%d.json'%os.getpid()) if args.resume else output/'execution_lock.json',execution)
-        with (output/'metrics.jsonl').open('a',buffering=1) as log,sharding.set_mesh(gpu_mesh):
+        with (records.local/'metrics.jsonl').open('a',buffering=1) as log,sharding.set_mesh(gpu_mesh):
             for step in range(first_update,30000):
                 start=time.time();indices=update_indices(len(dataset),run['seed'],step)
                 status.update(stage='preparing_batch',current_optimizer_update=step+1);write_json(status_path,status)
@@ -170,9 +174,11 @@ def main():
                         snapshot,evidence=host_snapshot(state)
                         checkpoints.save_state(manager,snapshot,Assets(),step);manager.wait_until_finished()
                         destination=output/str(step)
-                        publish_checkpoint(stage/str(step),destination,completed_updates=step+1)
-                        verify_checkpoint(destination,expected_updates=step+1)
+                        publish_with_retry(stage/str(step),destination,step+1,publish_checkpoint,verify_checkpoint)
+                        retry_io(lambda: verify_checkpoint(destination,expected_updates=step+1))
                         write_json(output/('snapshot_%d.json'%step),evidence)
+                        import shutil
+                        retry_io(lambda: shutil.copy2(records.local/'metrics.jsonl',output/'metrics.jsonl'))
                         del snapshot
                     status['latest_checkpoint']=str(destination);write_json(status_path,status)
         manager.close();status.update(state='complete',stage='complete',finished_at_unix=time.time(),final_checkpoint=str(output/'29999'))

@@ -51,8 +51,10 @@ def main():
         status['assigned_runs']=[json.loads(path.read_text())['run_id'] for path in run_paths]
         for path in run_paths:
             run=json.loads(path.read_text());out=Path(run['checkpoint_root'])
-            if (out/'status.json').exists():
-                existing=json.loads((out/'status.json').read_text())
+            local_status=root/'outputs/main_comparison/train_records'/run['run_id']/'status.json'
+            existing_status=local_status if local_status.exists() else out/'status.json'
+            if existing_status.exists():
+                existing=json.loads(existing_status.read_text())
                 if existing['state']=='complete' and (out/'29999/V03_COPY_COMPLETE.json').is_file():
                     status['completed_runs'].append(run['run_id']);continue
                 raise RuntimeError('Existing incomplete run requires inspected full-state resume: '+run['run_id'])
