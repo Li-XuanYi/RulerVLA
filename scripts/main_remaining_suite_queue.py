@@ -50,11 +50,21 @@ def main():
                 rows=subprocess.check_output(['nvidia-smi','--query-gpu=index,memory.free,utilization.gpu','--format=csv,noheader,nounits'],text=True)
                 values={int(line.split(',')[0]):[int(v) for v in line.split(',')[1:]] for line in rows.strip().splitlines()}
                 memory={line.split(':')[0]:int(line.split()[1]) for line in Path('/proc/meminfo').read_text().splitlines()}
+                owners_stable=True
+                for worker in (0,1):
+                    owner=json.loads((root/'outputs/main_comparison'/('spatial_training_queue_worker%d_status.json'%worker)).read_text())
+                    if owner['state']=='complete':continue
+                    current=root/'outputs/main_comparison/train_records'/str(owner.get('current_run'))/'status.json'
+                    if owner['state']!='running' or not current.exists():owners_stable=False;continue
+                    live=json.loads(current.read_text())
+                    try:os.kill(live['pid'],0)
+                    except ProcessLookupError:owners_stable=False;continue
+                    if live['state']!='running' or live.get('optimizer_updates',0)<50:owners_stable=False
                 candidates=[gpu for gpu in (4,5,0,1) if values[gpu][0]>=70000 and values[gpu][1]<=20]
                 status.update(host_available_gib=round(memory['MemAvailable']/1024**2,1),required_host_gib=min_host_gib,
-                    gpu_free_mib={str(gpu):values[gpu][0] for gpu in (4,5,0,1)},eligible_gpus=candidates)
+                    gpu_free_mib={str(gpu):values[gpu][0] for gpu in (4,5,0,1)},eligible_gpus=candidates,spatial_owners_stable=owners_stable)
                 write_json(path,status)
-                if candidates and memory['MemAvailable']>=min_host_gib*1024**2:
+                if candidates and owners_stable and memory['MemAvailable']>=min_host_gib*1024**2:
                     gpu=max(candidates,key=lambda candidate:values[candidate][0]);break
                 time.sleep(20)
             release=root/'outputs/main_comparison/suite_release'/run['suite']
