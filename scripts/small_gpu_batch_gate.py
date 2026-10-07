@@ -26,6 +26,7 @@ def main():
         'scripts/small_gpu_batch_gate.py', 'scripts/main_spatial_train.py', 'scripts/main_gpu_smoke.py',
         'scripts/small_spatial_train.py', 'scripts/small_gpu_smoke.py', 'scripts/small_training_contract.py',
         'scripts/small_training_queue.py', 'src/rulervla/training/accumulation.py',
+        'src/rulervla/training/blocking_snapshot.py',
         'experiments/small_ablation_v1/run_matrix.json']
     sources = {relative:sha(root/relative) for relative in source_paths}
     if path.exists():

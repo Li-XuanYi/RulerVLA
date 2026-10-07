@@ -8,7 +8,7 @@ import sys
 import time
 
 from main_gpu_smoke import write_json
-from small_training_contract import validate_run
+from small_training_contract import validate_run, sha
 
 
 def live(pid):
@@ -17,7 +17,7 @@ def live(pid):
     except ProcessLookupError: return False
 
 
-def resources(root, gpu):
+def resources(root, gpu, profile=None):
     query = subprocess.check_output(['nvidia-smi','--query-gpu=index,memory.free,utilization.gpu',
         '--format=csv,noheader,nounits'],text=True)
     values = {int(line.split(',')[0]):[int(v) for v in line.split(',')[1:]] for line in query.strip().splitlines()}
@@ -38,11 +38,46 @@ def resources(root, gpu):
         if not path.exists(): stable=False; continue
         status = json.loads(path.read_text())
         stable &= status['state']=='running' and status.get('optimizer_updates',0)>=50
-    receipt = dict(host_available_gib=round(memory['MemAvailable']/1024**2,1),required_host_gib=380,
-        gpu_free_mib=values[gpu][0],required_gpu_free_mib=70000,gpu_utilization=values[gpu][1],
+    host_required=profile['required_host_gib'] if profile else 380
+    gpu_required=profile['required_gpu_free_mib'] if profile else 70000
+    receipt = dict(host_available_gib=round(memory['MemAvailable']/1024**2,1),required_host_gib=host_required,
+        gpu_free_mib=values[gpu][0],required_gpu_free_mib=gpu_required,gpu_utilization=values[gpu][1],
         existing_training_initialization_stable=bool(stable),checked_at_unix=time.time())
-    ready = stable and memory['MemAvailable']>=380*1024**2 and values[gpu][0]>=70000 and values[gpu][1]<=20
+    ready = stable and memory['MemAvailable']>=host_required*1024**2 and values[gpu][0]>=gpu_required and values[gpu][1]<=20
     return ready,receipt
+
+
+def memory_profile(root):
+    path=root/'outputs/small_ablation_v1/platform_memory_release.json'
+    if not path.exists(): return None
+    profile=json.loads(path.read_text())
+    assert profile['state']=='validated' and profile['allocator']=='platform'
+    assert profile['required_host_gib']==220 and profile['required_gpu_free_mib']==54369
+    smoke=Path(profile['validated_smoke'])
+    assert sha(smoke)==profile['smoke_sha256']
+    result=json.loads(smoke.read_text())
+    assert result['state']=='complete' and result['full_train_state_restore_bitwise']
+    assert result['blocking_cpu_snapshot_unchanged_after_save']
+    assert result['optimizer_updates']==2 and result['effective_batch']==32
+    return profile
+
+
+def guarded_wait(child,path,status,record=None,release_admission=None):
+    while child.poll() is None:
+        memory={line.split(':')[0]:int(line.split()[1]) for line in Path('/proc/meminfo').read_text().splitlines()}
+        status['host_available_gib_live']=round(memory['MemAvailable']/1024**2,1)
+        if record is not None and record.exists():
+            current=json.loads(record.read_text());status['optimizer_updates']=current.get('optimizer_updates',0)
+            if release_admission is not None and status['optimizer_updates']>=50:
+                release_admission();release_admission=None;status['stage']='formal_training'
+        write_json(path,status)
+        if memory['MemAvailable']<32*1024**2:
+            child.terminate()
+            try: child.wait(timeout=30)
+            except subprocess.TimeoutExpired: child.kill();child.wait()
+            raise RuntimeError('Stopped only small experiment child to preserve 32GiB host reserve')
+        time.sleep(2)
+    return child.wait()
 
 
 def main():
@@ -71,6 +106,7 @@ def main():
     try:
         for run in runs:
             validate_run(root,run)
+            profile=memory_profile(root)
             config = base/'released_runs'/(run['run_id']+'.json')
             write_json(config,run)  # Identity remains exactly the frozen spec.
             smoke_out = base/'gpu_smoke'/run['run_id']
@@ -89,7 +125,7 @@ def main():
                 try: fcntl.flock(admission,fcntl.LOCK_EX | fcntl.LOCK_NB); held=True
                 except BlockingIOError:
                     status['stage']='waiting_for_admission'; write_json(path,status); time.sleep(20); continue
-                ready,receipt = resources(root,gpu)
+                ready,receipt = resources(root,gpu,profile)
                 status.update(stage='waiting_for_resources',resource_snapshot=receipt); write_json(path,status)
                 if ready: break
                 fcntl.flock(admission,fcntl.LOCK_UN); held=False; time.sleep(20)
@@ -97,7 +133,12 @@ def main():
                 OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',PYTHONDONTWRITEBYTECODE='1',WANDB_MODE='disabled',
                 NCCL_P2P_DISABLE='1',NCCL_IB_DISABLE='1',NCCL_SHM_DISABLE='1',NCCL_SOCKET_IFNAME='lo',NCCL_CUMEM_HOST_ENABLE='0')
             env.pop('JAX_PLATFORMS',None)
+            if profile:
+                env['XLA_PYTHON_CLIENT_ALLOCATOR']='platform'
+                status['memory_profile']=str(base/'platform_memory_release.json')
             smoke_status=smoke_out/'status.json'
+            if profile and run['method']=='ActionCoord-only':
+                smoke_status=Path(profile['validated_smoke'])
             if smoke_status.exists():
                 old=json.loads(smoke_status.read_text())
                 assert old['state']=='complete' and old['full_train_state_restore_bitwise'] and old['method']==run['method']
@@ -111,27 +152,26 @@ def main():
                     '--out',str(smoke_out),'--method',run['method'],'--save-restore','--cpu-optimizer','--fsdp-devices','1',
                     '--aimbot-source','/home/yqt/XuanyiLi/openpi0-aimbot/third_party/AimBot/src',
                     '--axisguide-source','/home/yqt/XuanyiLi/AxisGuide-code/src/lerobot/datasets/visual_cue_utils.py']
+                if profile:command.append('--blocking-cpu-save')
                 smoke_log=logs/(run['run_id']+'_smoke.log')
                 with smoke_log.open('a') as stream:
                     child=subprocess.Popen(command,cwd=root,env=env,stdin=subprocess.DEVNULL,stdout=stream,stderr=subprocess.STDOUT)
                 status.update(stage='per_arm_full_ft_smoke',child_pid=child.pid,log=str(smoke_log));write_json(path,status)
-                if child.wait(): raise RuntimeError('Smoke failed: '+str(smoke_log))
+                if guarded_wait(child,path,status): raise RuntimeError('Smoke failed: '+str(smoke_log))
             command=[sys.executable,str(root/'scripts/small_spatial_train.py'),'--run-config',str(config),
                 '--smoke',str(smoke_status),'--cue-audit',str(root/'outputs/main_comparison/cue_audit_20261006_with_wrist/audit.json')]
+            if profile:command.append('--blocking-cpu-save')
             train_log=logs/(run['run_id']+'.log')
             with train_log.open('a') as stream:
                 child=subprocess.Popen(command,cwd=root,env=env,stdin=subprocess.DEVNULL,stdout=stream,stderr=subprocess.STDOUT)
             status.update(stage='formal_training_initialization',child_pid=child.pid,log=str(train_log),
                 formal_training_started=True,smoke_status=str(smoke_status));write_json(path,status)
-            while child.poll() is None:
-                if train_status.exists():
-                    current=json.loads(train_status.read_text())
-                    status['optimizer_updates']=current.get('optimizer_updates',0);write_json(path,status)
-                    if current.get('optimizer_updates',0)>=50:
-                        status['stage']='formal_training';write_json(path,status);break
-                time.sleep(10)
-            fcntl.flock(admission,fcntl.LOCK_UN);held=False
-            if child.wait(): raise RuntimeError('Training failed: '+str(train_log))
+            def release():
+                nonlocal held
+                fcntl.flock(admission,fcntl.LOCK_UN);held=False
+            code=guarded_wait(child,path,status,train_status,release)
+            if held:release()
+            if code: raise RuntimeError('Training failed: '+str(train_log))
             final=json.loads(train_status.read_text())
             assert final['state']=='complete' and final['optimizer_updates']==run['shared_training']['optimizer_updates']
             assert (Path(final['final_checkpoint'])/'V03_COPY_COMPLETE.json').exists()

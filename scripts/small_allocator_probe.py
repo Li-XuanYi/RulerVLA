@@ -1,0 +1,66 @@
+"""Actual GPU5 full-state smoke, allocator-only change and host-memory watchdog."""
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import time
+
+from main_gpu_smoke import write_json
+
+
+def main():
+    root=Path(__file__).resolve().parents[1]
+    out=root/'outputs/small_ablation_v1/allocator_probe_actioncoord_attempt1'
+    out.mkdir(parents=True,exist_ok=False)
+    import fcntl
+    admission=(root/'outputs/main_comparison/logs/remaining_suite_admission.lock').open('w')
+    fcntl.flock(admission,fcntl.LOCK_EX)
+    env=dict(os.environ,CUDA_VISIBLE_DEVICES='5',XLA_PYTHON_CLIENT_PREALLOCATE='false',
+        XLA_PYTHON_CLIENT_ALLOCATOR='platform',OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',
+        PYTHONDONTWRITEBYTECODE='1',WANDB_MODE='disabled')
+    env.pop('JAX_PLATFORMS',None)
+    command=[sys.executable,str(root/'scripts/small_gpu_smoke.py'),
+        '--runtime',str(root/'outputs/main_comparison/runtime_v3'),
+        '--v03-root','/home/yqt/XuanyiLi/actioncoord/work/v03_sync_rgbd_20261003T164806',
+        '--rgbd-root','/home/Dataset2/yqt/openpi-aimbot/spatialcue_depth_source/regenerated_rgbd_v02',
+        '--geometry-root','/home/Dataset2/yqt/rulervla/main_comparison_v1/data_preparation/spatial_geometry',
+        '--out',str(out/'smoke'),'--method','ActionCoord-only','--save-restore','--cpu-optimizer',
+        '--fsdp-devices','1','--blocking-cpu-save',
+        '--aimbot-source','/home/yqt/XuanyiLi/openpi0-aimbot/third_party/AimBot/src',
+        '--axisguide-source','/home/yqt/XuanyiLi/AxisGuide-code/src/lerobot/datasets/visual_cue_utils.py']
+    with (out/'run.log').open('a') as log:
+        child=subprocess.Popen(command,cwd=root,env=env,stdin=subprocess.DEVNULL,stdout=log,stderr=subprocess.STDOUT)
+    status=dict(state='running',pid=os.getpid(),child_pid=child.pid,gpu=5,stage='full_ft_smoke',
+        started_at_unix=time.time(),allocator='platform',reserve_host_gib=32,
+        formal_training_started=False,peak_child_rss_gib=0,minimum_host_available_gib=1e9)
+    write_json(out/'probe_status.json',status)
+    try:
+        while child.poll() is None:
+            memory={line.split(':')[0]:int(line.split()[1]) for line in Path('/proc/meminfo').read_text().splitlines()}
+            available=memory['MemAvailable']/1024**2
+            proc=Path('/proc/%d/status'%child.pid)
+            if proc.exists():
+                rows={line.split(':')[0]:line.split(':')[1].strip() for line in proc.read_text().splitlines() if ':' in line}
+                rss=int(rows.get('VmRSS','0 kB').split()[0])/1024**2
+                status['peak_child_rss_gib']=max(status['peak_child_rss_gib'],rss)
+            status.update(host_available_gib=round(available,1),minimum_host_available_gib=min(status['minimum_host_available_gib'],available),updated_at_unix=time.time())
+            write_json(out/'probe_status.json',status)
+            if available<32:
+                child.terminate();status.update(state='stopped_for_memory',error='Preserved 32GiB host headroom; stopped only probe child')
+                try:child.wait(timeout=30)
+                except subprocess.TimeoutExpired:child.kill();child.wait()
+                break
+            time.sleep(2)
+        code=child.wait();status['child_exit_code']=code
+        if status['state']=='running':
+            smoke=json.loads((out/'smoke/status.json').read_text())
+            status['state']='complete' if code==0 and smoke['state']=='complete' else 'failed'
+            status['smoke']=smoke
+        status['finished_at_unix']=time.time()
+    finally:
+        write_json(out/'probe_status.json',status)
+        fcntl.flock(admission,fcntl.LOCK_UN)
+
+
+if __name__=='__main__':main()

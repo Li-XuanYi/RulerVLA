@@ -37,9 +37,13 @@ def main(supplemental=False):
     parser.add_argument('--fsdp-devices', type=int, default=2)
     parser.add_argument('--save-restore', action='store_true')
     parser.add_argument('--cpu-optimizer', action='store_true')
+    parser.add_argument('--blocking-cpu-save', action='store_true',
+        help='Supplement memory probe: CPU views held immutable through synchronous serialization')
     args = parser.parse_args()
     if supplemental:
         assert args.fsdp_devices == 1 and args.cpu_optimizer and args.save_restore
+    if args.blocking_cpu_save:
+        assert supplemental and args.cpu_optimizer and args.save_restore
     root = Path(__file__).resolve().parents[1]
     sys.path.insert(0, str(root / 'src'))
     sys.path.insert(0, str(args.runtime / 'packages/openpi-client/src'))
@@ -225,7 +229,11 @@ def main(supplemental=False):
             stage = Path('/dev/shm/rulervla_main_smoke_%d' % os.getpid())
             if stage.exists():
                 raise FileExistsError(stage)
-            snapshot, snapshot_evidence = host_snapshot(state)
+            if args.blocking_cpu_save:
+                from rulervla.training.blocking_snapshot import blocking_cpu_snapshot, verify_blocking_snapshot
+                snapshot,snapshot_evidence=blocking_cpu_snapshot(state)
+            else:
+                snapshot, snapshot_evidence = host_snapshot(state)
             write_json(args.out/'snapshot.json', snapshot_evidence)
             manager, _ = checkpoints.initialize_checkpoint_dir(stage, keep_period=None, overwrite=False, resume=False)
             class LoaderAssets:
@@ -237,6 +245,9 @@ def main(supplemental=False):
             archive = Path('/home/Dataset2/yqt/rulervla')/archive_family/'smoke_checkpoints'/args.out.name/'1'
             publish_checkpoint(stage/'1', archive, completed_updates=2)
             verify_checkpoint(archive, expected_updates=2)
+            if args.blocking_cpu_save:
+                verify_blocking_snapshot(snapshot,snapshot_evidence)
+                status['blocking_cpu_snapshot_unchanged_after_save']=True
             status.update(stage='restoring_checkpoint', checkpoint_saved=True, checkpoint=str(archive),
                 checkpoint_archive_sha_verified=True)
             write_json(args.out/'status.json', status)

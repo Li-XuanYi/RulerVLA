@@ -2,6 +2,24 @@
 
 冻结研究设计见 `SMALL_ABLATION_PROTOCOL.md`。本记录说明实际工程放行和进程状态，不更改原始 run_matrix、条件列表和共同训练参数。
 
+## 最新：正式训练已实际开始
+
+下方为本日早先的等待记录。经过真实GPU5两步full-FT和完整保存恢复验收，已放行低缓存分配方式：
+
+- **S23 ActionCoord-only：GPU5，训练PID276641，目标30000更新；核验时已完成3次正式更新。** loss 0.108287→0.096945→0.095144，gradient norm有限且非零。
+- GPU5新队列PID276602；ActionCoord完成后接Ruler-only。GPU4新队列PID276486；CameraXYZ等待容量，当前GPU4有其他任务高占用。
+- official pi05_base独立重新初始化，432 episodes/52970 frames，full FT、有效batch32、seed42、warmup1k/30k cosine、四槽、horizon10均未变。
+- `XLA_PYTHON_CLIENT_ALLOCATOR=platform`减少缓存保留；优化器/EMA仍在CPU。每次更新间可能只看到很少新增GPU显存，应以真实metrics/status判断训练是否推进。
+- checkpoint改为CPU不可变视图的严格阻塞保存，保存与Dataset2发布、SHA核验全部结束前不更新或donate state；保存前后SHA一致，完整weights/optimizer/EMA恢复逐字节一致。未改模型精度、架构或训练方式。
+- 两步smoke使用了33.53亿参数，loss 0.074276/0.075231，grad_norm 0.993012/1.161824，无NaN/OOM。smoke权重没有用于正式warm start。
+- 放行容量依实测调整为GPU空闲≥54369MiB、host≥220GiB，初始化仍串行；持续守护保留32GiB主机余量，只在不足时停止小实验子进程。旧380GiB/70000MiB等待门槛不再用于已验收的低缓存配置。
+- 真实训练前两批的sample_indices SHA与GPU2/3的Baseline、AimBot完全一致。完整证据在 `reports/S22_S23_actual_training_20261007.json`。
+- `/home2`有空间但当前yqt无可写目录，因此没有使用该盘或操作他人目录；暂存仍在自己的RAM目录，Dataset2归档保持完整。
+
+```bash
+tail -f /home/yqt/XuanyiLi/RulerVLA/outputs/small_ablation_v1/logs/S23_actioncoord_only_spatial_seed42.log
+```
+
 ## 已完成
 
 - 补充训练入口调用同一个 `main_spatial_train.main(supplemental=True)`；没有复制训练循环。唯一方法变化为 `SmallAblationAdapter`。

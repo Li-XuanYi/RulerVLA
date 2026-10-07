@@ -19,6 +19,7 @@ def main(supplemental=False):
     parser.add_argument('--smoke', type=Path, required=True)
     parser.add_argument('--cue-audit', type=Path, required=True)
     parser.add_argument('--resume', action='store_true')
+    parser.add_argument('--blocking-cpu-save', action='store_true')
     parser.add_argument('--suite-release',type=Path,help='Required audited release directory for non-Spatial suites')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
@@ -42,6 +43,9 @@ def main(supplemental=False):
     assert shared['initial_checkpoint'] == smoke['initial_checkpoint']
     if supplemental:
         assert smoke['method'] == run['method'] and smoke['optimizer_updates'] == 2
+    if args.blocking_cpu_save:
+        assert supplemental and smoke['blocking_cpu_snapshot_unchanged_after_save']
+        assert os.environ.get('XLA_PYTHON_CLIENT_ALLOCATOR') == 'platform'
     output = Path(run['checkpoint_root'])
     output.mkdir(parents=True,exist_ok=True)
     import fcntl
@@ -78,6 +82,8 @@ def main(supplemental=False):
         target_optimizer_updates=target_updates,micro_batch=1,gradient_accumulation=32,effective_batch=32,
         optimizer_and_ema_on_cpu=True,full_finetuning=True,lora=False,formal_training_started=True,
         initial_checkpoint=shared['initial_checkpoint'],started_at_unix=time.time(),checkpoint_root=str(output))
+    status.update(allocator=os.environ.get('XLA_PYTHON_CLIENT_ALLOCATOR','default'),
+        blocking_cpu_save=args.blocking_cpu_save)
     status_path=output/'status.json'
     record_family = 'small_ablation_v1' if supplemental else 'main_comparison'
     records=RunRecords(root/'outputs'/record_family/'train_records'/run['run_id'],output)
@@ -204,11 +210,17 @@ def main(supplemental=False):
                     # Serialize large CPU snapshots and RAM staging across independent GPU workers.
                     with (root/'outputs/main_comparison/checkpoint_staging.lock').open('w') as save_lock:
                         fcntl.flock(save_lock,fcntl.LOCK_EX)
-                        snapshot,evidence=host_snapshot(state)
+                        if args.blocking_cpu_save:
+                            from rulervla.training.blocking_snapshot import blocking_cpu_snapshot, verify_blocking_snapshot
+                            snapshot,evidence=blocking_cpu_snapshot(state)
+                        else:
+                            snapshot,evidence=host_snapshot(state)
                         checkpoints.save_state(manager,snapshot,Assets(),step);manager.wait_until_finished()
                         destination=output/str(step)
                         publish_with_retry(stage/str(step),destination,step+1,publish_checkpoint,verify_checkpoint)
                         retry_io(lambda: verify_checkpoint(destination,expected_updates=step+1))
+                        if args.blocking_cpu_save:
+                            verify_blocking_snapshot(snapshot,evidence)
                         write_json(output/('snapshot_%d.json'%step),evidence)
                         import shutil
                         retry_io(lambda: shutil.copy2(records.local/'metrics.jsonl',output/'metrics.jsonl'))
