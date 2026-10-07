@@ -60,6 +60,20 @@ def main():
         LIBERO_CONFIG_PATH='/home/yqt/XuanyiLi/actioncoord/fixes/framework_fix_20261002T151206Z/libero_config')
     try:
         for stage, command in stages:
+            if args.worker == 'rgbd':
+                suite = stage.removesuffix('_rgbd')
+                manifest_path = STORE/'suite_rgbd'/suite/'manifest.json'
+                if manifest_path.exists():
+                    cached = json.loads(manifest_path.read_text())
+                    expected = json.loads((ROOT/'experiments/main_comparison_v1/suite_manifests'/(suite+'.json')).read_text())
+                    if cached.get('complete'):
+                        assert cached['total_frames'] == expected['frames']
+                        assert sorted(row['episode_index'] for row in cached['episodes']) == expected['episode_ids']
+                        assert all(Path(row['npz']).is_file() for row in cached['episodes'])
+                        status['completed_stages'].append(stage)
+                        save()
+                        print('Reusing completed RGB-D suite: '+suite,flush=True)
+                        continue
             status.update(current_stage=stage, command=command)
             with (log_dir / (stage + '.log')).open('a') as stream:
                 child = subprocess.Popen(command, env=env, stdout=stream, stderr=subprocess.STDOUT)
