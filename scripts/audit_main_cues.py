@@ -11,8 +11,9 @@ from PIL import Image, ImageDraw
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--rgbd-root', type=Path, required=True)
-    parser.add_argument('--geometry-root', type=Path, required=True)
+    parser.add_argument('--rgbd-root', type=Path)
+    parser.add_argument('--geometry-root', type=Path)
+    parser.add_argument('--suite-root', type=Path, help='Combined completed RGB-D/geometry for Object, Goal or Long')
     parser.add_argument('--aimbot-source', type=Path, required=True)
     parser.add_argument('--axisguide-source', type=Path, required=True)
     parser.add_argument('--out', type=Path, required=True)
@@ -23,16 +24,25 @@ def main():
     from rulervla.config import load_config
     from rulervla.adapters.openpi import resize_rgb
     args.out.mkdir(parents=True, exist_ok=True)
-    rows = json.loads((args.rgbd_root/'regen_manifest.json').read_text())['episodes']
-    geo_rows = json.loads((args.geometry_root/'manifest.json').read_text())['episodes']
+    if args.suite_root:
+        assert args.rgbd_root is None and args.geometry_root is None
+        manifest=json.loads((args.suite_root/'manifest.json').read_text())
+        assert manifest['complete']
+        rows=manifest['episodes']
+        geo_rows=[dict(row,geometry_npz=row['npz']) for row in rows]
+    else:
+        assert args.rgbd_root is not None and args.geometry_root is not None
+        rows = json.loads((args.rgbd_root/'regen_manifest.json').read_text())['episodes']
+        geo_rows = json.loads((args.geometry_root/'manifest.json').read_text())['episodes']
     geometry = {row['episode_index']: row for row in geo_rows}
     methods = ('Baseline', 'AimBot', 'AxisGuide-adapted', 'RulerVLA-main')
     adapters = {name: MainCueAdapter(load_config(root/'configs/rulervla_main.yaml'), name,
         aimbot_source=args.aimbot_source, axisguide_source=args.axisguide_source) for name in methods}
     selected = [next(row for row in rows if row['task'] == task) for task in sorted({row['task'] for row in rows})]
-    sheet = Image.new('RGB', (224*8, 248*10), 'white')
+    assert len(selected)==10
+    sheet = Image.new('RGB', (224*8, 248*len(selected)), 'white')
     draw = ImageDraw.Draw(sheet)
-    wrist_sheet = Image.new('RGB', (224*8, 248*10), 'white')
+    wrist_sheet = Image.new('RGB', (224*8, 248*len(selected)), 'white')
     wrist_draw = ImageDraw.Draw(wrist_sheet)
     results = []
     for task_index, row in enumerate(selected):
