@@ -2,7 +2,7 @@
   "schema": "small_ablation_protocol_v1",
   "frozen_date": "2026-10-07",
   "protocol_document_sha256": "bd2a66f41389f1e1317acb74bf012071b381f59bb188c3db0214d3d9cfa3cddd",
-  "run_matrix_sha256": "8f04e3571456e8aecfe6e73187bf9eb62a87e022cc1096824c1a019b12b54efe",
+  "run_matrix_sha256": "33e7abf9b44903f507e4ffdae6506449e52d8c4d614838eba5f8a2774d7de355",
   "primary_suite": "libero_spatial",
   "training_seed": 42,
   "effective_batch": 32,

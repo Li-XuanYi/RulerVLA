@@ -10,7 +10,7 @@ ROOT=Path(__file__).resolve().parents[1]
 
 def write(path,data):
     path.parent.mkdir(parents=True,exist_ok=True)
-    path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    path.write_bytes((json.dumps(data,ensure_ascii=False,indent=2)+'\n').encode('utf-8'))
 
 
 def main():
