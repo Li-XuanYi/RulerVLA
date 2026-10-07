@@ -1,4 +1,4 @@
-"""30k Spatial full-FT run, released only after common smoke and cue gates."""
+"""30k suite full-FT run, released only after common smoke and suite cue gates."""
 import argparse
 import dataclasses
 import importlib.util
@@ -19,6 +19,7 @@ def main():
     parser.add_argument('--smoke', type=Path, required=True)
     parser.add_argument('--cue-audit', type=Path, required=True)
     parser.add_argument('--resume', action='store_true')
+    parser.add_argument('--suite-release',type=Path,help='Required audited release directory for non-Spatial suites')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     run = json.loads(args.run_config.read_text())
@@ -26,7 +27,7 @@ def main():
     smoke = json.loads(args.smoke.read_text())
     cue = json.loads(args.cue_audit.read_text())
     review = json.loads((args.cue_audit.parent/'visual_review.json').read_text())
-    assert run['suite'] == 'libero_spatial'
+    assert run['suite'] in {'libero_spatial','libero_object','libero_goal','libero_10'}
     assert smoke['state'] == 'complete' and smoke['forward_backward_passed']
     assert smoke['checkpoint_restored'] and smoke['full_train_state_restore_bitwise']
     assert smoke['optimizer_and_ema_on_cpu'] and smoke['effective_batch'] == 32
@@ -54,7 +55,7 @@ def main():
     from rulervla.adapters.main_comparison import MainComparisonInputs
     from rulervla.config import load_config
     from rulervla.training.accumulation import accumulated_gradients, apply_gradients
-    from rulervla.training.main_data import SpatialDataset, update_indices, file_sha
+    from rulervla.training.main_data import SpatialDataset, SuiteDataset, update_indices, file_sha
     from rulervla.training.storage_io import RunRecords, retry_io, publish_with_retry
     from actioncoord.integration.v03_checkpoint_snapshot import host_snapshot
     from actioncoord.integration.v03_storage import publish_checkpoint, verify_checkpoint
@@ -76,12 +77,27 @@ def main():
     status['local_record_root']=str(records.local)
     write_json(status_path,status)
     try:
-        rgbd=Path('/home/Dataset2/yqt/openpi-aimbot/spatialcue_depth_source/regenerated_rgbd_v02')
-        geometry=Path('/home/Dataset2/yqt/rulervla/main_comparison_v1/data_preparation/spatial_geometry')
-        dataset=SpatialDataset(rgbd,geometry)
-        norm_dir=args.smoke.parent.parent/'shared_spatial_norm'
+        if run['suite']=='libero_spatial':
+            rgbd=Path('/home/Dataset2/yqt/openpi-aimbot/spatialcue_depth_source/regenerated_rgbd_v02')
+            geometry=Path('/home/Dataset2/yqt/rulervla/main_comparison_v1/data_preparation/spatial_geometry')
+            dataset=SpatialDataset(rgbd,geometry)
+            norm_dir=args.smoke.parent.parent/'shared_spatial_norm'
+            expected_norm_sha=smoke['norm_stats_sha256']
+            data_manifests={'rgbd':rgbd/'regen_manifest.json','geometry':geometry/'manifest.json'}
+        else:
+            assert args.suite_release is not None
+            release=json.loads((args.suite_release/'release.json').read_text())
+            assert release['suite']==run['suite'] and release['numerical_preflight_passed']
+            assert not release['visual_review_pending'] and release['cue_audit_sha256']==file_sha(args.cue_audit)
+            rgbd=Path('/home/Dataset2/yqt/rulervla/main_comparison_v1/data_preparation/suite_rgbd')/run['suite']
+            definition=root/'experiments/main_comparison_v1/suite_manifests'/(run['suite']+'.json')
+            assert release['manifest_sha256']==file_sha(rgbd/'manifest.json')
+            assert release['suite_definition_sha256']==file_sha(definition)
+            dataset=SuiteDataset(rgbd,definition)
+            norm_dir=args.suite_release/'norm';expected_norm_sha=release['norm_stats_sha256']
+            data_manifests={'rgbd_geometry':rgbd/'manifest.json'}
         norm_stats=normalize.load(norm_dir)
-        assert file_sha(norm_dir/'norm_stats.json')==smoke['norm_stats_sha256']
+        assert file_sha(norm_dir/'norm_stats.json')==expected_norm_sha
         policy_config=Pi0Config(pi05=True,action_horizon=10,discrete_state_input=False)
         sched=shared['scheduler'];opt=shared['optimizer']
         training_config=dataclasses.replace(config.get_config('pi05_libero'),model=policy_config,batch_size=32,
@@ -113,7 +129,7 @@ def main():
             if not saved_steps:
                 raise FileNotFoundError('No saved full state to resume')
             previous=json.loads((output/'execution_lock.json').read_text())
-            assert previous['run']==run and previous['norm_stats_sha256']==smoke['norm_stats_sha256']
+            assert previous['run']==run and previous['norm_stats_sha256']==expected_norm_sha
             latest=saved_steps[-1];verify_checkpoint(output/str(latest),expected_updates=latest+1)
             import shutil
             stage.mkdir(parents=True,exist_ok=False)
@@ -129,6 +145,11 @@ def main():
                 return config.DataConfig(asset_id='physical-intelligence/libero',norm_stats=norm_stats)
         if args.resume:
             state=checkpoints.restore_state(manager,state,Assets(),step=latest)
+            jax.block_until_ready(state)
+            manager.close()
+            assert stage.resolve().parent==Path('/dev/shm') and stage.name==('rulervla_main_'+run['run_id']+'_'+str(os.getpid()))
+            shutil.rmtree(stage)
+            manager,_=checkpoints.initialize_checkpoint_dir(stage,keep_period=None,overwrite=False,resume=False)
         assert not jax.tree.leaves(state.params.filter(training_config.freeze_filter))
         first_update=int(jax.device_get(state.step))
         graph=state.model_def
@@ -140,11 +161,10 @@ def main():
         execution=dict(run=run,common_smoke_sha256=file_sha(args.smoke),
             cue_audit_sha256=file_sha(args.cue_audit),visual_review=review,runtime_manifest_sha256=file_sha(runtime/'RULERVLA_RUNTIME_MANIFEST.json'),
             micro_batch=1,gradient_accumulation=32,effective_batch=32,optimizer_and_ema_on_cpu=True,
-            episodes=432,frames=52970,sampler='uniform shuffled epochs, SeedSequence(training_seed,epoch)',
+            episodes=len(dataset.rows),frames=len(dataset),sampler='uniform shuffled epochs, SeedSequence(training_seed,epoch)',
             norm_stats_sha256=file_sha(norm_dir/'norm_stats.json'),staging_path=str(stage))
         execution['git_commit'] = __import__('subprocess').check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
-        execution['data_manifest_sha256'] = {'rgbd':file_sha(rgbd/'regen_manifest.json'),
-            'geometry':file_sha(geometry/'manifest.json')}
+        execution['data_manifest_sha256'] = {key:file_sha(value) for key,value in data_manifests.items()}
         write_json(output/('resume_execution_%d.json'%os.getpid()) if args.resume else output/'execution_lock.json',execution)
         with (records.local/'metrics.jsonl').open('a',buffering=1) as log,sharding.set_mesh(gpu_mesh):
             for step in range(first_update,30000):
@@ -180,6 +200,12 @@ def main():
                         import shutil
                         retry_io(lambda: shutil.copy2(records.local/'metrics.jsonl',output/'metrics.jsonl'))
                         del snapshot
+                        # Dataset2 retains every checkpoint. Release only this run's
+                        # verified temporary RAM staging before another worker saves.
+                        manager.close()
+                        assert stage.resolve().parent==Path('/dev/shm') and stage.name==('rulervla_main_'+run['run_id']+'_'+str(os.getpid()))
+                        shutil.rmtree(stage)
+                        manager,_=checkpoints.initialize_checkpoint_dir(stage,keep_period=None,overwrite=False,resume=False)
                     status['latest_checkpoint']=str(destination);write_json(status_path,status)
         manager.close();status.update(state='complete',stage='complete',finished_at_unix=time.time(),final_checkpoint=str(output/'29999'))
     except BaseException as error:

@@ -61,7 +61,10 @@ class SpatialDataset:
     @staticmethod
     def _load_episode(row, geometry):
         assert file_sha(row['npz']) == row['npz_sha256']
-        assert file_sha(geometry['geometry_npz']) == geometry['geometry_sha256']
+        if geometry['geometry_npz']==row['npz']:
+            assert geometry['geometry_sha256']==row['npz_sha256']
+        else:
+            assert file_sha(geometry['geometry_npz']) == geometry['geometry_sha256']
         with np.load(row['npz'], allow_pickle=False) as z:
             arrays = {key: z[key] for key in ('agentview_rgb','wrist_rgb','agentview_depth_m','ee_world_m','actions')}
         with np.load(geometry['geometry_npz'], allow_pickle=False) as z:
@@ -71,3 +74,18 @@ class SpatialDataset:
         for value in arrays.values():
             value.setflags(write=False)
         return arrays
+
+
+class SuiteDataset(SpatialDataset):
+    """Same frame/chunk contract for a combined, complete Object/Goal/Long cache."""
+    def __init__(self, rgbd_root, suite_definition):
+        manifest=json.loads((Path(rgbd_root)/'manifest.json').read_text())
+        expected=json.loads(Path(suite_definition).read_text())
+        self.rows=sorted(manifest['episodes'],key=lambda row:row['episode_index'])
+        assert manifest['complete'] and manifest['suite']==expected['suite']
+        assert [row['episode_index'] for row in self.rows]==expected['episode_ids']
+        assert len(self.rows)==expected['episodes']
+        self.geometry={row['episode_index']:dict(geometry_npz=row['npz'],geometry_sha256=row['npz_sha256']) for row in self.rows}
+        self.ends=np.cumsum([row['frames'] for row in self.rows])
+        assert int(self.ends[-1])==manifest['total_frames']==expected['frames']
+        self.cache=OrderedDict()
