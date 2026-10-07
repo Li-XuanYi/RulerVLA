@@ -1,0 +1,2007 @@
+{
+  "source_plan_sha256": "9a0fdf4cd48091381655c56b102f303a8d50cae44e98b47192abab9c25b0661f",
+  "conditions": [
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 0,
+      "environment_seed": 0,
+      "initial_state_sha256": "4e3eaf7a315bc3bafb6db4837c8eef0e5f8aea717782a2a3ea33139392d966ed"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 1,
+      "environment_seed": 1,
+      "initial_state_sha256": "6c2936dc25a97728b811f9db579687d011cbd231d5472e985775a67ca9892cf8"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 2,
+      "environment_seed": 2,
+      "initial_state_sha256": "a5d4b6d871eb48c276a3fc8499e1429ec1c59df278466aa82de44a93260087a0"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 3,
+      "environment_seed": 3,
+      "initial_state_sha256": "c12064bdc97da3ba4ca3675548ba9c76ed096ea772bbec9ca9422628c41b1588"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 4,
+      "environment_seed": 4,
+      "initial_state_sha256": "63dbd6b627e35e377a62f3e791055bc9051a74cab6fef9eadce7892671160536"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 5,
+      "environment_seed": 5,
+      "initial_state_sha256": "c9c2f8022034e9a0705daab34a7f5bf9947ac939dfc5cf5a0ab493a377028a02"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 6,
+      "environment_seed": 6,
+      "initial_state_sha256": "784dba596f01025199c62c3e262748c68f1f3b6ff92df2fd36aab8b5263bc0ce"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 7,
+      "environment_seed": 7,
+      "initial_state_sha256": "d297dd693cb3e13a607d16f211730e28c50b463f597f066ef2a424a8a036186c"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 8,
+      "environment_seed": 8,
+      "initial_state_sha256": "3f628d77bb395ff9ff2b248e18e5dea19d9b1103ed48b55df4eafa29188bd9f0"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 9,
+      "environment_seed": 9,
+      "initial_state_sha256": "6ccefe4bd69954c98ddc32f1acdcff81b5a66ed4304391089bbc027172b66d64"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 10,
+      "environment_seed": 10,
+      "initial_state_sha256": "f6ce6f7f25326bedc23933bb436b5f6eb4810cef61184635c75395e557e1808f"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 11,
+      "environment_seed": 11,
+      "initial_state_sha256": "f9b377d4c4ca5e3bef55b3eff2599229c22f2d944cd5df22c9a8b68882d9dc11"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 12,
+      "environment_seed": 12,
+      "initial_state_sha256": "504db0289ad1061538940e63d39bcfc82bf536dbf5f9083a1692a0e3a2852d79"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 13,
+      "environment_seed": 13,
+      "initial_state_sha256": "2fd168faf38ffee7943a97f4f9589b8e4ed4acb89670c3004a6541dcc4925bc6"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 14,
+      "environment_seed": 14,
+      "initial_state_sha256": "a695298e9ef752b05e4d30c817ab1e2061a6136d65242dac7a2cce63f858b9fd"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 15,
+      "environment_seed": 15,
+      "initial_state_sha256": "51f7d2ae92042fec16a54dd5cd6823eac63f9c096a04bae00a5ec737d8db2cd8"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 16,
+      "environment_seed": 16,
+      "initial_state_sha256": "db2c9ab25c6b23526efa6be860e4bd8330fab9a84131628f2dea6fe4062f993d"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 17,
+      "environment_seed": 17,
+      "initial_state_sha256": "cf9d2825f843308d0880ee0d5e3099a43ae2395e616351f6bae4c046dd50198a"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 18,
+      "environment_seed": 18,
+      "initial_state_sha256": "1f130e9178c4924cf8d24e175c2f0573a5e089299ddf6984b71265abf65bd4e0"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 0,
+      "instruction": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_00/init_states_50.npy",
+      "init_states_file_sha256": "cc4c7799d14c2e8b3769a2bc7b566049dd793cff4741df6a56c5b234eb833ff9",
+      "scene_index": 19,
+      "environment_seed": 19,
+      "initial_state_sha256": "18f349fb4d8b52566befcd2a80723d533717d8dd5dada90ecd7721d512b65e32"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 0,
+      "environment_seed": 0,
+      "initial_state_sha256": "d116842e01703fbea595511db813a3816c8d9f2302b4e979ebec4f15b7a750a2"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 1,
+      "environment_seed": 1,
+      "initial_state_sha256": "b8757ca36fc25bb010af8934ff98b8d3a221cbd3a5e38e7b07cc8055c3108a0b"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 2,
+      "environment_seed": 2,
+      "initial_state_sha256": "d45a8bb759e662331e34b0ade8f7a4ca847993b682d3299aaa4894b340c845a0"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 3,
+      "environment_seed": 3,
+      "initial_state_sha256": "9cdfce0fe3434dc2c261272bc32dd3b56956de7c14e1e6d4c8a76aa7323e0f4d"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 4,
+      "environment_seed": 4,
+      "initial_state_sha256": "97916cb27d2a1b9650016b93bbc33aa2855dfbdd11ded29650da8357c5c418e2"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 5,
+      "environment_seed": 5,
+      "initial_state_sha256": "d0345028d24b7dda175db33c7eb0e5c1d4df2fdf5620c51dd3641fdc77750964"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 6,
+      "environment_seed": 6,
+      "initial_state_sha256": "74548b977713394a062b37d064eb857cc795b1dd9e3dd6f72236514b2f85404c"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 7,
+      "environment_seed": 7,
+      "initial_state_sha256": "a45364f84a9e141a83181828fb6b8fb37a162e7e85d8636fa891064717f1f95e"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 8,
+      "environment_seed": 8,
+      "initial_state_sha256": "dec62b7a7f186620b39af37c3354071d3b720a7c93e5de1ca14e54f28bc76d41"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 9,
+      "environment_seed": 9,
+      "initial_state_sha256": "4c98afd093bda011d941abba6e2d53d57d3b258fe56cfdfbc4dc74d50260f9ae"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 10,
+      "environment_seed": 10,
+      "initial_state_sha256": "b0c9ecec06f999784b644016624af927deef020c8c7afee36946fd439c9f45d3"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 11,
+      "environment_seed": 11,
+      "initial_state_sha256": "dbec87b164a53746107bf8c0d65457de9b6c7b34eb033d5feaf6484af0b336d3"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 12,
+      "environment_seed": 12,
+      "initial_state_sha256": "b006cf551055a36a035803ef84f01d8fd6a00d1d5d2683ce2afbe0ae4b71ebdb"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 13,
+      "environment_seed": 13,
+      "initial_state_sha256": "6f694f45d065ddf64d33eb4fdcc791477ad36584a304eea9d83b0c054583079b"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 14,
+      "environment_seed": 14,
+      "initial_state_sha256": "0525c9e710afca2e894805d74ab6860315c289ef216629f858714d595f16499d"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 15,
+      "environment_seed": 15,
+      "initial_state_sha256": "e066d2a2b83106d42b1ebba4879b77a4206fe243c2722620df89ddf2724112be"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 16,
+      "environment_seed": 16,
+      "initial_state_sha256": "4f194fc2e167205fe0cb404ac38fc61d19637e9a22a914c4a59950813501bc4f"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 17,
+      "environment_seed": 17,
+      "initial_state_sha256": "d7e0d413dd7853419fb3d2c740087d47828487f25b21b485447376ebaf1946ee"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 18,
+      "environment_seed": 18,
+      "initial_state_sha256": "b7a22aa591d638c864be3019d088fec8a4fd1460d74098f0ead3193c5bed40c6"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 1,
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_01/init_states_50.npy",
+      "init_states_file_sha256": "4721e08a51dcc9b8e20ec150787f48786c5c8364e8ce6f4862ebf16db9fad2bc",
+      "scene_index": 19,
+      "environment_seed": 19,
+      "initial_state_sha256": "7ed62144c063138af691f12437505b3fe5200d7e464743f57ae599fe238e6fcc"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 0,
+      "environment_seed": 0,
+      "initial_state_sha256": "408c455fb617e5320060d643ef80ec2035d4e98600659cc3deb5a1e85482bf76"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 1,
+      "environment_seed": 1,
+      "initial_state_sha256": "05962fe9baf173d80806225d32a331fa8eedcdb5c14a085ee5354715380c0f8f"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 2,
+      "environment_seed": 2,
+      "initial_state_sha256": "111971abb8f2e699872e68aa0ed445287da5c2ed642a5da083a9c9d4d90a6d12"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 3,
+      "environment_seed": 3,
+      "initial_state_sha256": "8e240fdf6a9c939b6cbf573f7e07a29d3078fb53d22b17dc595b730c0de21fd4"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 4,
+      "environment_seed": 4,
+      "initial_state_sha256": "ec0ce01e43aac4b4465f6d7932a486df948ce36a096fe5970b677623505673a8"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 5,
+      "environment_seed": 5,
+      "initial_state_sha256": "244227d010ee2b731b1226316f6f51ddc0b589941068f68e88e7778eabf2e302"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 6,
+      "environment_seed": 6,
+      "initial_state_sha256": "015663b2e58bace14677f65f8871f622d3c7c24fb3938114fbacaa91ff56d38b"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 7,
+      "environment_seed": 7,
+      "initial_state_sha256": "3e05dba60bf1a41c0bc853e8480cee4f4a7c58fc86ae62cec40fdc9e5f61cbe0"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 8,
+      "environment_seed": 8,
+      "initial_state_sha256": "10d28a829243d7c83db659e2c66233f7bee106f22cfe5b2261f9f9831ebac708"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 9,
+      "environment_seed": 9,
+      "initial_state_sha256": "864819f19088c1c5f38f9b06923ccebd4818892a4bb231cedc71b892d2a2bc67"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 10,
+      "environment_seed": 10,
+      "initial_state_sha256": "a5783c80f66d8ee9f612b35b9451f4d856d51490248ddfafb528e325f8e6764c"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 11,
+      "environment_seed": 11,
+      "initial_state_sha256": "47530669e02bf233026da635b8092163537080a7031e3a43201feab9274a9d04"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 12,
+      "environment_seed": 12,
+      "initial_state_sha256": "44c095bf575781a707629ff0af5acc9e80ab7ddcf2ac9c9fb6245249dec6060b"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 13,
+      "environment_seed": 13,
+      "initial_state_sha256": "bf439eb9bbf4ded8477d245ff49e8ff00c520c79607cdc50d4238c46c04414af"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 14,
+      "environment_seed": 14,
+      "initial_state_sha256": "fa7608e3c09171809707e8ea49121debab0c56c38b1060a676d295fdcc633928"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 15,
+      "environment_seed": 15,
+      "initial_state_sha256": "45770514fe0b8e43809603f66532b15c29966b8bd10e974ac4934a32bcc2c94d"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 16,
+      "environment_seed": 16,
+      "initial_state_sha256": "048497d9ac994d7efd126ba1cb5794d350e266ab578ecba687fb31b9d529984e"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 17,
+      "environment_seed": 17,
+      "initial_state_sha256": "d3c93a325a74c6fb997498769e0608ac9e40c83950ded8f9dfdf6eb0e187f4ed"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 18,
+      "environment_seed": 18,
+      "initial_state_sha256": "c36f01f74b686f82c83b3ea55dcb018a741cfefe09b6d120ae227c9c21faf2ff"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 2,
+      "instruction": "pick up the black bowl from table center and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_02/init_states_50.npy",
+      "init_states_file_sha256": "7d646142c0298e851d70623b28d1bdd0adabb687788a1a4900f3f396e46765ed",
+      "scene_index": 19,
+      "environment_seed": 19,
+      "initial_state_sha256": "8b4a7bfbf0fff7d6bf560b38e4cf156bf967a1ee574e0e8b90944781ca52c664"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 0,
+      "environment_seed": 0,
+      "initial_state_sha256": "36424fa758f0e72399a35cefa285d0658e4b5bd17bfb3e2127f85aa2e0944517"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 1,
+      "environment_seed": 1,
+      "initial_state_sha256": "3a92ca9cb754b9daca5db603179f05e323c01209edfaf5d287655d5998252f9f"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 2,
+      "environment_seed": 2,
+      "initial_state_sha256": "1b7b03eb038b60bd3d265226a1f5832c44ebb968731ac264f8983ceebb1774e5"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 3,
+      "environment_seed": 3,
+      "initial_state_sha256": "904c8983a02abc68413c2b0c2b1863f9b7f97a5948b718b9ae113727777ae23a"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 4,
+      "environment_seed": 4,
+      "initial_state_sha256": "6aac318bd2ff7b4e940c094d4d4eb128449f99e34ce1fc2fb6e3bdba1c474b95"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 5,
+      "environment_seed": 5,
+      "initial_state_sha256": "6dac57dbcf0ffc62ca6a37b1334c61683200e4b3e944c2de2eb98563b1c6df56"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 6,
+      "environment_seed": 6,
+      "initial_state_sha256": "cc809ea238ea9d71bcd0fa683f60c51f7d2a3864963da43149e4df35d0eed85f"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 7,
+      "environment_seed": 7,
+      "initial_state_sha256": "b58022b980ae6497859d4ad985cfa89b16832f4c7f82cd2abb8b03cb2e0f6119"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 8,
+      "environment_seed": 8,
+      "initial_state_sha256": "7d5f3b9821665f85bbf943b1da3fa03d53b694bc8751b4503a39a7351734f89b"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 9,
+      "environment_seed": 9,
+      "initial_state_sha256": "d60041b13e4f125b32f1d55912b939701a3ddfc2815acb15484be856e2943dae"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 10,
+      "environment_seed": 10,
+      "initial_state_sha256": "769f3a08b75e4357785695fb7985920bb2e312d05b9b99ec76c182555afab656"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 11,
+      "environment_seed": 11,
+      "initial_state_sha256": "9ede7c34efdb378d99cbab23cf7a1c5160188fb17e2f54308ce3b4fbb6712d58"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 12,
+      "environment_seed": 12,
+      "initial_state_sha256": "0a03f52fd9b04847f49d54916274b6c8bac86898e31b582cfd7b5b3c3fcae0df"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 13,
+      "environment_seed": 13,
+      "initial_state_sha256": "796c143330826bb9f4544037bed5bdf85fff4e5d92eb32bdfecaf382ea948e8f"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 14,
+      "environment_seed": 14,
+      "initial_state_sha256": "6cf18c532b8185267195e43178fe22383f03c14c097cba540e5d20f1adc0a34c"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 15,
+      "environment_seed": 15,
+      "initial_state_sha256": "52361b17e964ee6de88d5cacda510e638cf084542ea78d76c70a5d395726abd5"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 16,
+      "environment_seed": 16,
+      "initial_state_sha256": "423931bf6a388befaa73aee6d7505d928643429025cfd78629d28fd20fd85227"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 17,
+      "environment_seed": 17,
+      "initial_state_sha256": "afbd7079d975f031f72f9f86d4f9b0546bb5aba956165e546a303aca82f6b006"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 18,
+      "environment_seed": 18,
+      "initial_state_sha256": "f8f9fc0451830fc655416dddfbe161dd478fe1024e89da2515d3f11d5e324d58"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 3,
+      "instruction": "pick up the black bowl on the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_03/init_states_50.npy",
+      "init_states_file_sha256": "3d88cb85a720c866ebd8057a3dcec03427d90b6abd27265f22881d7f6c7155ec",
+      "scene_index": 19,
+      "environment_seed": 19,
+      "initial_state_sha256": "506d45d3efe3f6738675330af8d19d16069ff0ddf8470ffad2306e592c3b48ed"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 0,
+      "environment_seed": 0,
+      "initial_state_sha256": "2e3f91b350eaef1b23c2d4ee14c513b2158a106bff7ed6c249b58e2cf89367f4"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 1,
+      "environment_seed": 1,
+      "initial_state_sha256": "d1f552d41794709fdcdccf886e4be6384f15a50c1d0e6227a99e08d86e19e23e"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 2,
+      "environment_seed": 2,
+      "initial_state_sha256": "d5a2a728be37ce588fd1326df08b48cb9e1913b333c6719bb7059308783d4731"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 3,
+      "environment_seed": 3,
+      "initial_state_sha256": "7e950b4903eb62f247605b60952d62aca17222446e05c299de3d8b615756a2fb"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 4,
+      "environment_seed": 4,
+      "initial_state_sha256": "eacc257cf75be38a89bdf75e5300cded0aee0ec1d0a2ac4b91d4c4cdb11c763b"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 5,
+      "environment_seed": 5,
+      "initial_state_sha256": "b87346216738a7ce42130dcd154c43380035d684b66a383eaa412aa7d7295b7c"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 6,
+      "environment_seed": 6,
+      "initial_state_sha256": "58efbae8fa8cdf03edfa2542dbbda4caf806bdf5268b8320a00f1549b00bec95"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 7,
+      "environment_seed": 7,
+      "initial_state_sha256": "f90125fb43ad6d5983af928adc76f7ad7520f2ce624dbd25bb45e1888a5a9e56"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 8,
+      "environment_seed": 8,
+      "initial_state_sha256": "2b61811f6b6a9a61b89a236fd0b30a5b10539a70b67c34209624cfdf52af4e5a"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 9,
+      "environment_seed": 9,
+      "initial_state_sha256": "6a71ea6e55326efc34ec666f301a018286ad06f19222511f0c3af44896801580"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 10,
+      "environment_seed": 10,
+      "initial_state_sha256": "7bb0de6b71378924db79db6837d31679f6792129b7d9861f58532ba7332d6eb3"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 11,
+      "environment_seed": 11,
+      "initial_state_sha256": "7ca087b8eea266273cbf99c09f51cc5cfee48a1e6408b367fedf168fc1c9cb15"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 12,
+      "environment_seed": 12,
+      "initial_state_sha256": "08c27762b56ead1630b15d284b71f591009a21d824139674181aae9060b98920"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 13,
+      "environment_seed": 13,
+      "initial_state_sha256": "066159b34ab7fd2c9a3292b11143f7a8d51f697aff2ea00ea90e7eeeeb06e2ba"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 14,
+      "environment_seed": 14,
+      "initial_state_sha256": "cf92dad8abe4770b520ec4e6bf4a9c074cbdc829e6c7bffae73060682dee7d69"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 15,
+      "environment_seed": 15,
+      "initial_state_sha256": "cb5e701ddd05a14b73dade2a434b1ce1bd338ce61091f2e5c21eef2af3c91ce2"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 16,
+      "environment_seed": 16,
+      "initial_state_sha256": "2fd6bf6a9d7196b0c22521e814d89983b55b5ee584b68a3de0ca6ff4659cfaba"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 17,
+      "environment_seed": 17,
+      "initial_state_sha256": "f5d465f187549523ee7aaedba70bf6427cc717feb1cdc5beffdb576b406b6ead"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 18,
+      "environment_seed": 18,
+      "initial_state_sha256": "aa414e9c1b365ba49f5754f04a6d22fe76579e537cc0532defd2b143c8162449"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 4,
+      "instruction": "pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_04/init_states_50.npy",
+      "init_states_file_sha256": "52a81d5186470f1b761915994f17eb49c09ee67a661002e4a4d398f330337aea",
+      "scene_index": 19,
+      "environment_seed": 19,
+      "initial_state_sha256": "c3c1ec2925956850aa3e3a52f63f7b6887c58e2e6cd4900bb07100abe491a044"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 0,
+      "environment_seed": 0,
+      "initial_state_sha256": "63f019944e240d60a5770936f1eaa3853e38bbfeb1c26c987826fb004ed4346c"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 1,
+      "environment_seed": 1,
+      "initial_state_sha256": "7e74f7975ea3899ecb94c8bee1f302127d74c600d13393826d7537db89bf9cc1"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 2,
+      "environment_seed": 2,
+      "initial_state_sha256": "56ae454858e60cf316c3e75237109ba85d8808ab2ef57108c3f9b96c1e839ff3"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 3,
+      "environment_seed": 3,
+      "initial_state_sha256": "316d2aba39523fa1219e5fd61ee263535f5d42fa5b34541af5397ddbb4de0f9f"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 4,
+      "environment_seed": 4,
+      "initial_state_sha256": "b41c19206da1db4e005476e6a4c4e077a5511aaa69cf52614dc483a9bd53773c"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 5,
+      "environment_seed": 5,
+      "initial_state_sha256": "8a66e26dcb5684fb06268d8558ec89cb48b496d3ba03c491d620ac3d37bba6ba"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 6,
+      "environment_seed": 6,
+      "initial_state_sha256": "a9b966c9cf9cc8d424d7ae20f2e72e57c828aef13f172c2643fa7f7d3b194181"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 7,
+      "environment_seed": 7,
+      "initial_state_sha256": "987aabd844775a9b57c09e65ce787dcc8b38ef6f8b0c5565dbd48c83ba6ced2f"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 8,
+      "environment_seed": 8,
+      "initial_state_sha256": "d6c4a596a6f3f6e5bb1b2366f1a4598afaca8d263b0a4e50652479a1ee117ed7"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 9,
+      "environment_seed": 9,
+      "initial_state_sha256": "b97e853cb653df09c54d36b06bd56c40dff4222ea2f6c4a01d6847e1a9b607eb"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 10,
+      "environment_seed": 10,
+      "initial_state_sha256": "bfaff55ad30b79eb4f16c1791d3353527b55561b017b783ffc10277aa26494e0"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 11,
+      "environment_seed": 11,
+      "initial_state_sha256": "ff39aa05adeb3467ae4e7003d9b14f9f9d307101ecb6ef43d415020975ee3ba8"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 12,
+      "environment_seed": 12,
+      "initial_state_sha256": "1035069b81bb91a6134b4ca623b29076df3a99387db6110fabbe0b7aa70d5437"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 13,
+      "environment_seed": 13,
+      "initial_state_sha256": "3731069406dc50d234dfc8e8cdff9b2a4e2e00970ebd0d000af7dea9884a4236"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 14,
+      "environment_seed": 14,
+      "initial_state_sha256": "a5932cf3fc7c1839b68d324f8e724108874c30a15b7936c821543aaff18663a6"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 15,
+      "environment_seed": 15,
+      "initial_state_sha256": "a4deab6566eeb86430ab9f1e5f4f8167ab666fecaf318188b9ce5f5d15999921"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 16,
+      "environment_seed": 16,
+      "initial_state_sha256": "7230223d3b36c289be0dc4cfbfe916bfe65e2b20c4755b123504b97f9db19e76"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 17,
+      "environment_seed": 17,
+      "initial_state_sha256": "6fd8ad771d6691f57d4512a8036552c7b7f13cc92730d96e1fe04cf10f19f622"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 18,
+      "environment_seed": 18,
+      "initial_state_sha256": "bae20d83cc8f5698c74606627590ca7a468ddfcefb40d2b14e88f856ead59dac"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 5,
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_05/init_states_50.npy",
+      "init_states_file_sha256": "1a37b1c6f6b2eadc1fa4253f4a086f3847a91c97c4dd26807abf12beb00587a9",
+      "scene_index": 19,
+      "environment_seed": 19,
+      "initial_state_sha256": "abdc5421f4dbbe198b856e56c8808bb94de1984fbc206990666daac8c48b94f9"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 0,
+      "environment_seed": 0,
+      "initial_state_sha256": "d81530779b15be6bdfe4935a7a802102e3e3883823b29fefd40a2131e50fd515"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 1,
+      "environment_seed": 1,
+      "initial_state_sha256": "1f2318d9cbd670217d18ba98020fb95f9969550b5cb30709224eb6f2d08319cf"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 2,
+      "environment_seed": 2,
+      "initial_state_sha256": "f6387456ce397a4ffbd6700d00f37cf068df8df4c085350ecd576be0c06fe838"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 3,
+      "environment_seed": 3,
+      "initial_state_sha256": "d19a9fb4d0ecb282facdf60aeb779a54566f6650fa8886721c253c21e5b4411c"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 4,
+      "environment_seed": 4,
+      "initial_state_sha256": "62a70d2032d8d785b0a4afedbfce1abf35ff393e9d918b5aace7a41ab50ba13d"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 5,
+      "environment_seed": 5,
+      "initial_state_sha256": "5a499b730ad51bec1d7a79a787b43dd62eb4c99b34d13f92a74cafebf7b6f9de"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 6,
+      "environment_seed": 6,
+      "initial_state_sha256": "9fe1e2e5914a33d82379a012d69199ead3e5a7248d4ca37da81786863dbc643d"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 7,
+      "environment_seed": 7,
+      "initial_state_sha256": "f0dc954a7059fa3185a63ea648be5fa5fac395b27f135e0771adc594f837b49c"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 8,
+      "environment_seed": 8,
+      "initial_state_sha256": "949373f1f909d26e57ace693cadbd21aa658d89546cf2f4ded0fd3e17a4606ac"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 9,
+      "environment_seed": 9,
+      "initial_state_sha256": "0ffc5da6f449cc4be5f2d6fbe4ea569c870e80a127d9aef2bced08e1407e4b5f"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 10,
+      "environment_seed": 10,
+      "initial_state_sha256": "eaf7293a6bf87fbf51f658f8b9f3041bb271b943e2b32b84852f939acb653f15"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 11,
+      "environment_seed": 11,
+      "initial_state_sha256": "086d92098f70b4304ee849a551a8841bc5540af72329890224b8c9d7eb4269aa"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 12,
+      "environment_seed": 12,
+      "initial_state_sha256": "6d69d364b3ba6a780de6a6b553be102a7076031abb03b27e25d10867efcaa40a"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 13,
+      "environment_seed": 13,
+      "initial_state_sha256": "5b5f5be6756670be320c90d8ddc74a90debb4c433c896028bac1169196d00f26"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 14,
+      "environment_seed": 14,
+      "initial_state_sha256": "42f14bceb4a4442495e345b5e2cae5a449eaa30105c546c8349a09bbba379d34"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 15,
+      "environment_seed": 15,
+      "initial_state_sha256": "5ac177ae8b3d5faae0f96018f1a10c896aa28c50cf164f892a63ace956e84d67"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 16,
+      "environment_seed": 16,
+      "initial_state_sha256": "2d63eeddc4973f63b27ea3eedb94aeb27091ca0ffca689f19f33f469304ff547"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 17,
+      "environment_seed": 17,
+      "initial_state_sha256": "cc6c84732e3358311f9cfb008badb2e680c95edae0258090dc72ca95c7ecc6d8"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 18,
+      "environment_seed": 18,
+      "initial_state_sha256": "cd32e37a9f4452ae643216373cd731097bb26b2de5b4179c598f449dffe7883c"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 6,
+      "instruction": "pick up the black bowl next to the cookie box and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_06/init_states_50.npy",
+      "init_states_file_sha256": "a7a7f82e111712754ab2bb7419e7c48d88e5c34ba7bb3ce9a7b260bc4924ab12",
+      "scene_index": 19,
+      "environment_seed": 19,
+      "initial_state_sha256": "83c492e3e060153644099b67cfed0ea3ba076f44b5c1d483cbe93efe90266de7"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 0,
+      "environment_seed": 0,
+      "initial_state_sha256": "501105aff4e1897d96cac0d0ee69fc702ad209e317511807e27df8b421ae1f2a"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 1,
+      "environment_seed": 1,
+      "initial_state_sha256": "9fb3287b9233e63f3c25de74a5c1697d6c3e3ce33d71da6cb975e98884df7b65"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 2,
+      "environment_seed": 2,
+      "initial_state_sha256": "055ebb922514bbc2796db6201c2eb1f36c0f2dc6d3e906bdfed720d9d67f25e1"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 3,
+      "environment_seed": 3,
+      "initial_state_sha256": "fb10b9a998805283abff88cfd066b7f6b4130868e2b53e5f6def7247f72b6c5a"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 4,
+      "environment_seed": 4,
+      "initial_state_sha256": "3caf9d7ec66e840dd915ee960dc5e226df2aee678fa087f77cac918e4169531e"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 5,
+      "environment_seed": 5,
+      "initial_state_sha256": "b887ede88d157e4e55c6c31aa79eec7ea0c950034f6111fd9f619c423469d483"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 6,
+      "environment_seed": 6,
+      "initial_state_sha256": "583801d2f7fa2816c9b5a290cd4e954a88c7b5a43f9bc4c7735ba26633f7997d"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 7,
+      "environment_seed": 7,
+      "initial_state_sha256": "7a2ae9fdc7b6512f45182c6c1eb0605cfc023075e306c0c5909078fe235db309"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 8,
+      "environment_seed": 8,
+      "initial_state_sha256": "ab1daae4e2f98cfe102420e3659a5e9b27643619d8637f8985b729db38be5b54"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 9,
+      "environment_seed": 9,
+      "initial_state_sha256": "546f905e8563676df7f13cf4071337c8e75b41ba50d997ad1732d0d666be50f5"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 10,
+      "environment_seed": 10,
+      "initial_state_sha256": "134b79de0703478113dd0dcff51a78fc95723a65f5bc0ace2fea3a4b429706ce"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 11,
+      "environment_seed": 11,
+      "initial_state_sha256": "86e1a1699c62958a3e3fe25e7f8a598cd67698b05f68e4c44d5ccfe3a34d2415"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 12,
+      "environment_seed": 12,
+      "initial_state_sha256": "da8243989fd7207ad4188c0b95665984656070c8d5f5c8fe7450de83d3db9467"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 13,
+      "environment_seed": 13,
+      "initial_state_sha256": "97cdc22f59d8f3ca1195ffe3005c257478fa743b2edc7427950718b01381a7ae"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 14,
+      "environment_seed": 14,
+      "initial_state_sha256": "ab04f435365a442c36f1fcfaf55412b385fb16192a1abca51fc22276b8f81f71"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 15,
+      "environment_seed": 15,
+      "initial_state_sha256": "c2d397c97dff15be672ebc121b0bf6a49522c58cc15164b688b81dcf1f53486c"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 16,
+      "environment_seed": 16,
+      "initial_state_sha256": "7ca0656515f25ac924542e0f9fdc1de90bd8f52c93368dde245b0d8d902b7b1f"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 17,
+      "environment_seed": 17,
+      "initial_state_sha256": "dfefa2e8fbfa660e7ad3f9fe8abfc5f0334de73d23101a02f4832a3e88b399f7"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 18,
+      "environment_seed": 18,
+      "initial_state_sha256": "a8adffa84c6ca0334dbd7c5f04255f37049725d84d1fff85bffd76f24e22a98c"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 7,
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_07/init_states_50.npy",
+      "init_states_file_sha256": "eb6a7a507ffba774ba2e91acb3aaf152c6008fb24c2759181a95ea3c7384a95a",
+      "scene_index": 19,
+      "environment_seed": 19,
+      "initial_state_sha256": "33513be059126ac134cdc4bc4e77077909122fc4e90b908bf8e9f3a149568415"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 0,
+      "environment_seed": 0,
+      "initial_state_sha256": "aef30979e2ee8c9893c9161c881264362f750a34df952f381e3969a567688451"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 1,
+      "environment_seed": 1,
+      "initial_state_sha256": "50873b51eb943c92ce71438551a26675e253fe37622918167c060a16477577f7"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 2,
+      "environment_seed": 2,
+      "initial_state_sha256": "4463e2e153ce61661d48384171f0532d4eb4c45158ab9c0325012e26c0a9d830"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 3,
+      "environment_seed": 3,
+      "initial_state_sha256": "8d1fbf0d1785c75002a47f290b3b6d195d3a26b8c9a86cf95512ba804fd36d4b"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 4,
+      "environment_seed": 4,
+      "initial_state_sha256": "ad6e3d768b047e190024a0a97a7869b0de5c83bfd7079cb2b048725b6c5c90f5"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 5,
+      "environment_seed": 5,
+      "initial_state_sha256": "6b4f91c1a15155e7f0a6ce3085bea10bef88c0cb5fa46526cf7115c56ca930e4"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 6,
+      "environment_seed": 6,
+      "initial_state_sha256": "e6c8b330e200dfac047d69461946edfa16c7526af280af94e5f035ca3f04a88e"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 7,
+      "environment_seed": 7,
+      "initial_state_sha256": "b0c0e39e2152058d077abf5025369e5183dc4b393291a638d59a529c54de2a63"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 8,
+      "environment_seed": 8,
+      "initial_state_sha256": "5cdf91438b981a12625fd10436771752a3d3a34bc99b3865800876064d71f6ac"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 9,
+      "environment_seed": 9,
+      "initial_state_sha256": "caf2ae97e43664e04a6534a50c176db42a116e6ccc6c963a6646f725ac07545e"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 10,
+      "environment_seed": 10,
+      "initial_state_sha256": "e6f05a53e5845b0332df031c9505cd9fbe0ab7eb64c29fb9da4952f28044148c"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 11,
+      "environment_seed": 11,
+      "initial_state_sha256": "a4bd8a6e1ff1837fb1e9464878301e0bb49cc600be2e261e5a749dcd572bb4aa"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 12,
+      "environment_seed": 12,
+      "initial_state_sha256": "22d3ac1a1c779c4a9f8249421bbe58f887c47cb7f7dd8302409066bf3074f628"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 13,
+      "environment_seed": 13,
+      "initial_state_sha256": "2398199a160896a8388fc8bf236829b9b45f4b05af5c9fc4b30d1fcdbfc46b20"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 14,
+      "environment_seed": 14,
+      "initial_state_sha256": "249d796cf13fea915ea0930c2cb94f5a4cccc0341be5758ea6cc64bf136936a0"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 15,
+      "environment_seed": 15,
+      "initial_state_sha256": "837065b5d5e92195cc5f9e7b89da3cca12228766cc72f5fcff69ffbcdfd30be4"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 16,
+      "environment_seed": 16,
+      "initial_state_sha256": "ba007128ac93f07dae4d1bd9c147dfe1b2793a7b934adee4666212617eccb8ff"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 17,
+      "environment_seed": 17,
+      "initial_state_sha256": "be6fbfec818b29b08a928dcc4b6be90ad5a7f2d829cd41071924230c8331a735"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 18,
+      "environment_seed": 18,
+      "initial_state_sha256": "21e9a30cf8e0eb3cf2c39deaf2f67ab160c505d26a8a7517d7ec659243f1d114"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 8,
+      "instruction": "pick up the black bowl next to the plate and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_08/init_states_50.npy",
+      "init_states_file_sha256": "b468d01b40ee27350e43efd4138034350604adb8c520e9a7c944ee1d70dcf471",
+      "scene_index": 19,
+      "environment_seed": 19,
+      "initial_state_sha256": "d391e42a6d2629a0c03aac61e103e668843920f864dfda9e010698f465ae1805"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 0,
+      "environment_seed": 0,
+      "initial_state_sha256": "885cdd89e3d71824f79e4f0ae4711f9ca04367c0011147cb657ecc32be3f375b"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 1,
+      "environment_seed": 1,
+      "initial_state_sha256": "9f7e0be6c15a36f64dae1f64c4e89799ab70078be2b9977ab38bce16aee041cf"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 2,
+      "environment_seed": 2,
+      "initial_state_sha256": "6e3698ba2ffc6e03326d30f3fd411f63e4d5304a967abf515195cbbcc61f512b"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 3,
+      "environment_seed": 3,
+      "initial_state_sha256": "c886eacbd6a6b3c55108d5e17d8d0f865c08b7841f1c0f0393df6b4da9dc53c3"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 4,
+      "environment_seed": 4,
+      "initial_state_sha256": "49ada1c8c36ae86de4d6288f08b9434efbd67ded5688382fd38b0d4c95304177"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 5,
+      "environment_seed": 5,
+      "initial_state_sha256": "3696f68817ba2c2ce9da0453042f1ba257245c07b7a4a814be58e0903b20efcf"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 6,
+      "environment_seed": 6,
+      "initial_state_sha256": "54598c38c111468114f1ba90bd651ea406747053136212c6e48a29dcecc1d89d"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 7,
+      "environment_seed": 7,
+      "initial_state_sha256": "f4e929cfbc734ce820906169165ff4cd18d641e944a183f686943303751b9fd6"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 8,
+      "environment_seed": 8,
+      "initial_state_sha256": "b1ed9a6a0930dfb10e2a1e103608cb68bae0f2bff2cf89ed283a6ebe00c28f96"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 9,
+      "environment_seed": 9,
+      "initial_state_sha256": "1798c4b6a1487a8d4cbe773e8c4ac1be5ac48439f0c3df53adc5cf84f757cc1f"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 10,
+      "environment_seed": 10,
+      "initial_state_sha256": "40079500b684bdfbb3f25d84d83bfe317f80795775b599d07f1cc36aea830616"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 11,
+      "environment_seed": 11,
+      "initial_state_sha256": "f65cf8d853b7dde7059cf39b95312ddcb8a7348644a4ab69349cc52091c8cf08"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 12,
+      "environment_seed": 12,
+      "initial_state_sha256": "13ce745b9607f6b8d98864b6ac40c2d526fd7ddd64cd912a00dfacc4214b28b0"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 13,
+      "environment_seed": 13,
+      "initial_state_sha256": "ed9093014c75f523152e1e046dce0f928a134b4a56288ebd3979ac38e1034bca"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 14,
+      "environment_seed": 14,
+      "initial_state_sha256": "ea57df2d58f867c189b2f0bd2b5eac2e2402ada4f3082dd0233f33d5109c23dc"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 15,
+      "environment_seed": 15,
+      "initial_state_sha256": "e5466b756c5f5583d1efe6408171fabdb6d57c076492841aaed2cf862bcb2086"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 16,
+      "environment_seed": 16,
+      "initial_state_sha256": "76e2ded6c389300a73bb7cf4306348a5ccb531ed7730f54c7fef7cb704955eca"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 17,
+      "environment_seed": 17,
+      "initial_state_sha256": "f6f3204e80922a4262c002a95fe878d8af31ae89305568ebdc0ab750f6ddaa50"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 18,
+      "environment_seed": 18,
+      "initial_state_sha256": "0c9b215520647ce1a2fb63052acb60707a3f3a9325d0e6a6c90015e9248e180c"
+    },
+    {
+      "suite": "libero_spatial",
+      "task_index": 9,
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "init_states_file": "/home/yqt/XuanyiLi/RulerVLA/outputs/main_comparison/eval_environment_preflight/libero_spatial/task_09/init_states_50.npy",
+      "init_states_file_sha256": "087810bedee383142a86b5ca336ca1b4ebfc4fc814e59c8c980087e0f5cb09b9",
+      "scene_index": 19,
+      "environment_seed": 19,
+      "initial_state_sha256": "f794efb4eb6e80746d815c6544cdfd24ec8dcf58c45780ffee26adab7532c50b"
+    }
+  ],
+  "selection": "task order; first20 primary or first3 intervention; outcome-independent",
+  "policy_sampling_contract": "pending exact main evaluation runtime freeze; must match before result reuse"
+}

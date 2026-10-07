@@ -1,0 +1,20 @@
+{
+  "experiment_id": "S26",
+  "display_name": "S26_\u8868\u793a\u6838\u9a8c",
+  "tasks": 10,
+  "frames": 50,
+  "input_contract_passed": true,
+  "existing_main_endpoints_bitwise_equal": true,
+  "basis_equivalence_max_error_m": 8.881784197001252e-16,
+  "existing_actioncoord_max_error_m": 0.0,
+  "maximum_component_clip_ratio": {
+    "camera_xyz": 0.0,
+    "camera_ee": 0.0,
+    "action_xyz": 0.0,
+    "actioncoord": 0.0
+  },
+  "encoding_gate_passed": true,
+  "rgbd_manifest_sha256": "02e428d9a3735bb959cdc29c1ca415cde73c2b9f6763ce1545603f385b8e127c",
+  "geometry_manifest_sha256": "f09a5d2b021058d51f54e54fb54e1222f8d1202eff805c6ba96efee00cbb0e9e",
+  "observations": "Engineering/geometry evidence only; no learned performance or causal benefit result"
+}

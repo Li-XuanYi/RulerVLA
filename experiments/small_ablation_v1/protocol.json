@@ -1,0 +1,43 @@
+{
+  "schema": "small_ablation_protocol_v1",
+  "frozen_date": "2026-10-07",
+  "protocol_document_sha256": "bd2a66f41389f1e1317acb74bf012071b381f59bb188c3db0214d3d9cfa3cddd",
+  "run_matrix_sha256": "8f04e3571456e8aecfe6e73187bf9eb62a87e022cc1096824c1a019b12b54efe",
+  "primary_suite": "libero_spatial",
+  "training_seed": 42,
+  "effective_batch": 32,
+  "micro_batch": 1,
+  "accumulation": 32,
+  "input_slots": 4,
+  "encoding_radius_m": 3.25,
+  "warmup_updates": 1000,
+  "cosine_decay_updates": 30000,
+  "primary_eval": {
+    "tasks": 10,
+    "official_initial_states_per_task": 20,
+    "cases_per_arm": 200,
+    "source": "outputs/main_comparison/eval_environment_preflight/paired_scene_plan.json",
+    "simulator_and_policy_sampling_contract": "must exactly match frozen main evaluation before release"
+  },
+  "inference_intervention": {
+    "experiment_id": "S25",
+    "tasks": 10,
+    "states_per_task": 3,
+    "conditions_per_state": 7,
+    "inference_calls": 210,
+    "rollouts": 0,
+    "required_checkpoint": "L06 Spatial RulerVLA-main seed42 step29999"
+  },
+  "reuse": {
+    "S22_ActionCoord": "S23 ActionCoord-only checkpoint9999; identical first10k optimizer prefix",
+    "S23_Baseline": "L06 libero_spatial_baseline_seed42 checkpoint29999",
+    "S23_RulerVLA": "L06 libero_spatial_rulervla_main_seed42 checkpoint29999",
+    "S24": "S22 matched10k CameraXYZ/ActionCoord snapshots"
+  },
+  "case_manifests": {
+    "primary_cases_200.json": "3fe4b2f151f5352b05a62e3b15cbae03f6cf2e4506e844b4a175f12a623a3438",
+    "intervention_cases_30.json": "52a475f2a127ae3ec10db7b41b9b79d6221fc308630cc41d42c226183b12e96f"
+  },
+  "new_training_started": false,
+  "old_protocol_results_preserved": true
+}
