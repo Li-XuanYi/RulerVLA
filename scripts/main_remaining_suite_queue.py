@@ -63,6 +63,9 @@ def main():
                 '--smoke',str(smoke),'--cue-audit',str(release/'cue_audit/audit.json'),'--suite-release',str(release)]
             env=dict(os.environ,CUDA_VISIBLE_DEVICES=str(args.gpu),XLA_PYTHON_CLIENT_PREALLOCATE='false',
                 OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',PYTHONDONTWRITEBYTECODE='1',WANDB_MODE='disabled')
+            # The lightweight scheduler may run CPU-only; its training child must
+            # select the assigned CUDA device, not inherit that platform override.
+            env.pop('JAX_PLATFORMS',None)
             log_path=logs/(run['run_id']+'.log')
             while True:
                 # Serialize admission, so two workers cannot both consume the same
