@@ -88,6 +88,21 @@ def main():
 
 
 def try_launch(root,status,path,args,min_host_gib,command,env,log_path):
+    # Small supplements take the next genuinely spare capacity on this GPU.
+    # Existing full-training children are never interrupted.
+    small_path=root/('outputs/small_ablation_v1/training_queue_worker%d_status.json'%args.worker_index)
+    if small_path.exists():
+        small=json.loads(small_path.read_text())
+        if small['state']=='running' and small['gpu']==args.gpu:
+            try:
+                os.kill(small['pid'],0)
+                cmdline=Path('/proc/%d/cmdline'%small['pid']).read_bytes()
+            except (ProcessLookupError,FileNotFoundError):pass
+            else:
+                if b'small_training_queue.py' in cmdline:
+                    status.update(stage='waiting_for_small_experiment_priority',small_queue_pid=small['pid'])
+                    write_json(path,status)
+                    return None
     rows=subprocess.check_output(['nvidia-smi','--query-gpu=index,memory.free,utilization.gpu','--format=csv,noheader,nounits'],text=True)
     values={int(line.split(',')[0]):[int(v) for v in line.split(',')[1:]] for line in rows.strip().splitlines()}
     memory={line.split(':')[0]:int(line.split()[1]) for line in Path('/proc/meminfo').read_text().splitlines()}

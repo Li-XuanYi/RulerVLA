@@ -13,7 +13,7 @@ import numpy as np
 from main_gpu_smoke import write_json
 
 
-def main():
+def main(supplemental=False):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run-config', type=Path, required=True)
     parser.add_argument('--smoke', type=Path, required=True)
@@ -24,6 +24,10 @@ def main():
     root = Path(__file__).resolve().parents[1]
     run = json.loads(args.run_config.read_text())
     shared = run['shared_training']
+    target_updates = shared['optimizer_updates']
+    if supplemental:
+        from small_training_contract import validate_run
+        validate_run(root, run)
     smoke = json.loads(args.smoke.read_text())
     cue = json.loads(args.cue_audit.read_text())
     review = json.loads((args.cue_audit.parent/'visual_review.json').read_text())
@@ -33,8 +37,11 @@ def main():
     assert smoke['optimizer_and_ema_on_cpu'] and smoke['effective_batch'] == 32
     assert cue['passed'] and review['passed']
     assert shared['finetuning'] == 'full' and not shared['lora'] and not shared['freeze_backbone']
-    assert shared['optimizer_updates'] == 30000 and shared['effective_batch'] == 32
+    assert (target_updates in (10000, 30000) if supplemental else target_updates == 30000)
+    assert shared['effective_batch'] == 32
     assert shared['initial_checkpoint'] == smoke['initial_checkpoint']
+    if supplemental:
+        assert smoke['method'] == run['method'] and smoke['optimizer_updates'] == 2
     output = Path(run['checkpoint_root'])
     output.mkdir(parents=True,exist_ok=True)
     import fcntl
@@ -68,11 +75,12 @@ def main():
     assert jax.device_count() == 1
     status = dict(state='running',stage='loading_data',pid=os.getpid(),run_id=run['run_id'],method=run['method'],
         suite=run['suite'],seed=run['seed'],gpu_ids=os.environ['CUDA_VISIBLE_DEVICES'],optimizer_updates=0,
-        target_optimizer_updates=30000,micro_batch=1,gradient_accumulation=32,effective_batch=32,
+        target_optimizer_updates=target_updates,micro_batch=1,gradient_accumulation=32,effective_batch=32,
         optimizer_and_ema_on_cpu=True,full_finetuning=True,lora=False,formal_training_started=True,
         initial_checkpoint=shared['initial_checkpoint'],started_at_unix=time.time(),checkpoint_root=str(output))
     status_path=output/'status.json'
-    records=RunRecords(root/'outputs/main_comparison/train_records'/run['run_id'],output)
+    record_family = 'small_ablation_v1' if supplemental else 'main_comparison'
+    records=RunRecords(root/'outputs'/record_family/'train_records'/run['run_id'],output)
     write_json=records.write
     status['local_record_root']=str(records.local)
     write_json(status_path,status)
@@ -81,7 +89,8 @@ def main():
             rgbd=Path('/home/Dataset2/yqt/openpi-aimbot/spatialcue_depth_source/regenerated_rgbd_v02')
             geometry=Path('/home/Dataset2/yqt/rulervla/main_comparison_v1/data_preparation/spatial_geometry')
             dataset=SpatialDataset(rgbd,geometry)
-            norm_dir=args.smoke.parent.parent/'shared_spatial_norm'
+            norm_dir=(root/'outputs/main_comparison/gpu_smoke_20261006/shared_spatial_norm'
+                if supplemental else args.smoke.parent.parent/'shared_spatial_norm')
             expected_norm_sha=smoke['norm_stats_sha256']
             data_manifests={'rgbd':rgbd/'regen_manifest.json','geometry':geometry/'manifest.json'}
         else:
@@ -101,14 +110,18 @@ def main():
         policy_config=Pi0Config(pi05=True,action_horizon=10,discrete_state_input=False)
         sched=shared['scheduler'];opt=shared['optimizer']
         training_config=dataclasses.replace(config.get_config('pi05_libero'),model=policy_config,batch_size=32,
-            seed=run['seed'],num_train_steps=30000,fsdp_devices=1,ema_decay=shared['ema_decay'],wandb_enabled=False,
+            seed=run['seed'],num_train_steps=target_updates,fsdp_devices=1,ema_decay=shared['ema_decay'],wandb_enabled=False,
             weight_loader=weight_loaders.CheckpointWeightLoader(shared['initial_checkpoint']),
             optimizer=optimizer.AdamW(b1=opt['beta1'],b2=opt['beta2'],eps=opt['eps'],weight_decay=opt['weight_decay'],
                 clip_gradient_norm=opt['clip_gradient_norm']),lr_schedule=optimizer.CosineDecaySchedule(
                 warmup_steps=sched['warmup_updates'],peak_lr=sched['peak_lr'],decay_steps=sched['decay_updates'],decay_lr=sched['end_lr']))
-        cue_adapter=MainCueAdapter(load_config(root/'configs/rulervla_main.yaml'),run['method'],
-            aimbot_source='/home/yqt/XuanyiLi/openpi0-aimbot/third_party/AimBot/src',
-            axisguide_source='/home/yqt/XuanyiLi/AxisGuide-code/src/lerobot/datasets/visual_cue_utils.py')
+        if supplemental:
+            from rulervla.adapters.small_ablation import SmallAblationAdapter
+            cue_adapter=SmallAblationAdapter(load_config(root/'configs/rulervla_main.yaml'),run['method'])
+        else:
+            cue_adapter=MainCueAdapter(load_config(root/'configs/rulervla_main.yaml'),run['method'],
+                aimbot_source='/home/yqt/XuanyiLi/openpi0-aimbot/third_party/AimBot/src',
+                axisguide_source='/home/yqt/XuanyiLi/AxisGuide-code/src/lerobot/datasets/visual_cue_utils.py')
         transform=transforms.compose([MainComparisonInputs(model_type=policy_config.model_type),
             transforms.Normalize(norm_stats,use_quantiles=True,strict=True),
             transforms.TokenizePrompt(PaligemmaTokenizer(policy_config.max_token_len),discrete_state_input=False),
@@ -167,7 +180,7 @@ def main():
         execution['data_manifest_sha256'] = {key:file_sha(value) for key,value in data_manifests.items()}
         write_json(output/('resume_execution_%d.json'%os.getpid()) if args.resume else output/'execution_lock.json',execution)
         with (records.local/'metrics.jsonl').open('a',buffering=1) as log,sharding.set_mesh(gpu_mesh):
-            for step in range(first_update,30000):
+            for step in range(first_update,target_updates):
                 start=time.time();indices=update_indices(len(dataset),run['seed'],step)
                 status.update(stage='preparing_batch',current_optimizer_update=step+1);write_json(status_path,status)
                 entries=[transform(cue_adapter.prepare(dataset[int(index)])) for index in indices]
@@ -207,7 +220,7 @@ def main():
                         shutil.rmtree(stage)
                         manager,_=checkpoints.initialize_checkpoint_dir(stage,keep_period=None,overwrite=False,resume=False)
                     status['latest_checkpoint']=str(destination);write_json(status_path,status)
-        manager.close();status.update(state='complete',stage='complete',finished_at_unix=time.time(),final_checkpoint=str(output/'29999'))
+        manager.close();status.update(state='complete',stage='complete',finished_at_unix=time.time(),final_checkpoint=str(output/str(target_updates-1)))
     except BaseException as error:
         status.update(state='failed',error=repr(error),finished_at_unix=time.time());raise
     finally:

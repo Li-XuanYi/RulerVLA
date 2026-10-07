@@ -20,14 +20,16 @@ def write_json(path, payload):
     os.replace(temporary, path)
 
 
-def main():
+def main(supplemental=False):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime', type=Path, required=True)
     parser.add_argument('--v03-root', type=Path, required=True)
     parser.add_argument('--rgbd-root', type=Path, required=True)
     parser.add_argument('--geometry-root', type=Path, required=True)
     parser.add_argument('--out', type=Path, required=True)
-    parser.add_argument('--method', choices=['Baseline', 'AimBot', 'AxisGuide-adapted', 'RulerVLA-main'], required=True)
+    choices = (['CameraXYZ-only', 'Ruler-only', 'ActionCoord-only'] if supplemental
+        else ['Baseline', 'AimBot', 'AxisGuide-adapted', 'RulerVLA-main'])
+    parser.add_argument('--method', choices=choices, required=True)
     parser.add_argument('--aimbot-source', type=Path, required=True)
     parser.add_argument('--axisguide-source', type=Path, required=True)
     parser.add_argument('--micro-batch', type=int, default=1)
@@ -36,6 +38,8 @@ def main():
     parser.add_argument('--save-restore', action='store_true')
     parser.add_argument('--cpu-optimizer', action='store_true')
     args = parser.parse_args()
+    if supplemental:
+        assert args.fsdp_devices == 1 and args.cpu_optimizer and args.save_restore
     root = Path(__file__).resolve().parents[1]
     sys.path.insert(0, str(root / 'src'))
     sys.path.insert(0, str(args.runtime / 'packages/openpi-client/src'))
@@ -100,7 +104,10 @@ def main():
         # Compute once from all training frames, shared by all methods. Chunk
         # statistics exactly weight the labels used at every frame, including
         # repeat-last padding within each episode. No evaluation scenes enter.
-        stats_dir = args.out.parent / 'shared_spatial_norm'
+        stats_dir = (root/'outputs/main_comparison/gpu_smoke_20261006/shared_spatial_norm'
+            if supplemental else args.out.parent / 'shared_spatial_norm')
+        if supplemental:
+            assert (stats_dir/'norm_stats.json').exists(), 'Reuse frozen norm; never regenerate'
         if not (stats_dir / 'norm_stats.json').exists():
             state_stats, action_stats = normalize.RunningStats(), normalize.RunningStats()
             for row in rows:
@@ -117,8 +124,12 @@ def main():
                 'sample_policy': 'all training frames; action horizon repeat-last within episode'})
         norm_stats = normalize.load(stats_dir)
         status['norm_stats_sha256'] = hashlib.sha256((stats_dir/'norm_stats.json').read_bytes()).hexdigest()
-        cue = MainCueAdapter(load_config(root/'configs/rulervla_main.yaml'), args.method,
-            aimbot_source=args.aimbot_source, axisguide_source=args.axisguide_source)
+        if supplemental:
+            from rulervla.adapters.small_ablation import SmallAblationAdapter
+            cue = SmallAblationAdapter(load_config(root/'configs/rulervla_main.yaml'), args.method)
+        else:
+            cue = MainCueAdapter(load_config(root/'configs/rulervla_main.yaml'), args.method,
+                aimbot_source=args.aimbot_source, axisguide_source=args.axisguide_source)
         transform = transforms.compose([MainComparisonInputs(model_type=policy_config.model_type),
             transforms.Normalize(norm_stats, use_quantiles=True, strict=True),
             transforms.TokenizePrompt(PaligemmaTokenizer(policy_config.max_token_len), discrete_state_input=False),
@@ -203,6 +214,9 @@ def main():
                 write_json(args.out/'status.json', status)
                 print(json.dumps(metrics[-1]), flush=True)
         if args.save_restore:
+            if supplemental:
+                save_lock = (root/'outputs/main_comparison/checkpoint_staging.lock').open('w')
+                fcntl.flock(save_lock, fcntl.LOCK_EX)
             status['stage'] = 'saving_checkpoint'
             write_json(args.out/'status.json', status)
             from openpi.training import checkpoints
@@ -219,7 +233,8 @@ def main():
                     return config.DataConfig(asset_id='physical-intelligence/libero', norm_stats=norm_stats)
             checkpoints.save_state(manager, snapshot, LoaderAssets(), 1)
             manager.wait_until_finished()
-            archive = Path('/home/Dataset2/yqt/rulervla/main_comparison_v1/smoke_checkpoints')/args.out.name/'1'
+            archive_family = 'small_ablation_v1' if supplemental else 'main_comparison_v1'
+            archive = Path('/home/Dataset2/yqt/rulervla')/archive_family/'smoke_checkpoints'/args.out.name/'1'
             publish_checkpoint(stage/'1', archive, completed_updates=2)
             verify_checkpoint(archive, expected_updates=2)
             status.update(stage='restoring_checkpoint', checkpoint_saved=True, checkpoint=str(archive),
@@ -237,6 +252,11 @@ def main():
                 np.testing.assert_array_equal(jax.device_get(actual), expected)
             status.update(checkpoint_restored=True, full_train_state_restore_bitwise=True, staging_path=str(stage))
             manager.close()
+            if supplemental:
+                import shutil
+                assert stage.resolve().parent == Path('/dev/shm') and stage.name == 'rulervla_main_smoke_%d' % os.getpid()
+                shutil.rmtree(stage)
+                save_lock.close()
         status.update(state='complete', stage='smoke_complete', finished_at_unix=time.time(),
             forward_backward_passed=True, effective_batch_32_verified=True)
     except BaseException as error:
