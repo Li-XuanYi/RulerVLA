@@ -30,3 +30,16 @@ Launch receipt: `outputs/main_comparison/parallel_launch_20261007.json`.
 ## Next dependent work
 
 Formal success-rate evaluation requires each frozen 30k checkpoint. Once available, evaluate the saved paired scenes and skip technically valid existing results. LIBERO-Plus baseline difficulty calibration depends on the corresponding trained baseline. These are not reported as completed experiments.
+
+## User-approved GPU 4 / GPU 5 split (supersedes the single spare queue)
+
+The former waiting queue was stopped only after confirming it had no training child; its status and log were preserved under `outputs/main_comparison/recovery/`. The 36 pending models are now partitioned without overlap:
+
+| GPU | Methods across Object / Goal / Long, seeds 42/43/44 | Runs | Queue PID/session |
+| --- | --- | --- | --- |
+| 4 | RulerVLA-main, Baseline | 18 | 1686892 |
+| 5 | AxisGuide-adapted, AimBot | 18 | 1687056 |
+
+Both queue processes were verified alive with `child_pid=null`, waiting for resources. Latest checks showed 39,564 MiB free on GPU 4, 49,598 MiB on GPU 5 and about 238 GiB available host RAM. Neither additional formal training has started yet. Their fixed-GPU resource gates retain the validated training protocol; admission is serialized and peer initialization must stabilize before another model loads. A CPU-only scheduler platform override is explicitly removed from training-child environments.
+
+Statuses and logs now use `remaining_suite_queue_worker0` / `remaining_suite_queue_worker1` filenames. Launch receipt: `outputs/main_comparison/dual_queue_launch_20261007.json`. GPU 2/3 existing Spatial training continues.
