@@ -34,12 +34,12 @@ def main(supplemental=False):
         validate_run(root, run)
     if args.episode_cache_gib is not None:
         assert supplemental and 0 < args.episode_cache_gib <= 8
-    if args.release_init_caches:
-        assert supplemental and smoke['initialization_caches_released']
     if args.staging_root != Path('/dev/shm'):
         assert supplemental and args.staging_root.resolve().is_relative_to('/home/Dataset2/yqt/rulervla/small_ablation_v1/staging')
         args.staging_root.mkdir(parents=True,exist_ok=True)
     smoke = json.loads(args.smoke.read_text())
+    if args.release_init_caches:
+        assert supplemental and smoke['initialization_caches_released']
     cue = json.loads(args.cue_audit.read_text())
     review = json.loads((args.cue_audit.parent/'visual_review.json').read_text())
     assert run['suite'] in {'libero_spatial','libero_object','libero_goal','libero_10'}
