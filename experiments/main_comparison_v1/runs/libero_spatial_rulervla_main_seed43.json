@@ -1,23 +1,23 @@
 {
-  "run_id": "libero_spatial_rulervla_main_seed43",
+  "run_id": "libero_spatial_rulervla_main_seed43_lora",
   "suite": "libero_spatial",
   "method": "RulerVLA-main",
   "seed": 43,
   "shared_training": {
     "backbone": "pi0.5",
-    "paligemma_variant": "gemma_2b",
-    "action_expert_variant": "gemma_300m",
-    "finetuning": "full",
-    "lora": false,
-    "freeze_backbone": false,
+    "paligemma_variant": "gemma_2b_lora",
+    "action_expert_variant": "gemma_300m_lora",
+    "finetuning": "lora",
+    "lora": true,
+    "freeze_backbone": true,
     "dtype": "bfloat16",
     "initial_checkpoint": "/home/Dataset2/yqt/openpi/checkpoints/Official/pi05_base/params",
     "optimizer_updates": 30000,
     "effective_batch": 32,
-    "micro_batch": null,
-    "gradient_accumulation": null,
-    "data_parallel_replicas": null,
-    "memory_configuration_status": "pending_common_worst_case_smoke",
+    "micro_batch": 1,
+    "gradient_accumulation": 32,
+    "data_parallel_replicas": 1,
+    "memory_configuration_status": "pending_lora_save_restore_smoke",
     "optimizer": {
       "name": "AdamW",
       "beta1": 0.9,
@@ -41,8 +41,36 @@
     "random_image_augmentation": false,
     "extra_delta_transform": false,
     "checkpoint_updates": [
+      100,
+      1000,
+      2000,
+      3000,
+      4000,
+      5000,
+      6000,
+      7000,
+      8000,
+      9000,
       10000,
+      11000,
+      12000,
+      13000,
+      14000,
+      15000,
+      16000,
+      17000,
+      18000,
+      19000,
       20000,
+      21000,
+      22000,
+      23000,
+      24000,
+      25000,
+      26000,
+      27000,
+      28000,
+      29000,
       30000
     ],
     "formal_checkpoint_index": 29999,
@@ -50,10 +78,26 @@
       42,
       43,
       44
-    ]
+    ],
+    "lora_config": {
+      "paligemma_rank": 16,
+      "paligemma_alpha": 16,
+      "action_expert_rank": 32,
+      "action_expert_alpha": 32,
+      "freeze_policy": "official Pi0Config.get_freeze_filter"
+    },
+    "checkpoint_retention": {
+      "latest": 2,
+      "milestone_updates": [
+        10000,
+        20000,
+        30000
+      ]
+    }
   },
   "suite_manifest": "suite_manifests/libero_spatial.json",
-  "checkpoint_root": "/home/Dataset2/yqt/rulervla/main_comparison_v1/checkpoints/libero_spatial_rulervla_main_seed43",
+  "checkpoint_root": "/home/Dataset2/yqt/rulervla/main_comparison_lora_v1/checkpoints/libero_spatial_rulervla_main_seed43_lora",
   "execution_ready": false,
-  "status": "planned"
+  "status": "planned",
+  "protocol_revision": "lora_20261008"
 }

@@ -6,18 +6,18 @@
   "models_added_conditional_P1": 2,
   "runs": [
     {
-      "run_id": "S22_camera_xyz_only_spatial_seed42",
+      "run_id": "S22_camera_xyz_only_spatial_seed42_lora",
       "experiment_id": "S22",
       "suite": "libero_spatial",
       "method": "CameraXYZ-only",
       "seed": 42,
       "shared_training": {
         "backbone": "pi0.5",
-        "paligemma_variant": "gemma_2b",
-        "action_expert_variant": "gemma_300m",
-        "finetuning": "full",
-        "lora": false,
-        "freeze_backbone": false,
+        "paligemma_variant": "gemma_2b_lora",
+        "action_expert_variant": "gemma_300m_lora",
+        "finetuning": "lora",
+        "lora": true,
+        "freeze_backbone": true,
         "dtype": "bfloat16",
         "initial_checkpoint": "/home/Dataset2/yqt/openpi/checkpoints/Official/pi05_base/params",
         "optimizer_updates": 10000,
@@ -25,7 +25,7 @@
         "micro_batch": 1,
         "gradient_accumulation": 32,
         "data_parallel_replicas": 1,
-        "memory_configuration_status": "common validated single GPU, optimizer/EMA/master CPU",
+        "memory_configuration_status": "pending_lora_save_restore_smoke",
         "optimizer": {
           "name": "AdamW",
           "beta1": 0.9,
@@ -72,9 +72,16 @@
             20000,
             30000
           ]
+        },
+        "lora_config": {
+          "paligemma_rank": 16,
+          "paligemma_alpha": 16,
+          "action_expert_rank": 32,
+          "action_expert_alpha": 32,
+          "freeze_policy": "official Pi0Config.get_freeze_filter"
         }
       },
-      "checkpoint_root": "/home/Dataset2/yqt/rulervla/small_ablation_v1/checkpoints/S22/camera_xyz_only_seed42",
+      "checkpoint_root": "/home/Dataset2/yqt/rulervla/small_ablation_v1/checkpoints/lora/S22/camera_xyz_only_seed42_lora",
       "execution_ready": false,
       "launch_gate": "capacity + per-arm smoke + evaluation contract",
       "trainer_adapter": "rulervla.adapters.small_ablation.SmallAblationAdapter",
@@ -82,18 +89,18 @@
       "conditional": false
     },
     {
-      "run_id": "S23_ruler_only_spatial_seed42",
+      "run_id": "S23_ruler_only_spatial_seed42_lora",
       "experiment_id": "S23",
       "suite": "libero_spatial",
       "method": "Ruler-only",
       "seed": 42,
       "shared_training": {
         "backbone": "pi0.5",
-        "paligemma_variant": "gemma_2b",
-        "action_expert_variant": "gemma_300m",
-        "finetuning": "full",
-        "lora": false,
-        "freeze_backbone": false,
+        "paligemma_variant": "gemma_2b_lora",
+        "action_expert_variant": "gemma_300m_lora",
+        "finetuning": "lora",
+        "lora": true,
+        "freeze_backbone": true,
         "dtype": "bfloat16",
         "initial_checkpoint": "/home/Dataset2/yqt/openpi/checkpoints/Official/pi05_base/params",
         "optimizer_updates": 30000,
@@ -101,7 +108,7 @@
         "micro_batch": 1,
         "gradient_accumulation": 32,
         "data_parallel_replicas": 1,
-        "memory_configuration_status": "common validated single GPU, optimizer/EMA/master CPU",
+        "memory_configuration_status": "pending_lora_save_restore_smoke",
         "optimizer": {
           "name": "AdamW",
           "beta1": 0.9,
@@ -168,9 +175,16 @@
             20000,
             30000
           ]
+        },
+        "lora_config": {
+          "paligemma_rank": 16,
+          "paligemma_alpha": 16,
+          "action_expert_rank": 32,
+          "action_expert_alpha": 32,
+          "freeze_policy": "official Pi0Config.get_freeze_filter"
         }
       },
-      "checkpoint_root": "/home/Dataset2/yqt/rulervla/small_ablation_v1/checkpoints/S23/ruler_only_seed42",
+      "checkpoint_root": "/home/Dataset2/yqt/rulervla/small_ablation_v1/checkpoints/lora/S23/ruler_only_seed42_lora",
       "execution_ready": false,
       "launch_gate": "capacity + per-arm smoke + evaluation contract",
       "trainer_adapter": "rulervla.adapters.small_ablation.SmallAblationAdapter",
@@ -178,18 +192,18 @@
       "conditional": false
     },
     {
-      "run_id": "S23_actioncoord_only_spatial_seed42",
+      "run_id": "S23_actioncoord_only_spatial_seed42_lora",
       "experiment_id": "S23",
       "suite": "libero_spatial",
       "method": "ActionCoord-only",
       "seed": 42,
       "shared_training": {
         "backbone": "pi0.5",
-        "paligemma_variant": "gemma_2b",
-        "action_expert_variant": "gemma_300m",
-        "finetuning": "full",
-        "lora": false,
-        "freeze_backbone": false,
+        "paligemma_variant": "gemma_2b_lora",
+        "action_expert_variant": "gemma_300m_lora",
+        "finetuning": "lora",
+        "lora": true,
+        "freeze_backbone": true,
         "dtype": "bfloat16",
         "initial_checkpoint": "/home/Dataset2/yqt/openpi/checkpoints/Official/pi05_base/params",
         "optimizer_updates": 30000,
@@ -197,7 +211,7 @@
         "micro_batch": 1,
         "gradient_accumulation": 32,
         "data_parallel_replicas": 1,
-        "memory_configuration_status": "common validated single GPU, optimizer/EMA/master CPU",
+        "memory_configuration_status": "pending_lora_save_restore_smoke",
         "optimizer": {
           "name": "AdamW",
           "beta1": 0.9,
@@ -264,9 +278,16 @@
             20000,
             30000
           ]
+        },
+        "lora_config": {
+          "paligemma_rank": 16,
+          "paligemma_alpha": 16,
+          "action_expert_rank": 32,
+          "action_expert_alpha": 32,
+          "freeze_policy": "official Pi0Config.get_freeze_filter"
         }
       },
-      "checkpoint_root": "/home/Dataset2/yqt/rulervla/small_ablation_v1/checkpoints/S23/actioncoord_only_seed42",
+      "checkpoint_root": "/home/Dataset2/yqt/rulervla/small_ablation_v1/checkpoints/lora/S23/actioncoord_only_seed42_lora",
       "execution_ready": false,
       "launch_gate": "capacity + per-arm smoke + evaluation contract",
       "trainer_adapter": "rulervla.adapters.small_ablation.SmallAblationAdapter",
@@ -274,18 +295,18 @@
       "conditional": false
     },
     {
-      "run_id": "S24_camera_ee_only_spatial_seed42",
+      "run_id": "S24_camera_ee_only_spatial_seed42_lora",
       "experiment_id": "S24",
       "suite": "libero_spatial",
       "method": "CameraEE-only",
       "seed": 42,
       "shared_training": {
         "backbone": "pi0.5",
-        "paligemma_variant": "gemma_2b",
-        "action_expert_variant": "gemma_300m",
-        "finetuning": "full",
-        "lora": false,
-        "freeze_backbone": false,
+        "paligemma_variant": "gemma_2b_lora",
+        "action_expert_variant": "gemma_300m_lora",
+        "finetuning": "lora",
+        "lora": true,
+        "freeze_backbone": true,
         "dtype": "bfloat16",
         "initial_checkpoint": "/home/Dataset2/yqt/openpi/checkpoints/Official/pi05_base/params",
         "optimizer_updates": 10000,
@@ -293,7 +314,7 @@
         "micro_batch": 1,
         "gradient_accumulation": 32,
         "data_parallel_replicas": 1,
-        "memory_configuration_status": "common validated single GPU, optimizer/EMA/master CPU",
+        "memory_configuration_status": "pending_lora_save_restore_smoke",
         "optimizer": {
           "name": "AdamW",
           "beta1": 0.9,
@@ -340,9 +361,16 @@
             20000,
             30000
           ]
+        },
+        "lora_config": {
+          "paligemma_rank": 16,
+          "paligemma_alpha": 16,
+          "action_expert_rank": 32,
+          "action_expert_alpha": 32,
+          "freeze_policy": "official Pi0Config.get_freeze_filter"
         }
       },
-      "checkpoint_root": "/home/Dataset2/yqt/rulervla/small_ablation_v1/checkpoints/S24/camera_ee_only_seed42",
+      "checkpoint_root": "/home/Dataset2/yqt/rulervla/small_ablation_v1/checkpoints/lora/S24/camera_ee_only_seed42_lora",
       "execution_ready": false,
       "launch_gate": "conditional S22 positive primary result",
       "trainer_adapter": "rulervla.adapters.small_ablation.SmallAblationAdapter",
@@ -350,18 +378,18 @@
       "conditional": true
     },
     {
-      "run_id": "S24_action_xyz_only_spatial_seed42",
+      "run_id": "S24_action_xyz_only_spatial_seed42_lora",
       "experiment_id": "S24",
       "suite": "libero_spatial",
       "method": "ActionXYZ-only",
       "seed": 42,
       "shared_training": {
         "backbone": "pi0.5",
-        "paligemma_variant": "gemma_2b",
-        "action_expert_variant": "gemma_300m",
-        "finetuning": "full",
-        "lora": false,
-        "freeze_backbone": false,
+        "paligemma_variant": "gemma_2b_lora",
+        "action_expert_variant": "gemma_300m_lora",
+        "finetuning": "lora",
+        "lora": true,
+        "freeze_backbone": true,
         "dtype": "bfloat16",
         "initial_checkpoint": "/home/Dataset2/yqt/openpi/checkpoints/Official/pi05_base/params",
         "optimizer_updates": 10000,
@@ -369,7 +397,7 @@
         "micro_batch": 1,
         "gradient_accumulation": 32,
         "data_parallel_replicas": 1,
-        "memory_configuration_status": "common validated single GPU, optimizer/EMA/master CPU",
+        "memory_configuration_status": "pending_lora_save_restore_smoke",
         "optimizer": {
           "name": "AdamW",
           "beta1": 0.9,
@@ -416,14 +444,22 @@
             20000,
             30000
           ]
+        },
+        "lora_config": {
+          "paligemma_rank": 16,
+          "paligemma_alpha": 16,
+          "action_expert_rank": 32,
+          "action_expert_alpha": 32,
+          "freeze_policy": "official Pi0Config.get_freeze_filter"
         }
       },
-      "checkpoint_root": "/home/Dataset2/yqt/rulervla/small_ablation_v1/checkpoints/S24/action_xyz_only_seed42",
+      "checkpoint_root": "/home/Dataset2/yqt/rulervla/small_ablation_v1/checkpoints/lora/S24/action_xyz_only_seed42_lora",
       "execution_ready": false,
       "launch_gate": "conditional S22 positive primary result",
       "trainer_adapter": "rulervla.adapters.small_ablation.SmallAblationAdapter",
       "trainer_integration_status": "pending isolated entry; do not pass directly to main trainer",
       "conditional": true
     }
-  ]
+  ],
+  "protocol_revision": "lora_20261008"
 }

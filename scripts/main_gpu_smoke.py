@@ -43,17 +43,18 @@ def main(supplemental=False):
         help='Release saved CPU arrays before restore; verify every restored leaf against frozen SHA-256')
     parser.add_argument('--staging-root', type=Path, default=Path('/dev/shm'))
     parser.add_argument('--release-init-caches', action='store_true')
+    parser.add_argument('--lora', action='store_true')
     args = parser.parse_args()
     if supplemental:
         assert args.fsdp_devices == 1 and args.cpu_optimizer and args.save_restore
     if args.blocking_cpu_save:
-        assert supplemental and args.cpu_optimizer and args.save_restore
+        assert (supplemental or args.lora) and args.cpu_optimizer and args.save_restore
     if args.stream_restore_check:
-        assert supplemental and args.blocking_cpu_save
+        assert (supplemental or args.lora) and args.blocking_cpu_save
     if args.release_init_caches:
-        assert supplemental and args.cpu_optimizer
+        assert (supplemental or args.lora) and args.cpu_optimizer
     if args.staging_root != Path('/dev/shm'):
-        assert supplemental and args.staging_root.resolve().is_relative_to('/home/Dataset2/yqt/rulervla/small_ablation_v1/staging')
+        assert (supplemental or args.lora) and args.staging_root.resolve().is_relative_to('/home/Dataset2/yqt/rulervla/small_ablation_v1/staging')
         args.staging_root.mkdir(parents=True,exist_ok=True)
     root = Path(__file__).resolve().parents[1]
     sys.path.insert(0, str(root / 'src'))
@@ -100,15 +101,17 @@ def main(supplemental=False):
         np.testing.assert_array_equal(jax.device_get(collective(warmup)), warmup.sum(axis=0))
         status['gpu_collective_passed'] = True
         base_params = '/home/Dataset2/yqt/openpi/checkpoints/Official/pi05_base/params'
-        policy_config = Pi0Config(pi05=True, action_horizon=10, discrete_state_input=False)
+        from rulervla.training.finetuning import policy_config as make_policy, parameter_audit, frozen_hashes
+        policy_config = make_policy(args.lora)
         training_config = dataclasses.replace(config.get_config('pi05_libero'), model=policy_config,
             batch_size=32, seed=42, num_train_steps=30000, fsdp_devices=args.fsdp_devices,
+            freeze_filter=policy_config.get_freeze_filter(),
             optimizer=optimizer.AdamW(b1=.9, b2=.95, eps=1e-8, weight_decay=1e-10, clip_gradient_norm=1),
             lr_schedule=optimizer.CosineDecaySchedule(warmup_steps=1000, peak_lr=5e-5,
                 decay_steps=30000, decay_lr=5e-6), ema_decay=.999,
             weight_loader=weight_loaders.CheckpointWeightLoader(base_params), wandb_enabled=False)
         status.update(stage='preparing_real_batch', initial_checkpoint=base_params,
-            full_finetuning=True, lora=False, supervised_components=7, action_horizon=10)
+            full_finetuning=not args.lora, lora=args.lora, supervised_components=7, action_horizon=10)
         write_json(args.out / 'status.json', status)
         rgbd_manifest = json.loads((args.rgbd_root / 'regen_manifest.json').read_text())
         geometry_manifest = json.loads((args.geometry_root / 'manifest.json').read_text())
@@ -120,7 +123,7 @@ def main(supplemental=False):
         # statistics exactly weight the labels used at every frame, including
         # repeat-last padding within each episode. No evaluation scenes enter.
         stats_dir = (root/'outputs/main_comparison/gpu_smoke_20261006/shared_spatial_norm'
-            if supplemental else args.out.parent / 'shared_spatial_norm')
+            if supplemental or args.lora else args.out.parent / 'shared_spatial_norm')
         if supplemental:
             assert (stats_dir/'norm_stats.json').exists(), 'Reuse frozen norm; never regenerate'
         if not (stats_dir / 'norm_stats.json').exists():
@@ -192,22 +195,23 @@ def main(supplemental=False):
             jax.clear_caches(); gc.collect()
             ctypes.CDLL(None).malloc_trim(0)
             status['initialization_caches_released']=True
-        assert not jax.tree.leaves(state.params.filter(training_config.freeze_filter))
-        assert len(jax.tree.leaves(state.params.filter(training_config.trainable_filter))) == len(jax.tree.leaves(state.params))
+        status.update(parameter_audit(state,training_config,args.lora))
+        initial_frozen_hashes=frozen_hashes(state.params,training_config.freeze_filter)
         assert all(not isinstance(value, jax.ShapeDtypeStruct) for value in jax.tree.leaves(state.params))
-        assert not any('lora' in jax.tree_util.keystr(path).lower() for path, _ in jax.tree_util.tree_flatten_with_path(state.params)[0])
+        status['lora_parameters_present']=args.lora
         status.update(stage='compiling_forward_backward', official_weights_loaded=True,
             parameter_count=int(sum(np.prod(value.shape) for value in jax.tree.leaves(state.params))),
             four_real_input_slots=True, batch_source_episode=row['episode_index'], batch_source_frames=list(range(32)))
         write_json(args.out/'status.json', status)
         graph = state.model_def
         gradient_sharding = sharding.fsdp_sharding(jax.eval_shape(lambda: state.params), mesh)
+        trainable_sharding=gradient_sharding.filter(training_config.trainable_filter)
         gradient = jax.jit(lambda rng, step, params, values:
             accumulated_gradients(training_config, rng, graph, params, step, values),
             in_shardings=(replicated, replicated, gradient_sharding, batch_sharding),
-            out_shardings=(gradient_sharding, replicated))
+            out_shardings=(trainable_sharding, replicated))
         update = jax.jit(lambda current, gradients: apply_gradients(training_config, current, gradients),
-            in_shardings=(state_sharding, state_sharding.params), out_shardings=state_sharding,
+            in_shardings=(state_sharding, state_sharding.params.filter(training_config.trainable_filter)), out_shardings=state_sharding,
             donate_argnums=(0, 1))
         batch = jax.device_put(batch, batch_sharding)
         metrics = []
@@ -218,7 +222,7 @@ def main(supplemental=False):
                 gradients, info = gradient(jax.random.key(42), jax.device_put(state.step, replicated), gpu_params, batch)
                 jax.block_until_ready(gradients)
                 if args.cpu_optimizer:
-                    gradients_cpu = jax.device_put(gradients, state_sharding.params)
+                    gradients_cpu = jax.device_put(gradients, state_sharding.params.filter(training_config.trainable_filter))
                     jax.block_until_ready(gradients_cpu)
                     del gradients, gpu_params
                     state = update(state, gradients_cpu)
@@ -233,6 +237,8 @@ def main(supplemental=False):
                 status.update(stage='backward_running', optimizer_updates=index+1, metrics=metrics)
                 write_json(args.out/'status.json', status)
                 print(json.dumps(metrics[-1]), flush=True)
+        assert initial_frozen_hashes == frozen_hashes(state.params,training_config.freeze_filter)
+        status['frozen_parameters_unchanged']=True
         if args.save_restore:
             if supplemental:
                 save_lock = (root/'outputs/main_comparison/checkpoint_staging.lock').open('w')

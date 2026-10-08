@@ -12,8 +12,7 @@ env=dict(os.environ,CUDA_VISIBLE_DEVICES='2',XLA_PYTHON_CLIENT_PREALLOCATE='fals
          XLA_PYTHON_CLIENT_ALLOCATOR='platform',OPENBLAS_NUM_THREADS='1',OMP_NUM_THREADS='1',
          PYTHONDONTWRITEBYTECODE='1',WANDB_MODE='disabled')
 env.pop('JAX_PLATFORMS',None)
-smokes={'CameraXYZ-only':base/'camera_gpu5_solo_smoke_20261008/status.json',
-        'ActionCoord-only':base/'allocator_probe_actioncoord_attempt1/smoke/status.json'}
+smokes={}
 v03='/home/yqt/XuanyiLi/actioncoord/work/v03_sync_rgbd_20261003T164806'
 sys.path.insert(0,v03+'/repo/actioncoord_experiments/src')
 from actioncoord.integration.v03_storage import verify_checkpoint
@@ -23,7 +22,7 @@ def wait_resources():
         rows=subprocess.check_output(['nvidia-smi','--query-gpu=index,memory.free',
              '--format=csv,noheader,nounits'],text=True)
         frees={int(line.split(',')[0]):int(line.split(',')[1]) for line in rows.splitlines()}
-        eligible=[gpu for gpu in (2,4,5) if frees[gpu]>=65000]
+        eligible=[gpu for gpu in (2,4,5) if frees[gpu]>=32000]
         mem={x.split(':')[0]:int(x.split()[1]) for x in Path('/proc/meminfo').read_text().splitlines()}
         status.update(stage='waiting_resources',gpu_free_mib={str(g):frees[g] for g in (2,4,5)},
                       host_available_gib=mem['MemAvailable']/1024**2)
@@ -58,17 +57,18 @@ try:
         wait_resources()
         smoke=smokes.get(method)
         if smoke is None:
-            smoke_out=(base/'logs').resolve().parent/'ruler_only_recovery_smoke_20261008';smoke=smoke_out/'status.json'
+            smoke_out=(base/'logs').resolve().parent/('lora_smoke_'+run['run_id']);smoke=smoke_out/'status.json'
             if not smoke.exists():
                 command=[sys.executable,str(root/'scripts/small_gpu_smoke.py'),'--runtime',str(base.parent/'main_comparison/runtime_v3'),
                     '--v03-root',v03,'--rgbd-root','/home/Dataset2/yqt/openpi-aimbot/spatialcue_depth_source/regenerated_rgbd_v02',
                     '--geometry-root','/home/Dataset2/yqt/rulervla/main_comparison_v1/data_preparation/spatial_geometry',
                     '--out',str(smoke_out),'--method',method,'--save-restore','--cpu-optimizer','--fsdp-devices','1',
-                    '--blocking-cpu-save','--stream-restore-check','--release-init-caches',
+                    '--blocking-cpu-save','--stream-restore-check','--release-init-caches','--lora',
                     '--staging-root','/home/Dataset2/yqt/rulervla/small_ablation_v1/staging',
                     '--aimbot-source','/home/yqt/XuanyiLi/openpi0-aimbot/third_party/AimBot/src',
                     '--axisguide-source','/home/yqt/XuanyiLi/AxisGuide-code/src/lerobot/datasets/visual_cue_utils.py']
-                with (base/'logs/ruler_only_recovery_smoke.log').open('a') as log:
+                with (base/'logs'/(run['run_id']+'_smoke.log')).open('a') as log:
+                    status.update(stage='lora_smoke',smoke=str(smoke));write_json(path,status)
                     assert subprocess.call(command,cwd=root,env=env,stdout=log,stderr=subprocess.STDOUT)==0
         s=json.loads(smoke.read_text());assert s['state']=='complete' and s['method']==method
         config=(base/'logs').resolve().parent/'released_runs'/(run['run_id']+'.json');write_json(config,run)

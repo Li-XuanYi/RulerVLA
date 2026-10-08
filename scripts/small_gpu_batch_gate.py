@@ -28,6 +28,7 @@ def main():
         'scripts/small_training_queue.py', 'src/rulervla/training/accumulation.py',
         'src/rulervla/training/blocking_snapshot.py',
         'src/rulervla/training/checkpoint_retention.py',
+        'src/rulervla/training/finetuning.py',
         'experiments/small_ablation_v1/run_matrix.json']
     sources = {relative:sha(root/relative) for relative in source_paths}
     if path.exists():

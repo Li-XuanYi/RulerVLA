@@ -29,19 +29,20 @@ def main(supplemental=False):
     root = Path(__file__).resolve().parents[1]
     run = json.loads(args.run_config.read_text())
     shared = run['shared_training']
+    use_lora=shared['lora']
     target_updates = shared['optimizer_updates']
-    assert not args.resource_guard or supplemental
+    assert not args.resource_guard or supplemental or use_lora
     if supplemental:
         from small_training_contract import validate_run
         validate_run(root, run)
     if args.episode_cache_gib is not None:
-        assert supplemental and 0 < args.episode_cache_gib <= 8
+        assert (supplemental or use_lora) and 0 < args.episode_cache_gib <= 8
     if args.staging_root != Path('/dev/shm'):
-        assert supplemental and args.staging_root.resolve().is_relative_to('/home/Dataset2/yqt/rulervla/small_ablation_v1/staging')
+        assert (supplemental or use_lora) and args.staging_root.resolve().is_relative_to('/home/Dataset2/yqt/rulervla/small_ablation_v1/staging')
         args.staging_root.mkdir(parents=True,exist_ok=True)
     smoke = json.loads(args.smoke.read_text())
     if args.release_init_caches:
-        assert supplemental and smoke['initialization_caches_released']
+        assert (supplemental or use_lora) and smoke['initialization_caches_released']
     cue = json.loads(args.cue_audit.read_text())
     review = json.loads((args.cue_audit.parent/'visual_review.json').read_text())
     assert run['suite'] in {'libero_spatial','libero_object','libero_goal','libero_10'}
@@ -49,14 +50,18 @@ def main(supplemental=False):
     assert smoke['checkpoint_restored'] and smoke['full_train_state_restore_bitwise']
     assert smoke['optimizer_and_ema_on_cpu'] and smoke['effective_batch'] == 32
     assert cue['passed'] and review['passed']
-    assert shared['finetuning'] == 'full' and not shared['lora'] and not shared['freeze_backbone']
+    use_lora=shared['lora']
+    assert shared['finetuning'] == ('lora' if use_lora else 'full')
+    assert smoke['lora'] == use_lora
+    if use_lora:
+        assert smoke['frozen_parameters_unchanged'] and smoke['lora_parameters_present']
     assert (target_updates in (10000, 30000) if supplemental else target_updates == 30000)
     assert shared['effective_batch'] == 32
     assert shared['initial_checkpoint'] == smoke['initial_checkpoint']
     if supplemental:
         assert smoke['method'] == run['method'] and smoke['optimizer_updates'] == 2
     if args.blocking_cpu_save:
-        assert supplemental and smoke['blocking_cpu_snapshot_unchanged_after_save']
+        assert (supplemental or use_lora) and smoke['blocking_cpu_snapshot_unchanged_after_save']
         assert os.environ.get('XLA_PYTHON_CLIENT_ALLOCATOR') == 'platform'
     output = Path(run['checkpoint_root'])
     output.mkdir(parents=True,exist_ok=True)
@@ -92,7 +97,7 @@ def main(supplemental=False):
     status = dict(state='running',stage='loading_data',pid=os.getpid(),run_id=run['run_id'],method=run['method'],
         suite=run['suite'],seed=run['seed'],gpu_ids=os.environ['CUDA_VISIBLE_DEVICES'],optimizer_updates=0,
         target_optimizer_updates=target_updates,micro_batch=1,gradient_accumulation=32,effective_batch=32,
-        optimizer_and_ema_on_cpu=True,full_finetuning=True,lora=False,formal_training_started=True,
+        optimizer_and_ema_on_cpu=True,full_finetuning=not use_lora,lora=use_lora,formal_training_started=True,
         initial_checkpoint=shared['initial_checkpoint'],started_at_unix=time.time(),checkpoint_root=str(output))
     status.update(allocator=os.environ.get('XLA_PYTHON_CLIENT_ALLOCATOR','default'),
         blocking_cpu_save=args.blocking_cpu_save)
@@ -108,7 +113,7 @@ def main(supplemental=False):
             geometry=Path('/home/Dataset2/yqt/rulervla/main_comparison_v1/data_preparation/spatial_geometry')
             dataset=SpatialDataset(rgbd,geometry,max_cache_bytes=args.episode_cache_gib*1024**3 if args.episode_cache_gib else None)
             norm_dir=(root/'outputs/main_comparison/gpu_smoke_20261006/shared_spatial_norm'
-                if supplemental else args.smoke.parent.parent/'shared_spatial_norm')
+                if supplemental or use_lora else args.smoke.parent.parent/'shared_spatial_norm')
             expected_norm_sha=smoke['norm_stats_sha256']
             data_manifests={'rgbd':rgbd/'regen_manifest.json','geometry':geometry/'manifest.json'}
         else:
@@ -125,10 +130,12 @@ def main(supplemental=False):
             data_manifests={'rgbd_geometry':rgbd/'manifest.json'}
         norm_stats=normalize.load(norm_dir)
         assert file_sha(norm_dir/'norm_stats.json')==expected_norm_sha
-        policy_config=Pi0Config(pi05=True,action_horizon=10,discrete_state_input=False)
+        from rulervla.training.finetuning import policy_config as make_policy, parameter_audit
+        policy_config=make_policy(use_lora)
         sched=shared['scheduler'];opt=shared['optimizer']
         training_config=dataclasses.replace(config.get_config('pi05_libero'),model=policy_config,batch_size=32,
             seed=run['seed'],num_train_steps=target_updates,fsdp_devices=1,ema_decay=shared['ema_decay'],wandb_enabled=False,
+            freeze_filter=policy_config.get_freeze_filter(),
             weight_loader=weight_loaders.CheckpointWeightLoader(shared['initial_checkpoint']),
             optimizer=optimizer.AdamW(b1=opt['beta1'],b2=opt['beta2'],eps=opt['eps'],weight_decay=opt['weight_decay'],
                 clip_gradient_norm=opt['clip_gradient_norm']),lr_schedule=optimizer.CosineDecaySchedule(
@@ -181,7 +188,7 @@ def main(supplemental=False):
             assert stage.resolve().parent==args.staging_root.resolve() and stage.name==('rulervla_main_'+run['run_id']+'_'+str(os.getpid()))
             shutil.rmtree(stage)
             manager,_=checkpoints.initialize_checkpoint_dir(stage,keep_period=None,overwrite=False,resume=False)
-        assert not jax.tree.leaves(state.params.filter(training_config.freeze_filter))
+        status.update(parameter_audit(state,training_config,use_lora))
         if args.release_init_caches:
             import ctypes, gc
             jax.block_until_ready(state);jax.clear_caches();gc.collect()
@@ -189,10 +196,11 @@ def main(supplemental=False):
         first_update=int(jax.device_get(state.step))
         graph=state.model_def
         param_sharding=sharding.fsdp_sharding(jax.eval_shape(lambda:state.params),gpu_mesh)
+        gradient_sharding=param_sharding.filter(training_config.trainable_filter)
         gradient=jax.jit(lambda rng,step,params,batch:accumulated_gradients(training_config,rng,graph,params,step,batch),
-            in_shardings=(gpu,gpu,param_sharding,gpu),out_shardings=(param_sharding,gpu))
+            in_shardings=(gpu,gpu,param_sharding,gpu),out_shardings=(gradient_sharding,gpu))
         update=jax.jit(lambda current,grad:apply_gradients(training_config,current,grad),
-            in_shardings=(state_sharding,state_sharding.params),out_shardings=state_sharding,donate_argnums=(0,1))
+            in_shardings=(state_sharding,state_sharding.params.filter(training_config.trainable_filter)),out_shardings=state_sharding,donate_argnums=(0,1))
         execution=dict(run=run,common_smoke_sha256=file_sha(args.smoke),
             cue_audit_sha256=file_sha(args.cue_audit),visual_review=review,runtime_manifest_sha256=file_sha(runtime/'RULERVLA_RUNTIME_MANIFEST.json'),
             micro_batch=1,gradient_accumulation=32,effective_batch=32,optimizer_and_ema_on_cpu=True,
@@ -211,7 +219,7 @@ def main(supplemental=False):
                             '--id='+os.environ['CUDA_VISIBLE_DEVICES'],
                             '--query-gpu=memory.free','--format=csv,noheader,nounits'],text=True).strip())
                         disk_gib=shutil.disk_usage(output).free/1024**3
-                        if free_mib>=60000 and disk_gib>=100:
+                        if free_mib >= (24000 if use_lora else 60000) and disk_gib>=100:
                             break
                         status.update(stage='waiting_resource_headroom',gpu_free_mib=free_mib,
                                       archive_free_gib=disk_gib)
@@ -225,7 +233,7 @@ def main(supplemental=False):
                 status['stage']='forward_backward';write_json(status_path,status)
                 params=jax.device_put(state.params,param_sharding)
                 grads,info=gradient(jax.random.key(run['seed']),jax.device_put(state.step,gpu),params,batch)
-                grads_cpu=jax.device_put(grads,state_sharding.params);jax.block_until_ready(grads_cpu)
+                grads_cpu=jax.device_put(grads,state_sharding.params.filter(training_config.trainable_filter));jax.block_until_ready(grads_cpu)
                 metrics={key:float(value) for key,value in jax.device_get(info).items()}
                 assert all(np.isfinite(value) for value in metrics.values()) and metrics['grad_norm']>0
                 del grads,params
@@ -235,7 +243,7 @@ def main(supplemental=False):
                 log.write(json.dumps(record)+'\n');print(json.dumps(record),flush=True)
                 status.update(stage='training',optimizer_updates=step+1,latest_metrics=record);write_json(status_path,status)
                 # Keep all six complete checkpoints; no deletion from Dataset2.
-                if ((step+1) in shared['checkpoint_updates'] if supplemental else (step+1)%5000==0):
+                if ((step+1) in shared['checkpoint_updates'] if supplemental or use_lora else (step+1)%5000==0):
                     status['stage']='saving_checkpoint';write_json(status_path,status)
                     # Serialize large CPU snapshots and RAM staging across independent GPU workers.
                     with (root/'outputs/main_comparison/checkpoint_staging.lock').open('w') as save_lock:
@@ -262,7 +270,7 @@ def main(supplemental=False):
                         shutil.rmtree(stage)
                         manager,_=checkpoints.initialize_checkpoint_dir(stage,keep_period=None,overwrite=False,resume=False)
                     status['latest_checkpoint']=str(destination);write_json(status_path,status)
-                    if supplemental:
+                    if supplemental or use_lora:
                         from rulervla.training.checkpoint_retention import prune_verified_checkpoints
                         prune_verified_checkpoints(output, shared['checkpoint_updates'],
                             shared['checkpoint_retention'], step+1, verify_checkpoint)

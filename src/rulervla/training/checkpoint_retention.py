@@ -5,7 +5,8 @@ import shutil
 
 def prune_verified_checkpoints(root, schedule, retention, current_updates, verifier):
     root = Path(root).resolve()
-    assert root.is_relative_to('/home/Dataset2/yqt/rulervla/small_ablation_v1/checkpoints')
+    assert (root.is_relative_to('/home/Dataset2/yqt/rulervla/small_ablation_v1/checkpoints') or
+            root.is_relative_to('/home/Dataset2/yqt/rulervla/main_comparison_lora_v1/checkpoints'))
     assert current_updates in schedule
     verifier(root/str(current_updates-1), expected_updates=current_updates)
     saved = sorted(int(p.name)+1 for p in root.iterdir()
