@@ -17,6 +17,36 @@ def live(pid):
     except ProcessLookupError: return False
 
 
+class ExistingChild:
+    """Monitor an existing child without restarting its optimizer state."""
+    def __init__(self, pid, record):
+        self.pid, self.record = pid, record
+
+    def poll(self):
+        if live(self.pid):
+            proc = Path('/proc/%d/stat' % self.pid)
+            if proc.exists() and proc.read_text().split(') ',1)[1].split()[0] != 'Z':
+                return None
+        state = json.loads(self.record.read_text())
+        return 0 if state['state'] == 'complete' else 1
+
+    def terminate(self):
+        import signal
+        os.kill(self.pid, signal.SIGTERM)
+
+    def kill(self):
+        import signal
+        os.kill(self.pid, signal.SIGKILL)
+
+    def wait(self, timeout=None):
+        deadline = None if timeout is None else time.monotonic()+timeout
+        while self.poll() is None:
+            if deadline is not None and time.monotonic() >= deadline:
+                raise subprocess.TimeoutExpired('existing training child', timeout)
+            time.sleep(1)
+        return self.poll()
+
+
 def resources(root, gpu, profile=None):
     query = subprocess.check_output(['nvidia-smi','--query-gpu=index,memory.free,utilization.gpu',
         '--format=csv,noheader,nounits'],text=True)
@@ -83,6 +113,8 @@ def guarded_wait(child,path,status,record=None,release_admission=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--worker-index',type=int,choices=(0,1),required=True)
+    parser.add_argument('--include-camera',action='store_true',help='GPU5: ActionCoord then CameraXYZ then Ruler')
+    parser.add_argument('--adopt-running',action='store_true',help='Monitor an already-running matching training child')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     gpu = (4,5)[args.worker_index]
@@ -95,6 +127,9 @@ def main():
     admission = (root/'outputs/main_comparison/logs/remaining_suite_admission.lock').open('w')
     matrix = json.loads((root/'experiments/small_ablation_v1/run_matrix.json').read_text())
     methods = (['CameraXYZ-only'] if args.worker_index==0 else ['ActionCoord-only','Ruler-only'])
+    if args.include_camera:
+        assert args.worker_index == 1
+        methods = ['ActionCoord-only','CameraXYZ-only','Ruler-only']
     by_method = {run['method']:run for run in matrix['runs']}
     runs = [by_method[method] for method in methods]
     path = base/('training_queue_worker%d_status.json'%args.worker_index)
@@ -115,6 +150,25 @@ def main():
                 old=json.loads(train_status.read_text())
                 if old['state']=='complete' and (Path(run['checkpoint_root'])/str(run['shared_training']['optimizer_updates']-1)/'V03_COPY_COMPLETE.json').exists():
                     status['completed_runs'].append(run['run_id']); continue
+                if args.adopt_running and old['state']=='running' and live(old.get('pid')):
+                    assert old['run_id']==run['run_id'] and old['gpu_ids']==str(gpu)
+                    commandline=Path('/proc/%d/cmdline'%old['pid']).read_bytes().replace(b'\0',b' ').decode()
+                    assert 'small_spatial_train.py' in commandline and str(config) in commandline
+                    execution=json.loads((Path(run['checkpoint_root'])/'execution_lock.json').read_text())
+                    assert execution['run']==run and execution['effective_batch']==32
+                    status.update(current_run=run['run_id'],method=run['method'],stage='formal_training',
+                        child_pid=old['pid'],formal_training_started=True,adopted_existing_child=True,
+                        target_optimizer_updates=run['shared_training']['optimizer_updates'],
+                        checkpoint_root=run['checkpoint_root'],log=str(logs/(run['run_id']+'.log')))
+                    write_json(path,status)
+                    if guarded_wait(ExistingChild(old['pid'],train_status),path,status,train_status):
+                        raise RuntimeError('Adopted training failed: '+run['run_id'])
+                    final=json.loads(train_status.read_text())
+                    assert final['optimizer_updates']==run['shared_training']['optimizer_updates']
+                    assert (Path(final['final_checkpoint'])/'V03_COPY_COMPLETE.json').exists()
+                    status['completed_runs'].append(run['run_id']);status['child_pid']=None
+                    write_json(path,status)
+                    continue
                 raise RuntimeError('Existing run needs inspected resume: '+run['run_id'])
             if any(p.name.isdigit() for p in Path(run['checkpoint_root']).glob('*')):
                 raise RuntimeError('Existing checkpoints need inspected resume: '+run['run_id'])

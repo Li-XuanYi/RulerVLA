@@ -20,6 +20,9 @@ def main(supplemental=False):
     parser.add_argument('--cue-audit', type=Path, required=True)
     parser.add_argument('--resume', action='store_true')
     parser.add_argument('--blocking-cpu-save', action='store_true')
+    parser.add_argument('--episode-cache-gib',type=int,default=None)
+    parser.add_argument('--staging-root',type=Path,default=Path('/dev/shm'))
+    parser.add_argument('--release-init-caches',action='store_true')
     parser.add_argument('--suite-release',type=Path,help='Required audited release directory for non-Spatial suites')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
@@ -29,6 +32,13 @@ def main(supplemental=False):
     if supplemental:
         from small_training_contract import validate_run
         validate_run(root, run)
+    if args.episode_cache_gib is not None:
+        assert supplemental and 0 < args.episode_cache_gib <= 8
+    if args.release_init_caches:
+        assert supplemental and smoke['initialization_caches_released']
+    if args.staging_root != Path('/dev/shm'):
+        assert supplemental and args.staging_root.resolve().is_relative_to('/home/Dataset2/yqt/rulervla/small_ablation_v1/staging')
+        args.staging_root.mkdir(parents=True,exist_ok=True)
     smoke = json.loads(args.smoke.read_text())
     cue = json.loads(args.cue_audit.read_text())
     review = json.loads((args.cue_audit.parent/'visual_review.json').read_text())
@@ -94,7 +104,7 @@ def main(supplemental=False):
         if run['suite']=='libero_spatial':
             rgbd=Path('/home/Dataset2/yqt/openpi-aimbot/spatialcue_depth_source/regenerated_rgbd_v02')
             geometry=Path('/home/Dataset2/yqt/rulervla/main_comparison_v1/data_preparation/spatial_geometry')
-            dataset=SpatialDataset(rgbd,geometry)
+            dataset=SpatialDataset(rgbd,geometry,max_cache_bytes=args.episode_cache_gib*1024**3 if args.episode_cache_gib else None)
             norm_dir=(root/'outputs/main_comparison/gpu_smoke_20261006/shared_spatial_norm'
                 if supplemental else args.smoke.parent.parent/'shared_spatial_norm')
             expected_norm_sha=smoke['norm_stats_sha256']
@@ -143,7 +153,7 @@ def main(supplemental=False):
         saved_steps=sorted(int(path.name) for path in output.iterdir() if path.is_dir() and path.name.isdigit())
         if saved_steps and not args.resume:
             raise FileExistsError('Existing checkpoint requires explicit full-state resume')
-        stage=Path('/dev/shm')/('rulervla_main_'+run['run_id']+'_'+str(os.getpid()))
+        stage=args.staging_root/('rulervla_main_'+run['run_id']+'_'+str(os.getpid()))
         if args.resume:
             if not saved_steps:
                 raise FileNotFoundError('No saved full state to resume')
@@ -166,10 +176,14 @@ def main(supplemental=False):
             state=checkpoints.restore_state(manager,state,Assets(),step=latest)
             jax.block_until_ready(state)
             manager.close()
-            assert stage.resolve().parent==Path('/dev/shm') and stage.name==('rulervla_main_'+run['run_id']+'_'+str(os.getpid()))
+            assert stage.resolve().parent==args.staging_root.resolve() and stage.name==('rulervla_main_'+run['run_id']+'_'+str(os.getpid()))
             shutil.rmtree(stage)
             manager,_=checkpoints.initialize_checkpoint_dir(stage,keep_period=None,overwrite=False,resume=False)
         assert not jax.tree.leaves(state.params.filter(training_config.freeze_filter))
+        if args.release_init_caches:
+            import ctypes, gc
+            jax.block_until_ready(state);jax.clear_caches();gc.collect()
+            ctypes.CDLL(None).malloc_trim(0)
         first_update=int(jax.device_get(state.step))
         graph=state.model_def
         param_sharding=sharding.fsdp_sharding(jax.eval_shape(lambda:state.params),gpu_mesh)
@@ -183,6 +197,7 @@ def main(supplemental=False):
             episodes=len(dataset.rows),frames=len(dataset),sampler='uniform shuffled epochs, SeedSequence(training_seed,epoch)',
             norm_stats_sha256=file_sha(norm_dir/'norm_stats.json'),staging_path=str(stage))
         execution['git_commit'] = __import__('subprocess').check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
+        execution['episode_cache_limit_bytes'] = dataset.max_cache_bytes
         execution['data_manifest_sha256'] = {key:file_sha(value) for key,value in data_manifests.items()}
         write_json(output/('resume_execution_%d.json'%os.getpid()) if args.resume else output/'execution_lock.json',execution)
         with (records.local/'metrics.jsonl').open('a',buffering=1) as log,sharding.set_mesh(gpu_mesh):
@@ -228,7 +243,7 @@ def main(supplemental=False):
                         # Dataset2 retains every checkpoint. Release only this run's
                         # verified temporary RAM staging before another worker saves.
                         manager.close()
-                        assert stage.resolve().parent==Path('/dev/shm') and stage.name==('rulervla_main_'+run['run_id']+'_'+str(os.getpid()))
+                        assert stage.resolve().parent==args.staging_root.resolve() and stage.name==('rulervla_main_'+run['run_id']+'_'+str(os.getpid()))
                         shutil.rmtree(stage)
                         manager,_=checkpoints.initialize_checkpoint_dir(stage,keep_period=None,overwrite=False,resume=False)
                     status['latest_checkpoint']=str(destination);write_json(status_path,status)

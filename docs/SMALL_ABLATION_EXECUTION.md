@@ -1,3 +1,27 @@
+## 2026-10-08 实际状态更正与Camera优先
+
+GPU5并行Camera测试未通过：第一次被48GiB host保护停止；清理初始化缓存后的第二次Camera与原ActionCoord进程都消失，没有Python异常。user-1015 cgroup oom/oom_kill计数为0，原因尚未确认，不能宣称OOM。ActionCoord最后完成1372步，没有到5000保存点，正式训练状态无法恢复。日志、metadata与指标保留于gpu5_interruption_20261008，必须从同一base重启。
+
+随后Camera单独在GPU5完成两次full-FT更新：loss0.072416529/0.072523169，grad0.899978697/0.908783019。完整42GiB checkpoint已经写入Dataset2磁盘staging。归档复制遭遇EHOSTDOWN，正在通过原始step2 snapshot逐leaf shape/dtype/SHA-256验证恢复并调用现有publish_with_retry重新归档。
+
+恢复启动控制器PID1334377；正式启动必须等待全状态验证通过，不能将两步smoke冒充10k训练。主状态仍为outputs/small_ablation_v1/camera_gpu5_now_status.json。
+
+后续顺序：Camera 10k完成 → 保留ActionCoord1372步中断证据并从官方base重新开始30k → Ruler-only30k。其他模型checkpoint和旧实验未更改。
+
+## 2026-10-08 用户要求立即并行Camera
+
+在GPU5现有ActionCoord之外，执行CameraXYZ两步并行full-FT smoke，然后通过完整checkpoint保存/SHA/全状态恢复才能正式启动10k。
+
+新增内存策略不改变训练数学：Camera新进程的episode缓存上限8GiB；checkpoint staging放Dataset2磁盘；smoke恢复前释放期望数组，以记录的每个leaf shape/dtype/SHA-256检查全部optimizer/EMA/weights。Camera控制器保留48GiB host headroom，仅停止自身child。其他训练未重启。
+
+状态：outputs/small_ablation_v1/camera_gpu5_now_status.json。当前控制器PID600112，实际状态以该文件为准，不将input gate或smoke称为正式训练。
+
+## 2026-10-08 GPU5 Camera队列调整
+
+用户要求CameraXYZ也在GPU5运行。GPU5顺序改为：ActionCoord-only 30k → CameraXYZ-only 10k → Ruler-only 30k。
+
+采用现有训练PID接管，ActionCoord不重启、不恢复旧checkpoint，也不从base重新开跑。GPU4未启动的Camera队列停止并保留状态；避免重复训练。后续每组仍独立从pi05_base初始化、做各自smoke，沿用原资源门槛。此调整是设备和队列顺序变化，尚不代表Camera正式训练已开始。
+
 # S22/S23 GPU 执行记录（2026-10-07）
 
 冻结研究设计见 `SMALL_ABLATION_PROTOCOL.md`。本记录说明实际工程放行和进程状态，不更改原始 run_matrix、条件列表和共同训练参数。

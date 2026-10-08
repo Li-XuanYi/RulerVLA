@@ -32,6 +32,15 @@ class BlockingSnapshotTests(unittest.TestCase):
         snapshot['params'][0,0]=123
         with self.assertRaises(AssertionError):verify_blocking_snapshot(snapshot,evidence)
 
+    def test_reconstructed_state_passes_without_retaining_expected_arrays(self):
+        snapshot,evidence=blocking_cpu_snapshot(self.state)
+        copied={k:np.array(v,copy=True) for k,v in snapshot.items()}
+        del snapshot
+        restored=jax.device_put(copied,jax.devices('cpu')[0])
+        verify_blocking_snapshot(restored,evidence)
+        restored['params']=restored['params'].at[0,0].set(123)
+        with self.assertRaises(AssertionError):verify_blocking_snapshot(restored,evidence)
+
     def test_missing_leaf_cannot_pass(self):
         snapshot,evidence=blocking_cpu_snapshot(self.state)
         evidence=deepcopy(evidence);evidence['leaves']=evidence['leaves'][:-1]

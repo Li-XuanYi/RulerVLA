@@ -39,11 +39,22 @@ def main(supplemental=False):
     parser.add_argument('--cpu-optimizer', action='store_true')
     parser.add_argument('--blocking-cpu-save', action='store_true',
         help='Supplement memory probe: CPU views held immutable through synchronous serialization')
+    parser.add_argument('--stream-restore-check', action='store_true',
+        help='Release saved CPU arrays before restore; verify every restored leaf against frozen SHA-256')
+    parser.add_argument('--staging-root', type=Path, default=Path('/dev/shm'))
+    parser.add_argument('--release-init-caches', action='store_true')
     args = parser.parse_args()
     if supplemental:
         assert args.fsdp_devices == 1 and args.cpu_optimizer and args.save_restore
     if args.blocking_cpu_save:
         assert supplemental and args.cpu_optimizer and args.save_restore
+    if args.stream_restore_check:
+        assert supplemental and args.blocking_cpu_save
+    if args.release_init_caches:
+        assert supplemental and args.cpu_optimizer
+    if args.staging_root != Path('/dev/shm'):
+        assert supplemental and args.staging_root.resolve().is_relative_to('/home/Dataset2/yqt/rulervla/small_ablation_v1/staging')
+        args.staging_root.mkdir(parents=True,exist_ok=True)
     root = Path(__file__).resolve().parents[1]
     sys.path.insert(0, str(root / 'src'))
     sys.path.insert(0, str(args.runtime / 'packages/openpi-client/src'))
@@ -176,6 +187,11 @@ def main(supplemental=False):
             init_rng = jax.device_put(init_rng, jax.sharding.NamedSharding(optimizer_mesh, jax.sharding.PartitionSpec()))
         state, state_sharding = train.init_train_state(training_config, init_rng, optimizer_mesh, resume=False)
         jax.block_until_ready(state)
+        if args.release_init_caches:
+            import ctypes, gc
+            jax.clear_caches(); gc.collect()
+            ctypes.CDLL(None).malloc_trim(0)
+            status['initialization_caches_released']=True
         assert not jax.tree.leaves(state.params.filter(training_config.freeze_filter))
         assert len(jax.tree.leaves(state.params.filter(training_config.trainable_filter))) == len(jax.tree.leaves(state.params))
         assert all(not isinstance(value, jax.ShapeDtypeStruct) for value in jax.tree.leaves(state.params))
@@ -226,7 +242,7 @@ def main(supplemental=False):
             from openpi.training import checkpoints
             from actioncoord.integration.v03_checkpoint_snapshot import host_snapshot
             from actioncoord.integration.v03_storage import publish_checkpoint, verify_checkpoint
-            stage = Path('/dev/shm/rulervla_main_smoke_%d' % os.getpid())
+            stage = args.staging_root/('rulervla_main_smoke_%d' % os.getpid())
             if stage.exists():
                 raise FileExistsError(stage)
             if args.blocking_cpu_save:
@@ -254,18 +270,24 @@ def main(supplemental=False):
             shapes, shards = train.init_train_state(training_config, init_rng, optimizer_mesh, resume=True)
             shapes = jax.tree.map(lambda shape, shard: jax.ShapeDtypeStruct(shape.shape, shape.dtype, sharding=shard), shapes, shards)
             del state
+            if args.stream_restore_check:
+                del snapshot
             import gc
             gc.collect()
             restored = checkpoints.restore_state(manager, shapes, LoaderAssets(), step=1)
             assert int(jax.device_get(restored.step)) == 2
             # Compare full optimizer/EMA/weights, not just the inference params.
-            for actual, expected in zip(jax.tree.leaves(restored), jax.tree.leaves(snapshot), strict=True):
-                np.testing.assert_array_equal(jax.device_get(actual), expected)
+            if args.stream_restore_check:
+                verify_blocking_snapshot(restored, snapshot_evidence)
+                status['restore_check']='all full-state leaf shapes, dtypes and SHA-256 bytes'
+            else:
+                for actual, expected in zip(jax.tree.leaves(restored), jax.tree.leaves(snapshot), strict=True):
+                    np.testing.assert_array_equal(jax.device_get(actual), expected)
             status.update(checkpoint_restored=True, full_train_state_restore_bitwise=True, staging_path=str(stage))
             manager.close()
             if supplemental:
                 import shutil
-                assert stage.resolve().parent == Path('/dev/shm') and stage.name == 'rulervla_main_smoke_%d' % os.getpid()
+                assert stage.resolve().parent == args.staging_root.resolve() and stage.name == 'rulervla_main_smoke_%d' % os.getpid()
                 shutil.rmtree(stage)
                 save_lock.close()
         status.update(state='complete', stage='smoke_complete', finished_at_unix=time.time(),
