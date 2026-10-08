@@ -23,12 +23,14 @@ def main(supplemental=False):
     parser.add_argument('--episode-cache-gib',type=int,default=None)
     parser.add_argument('--staging-root',type=Path,default=Path('/dev/shm'))
     parser.add_argument('--release-init-caches',action='store_true')
+    parser.add_argument('--resource-guard',action='store_true')
     parser.add_argument('--suite-release',type=Path,help='Required audited release directory for non-Spatial suites')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     run = json.loads(args.run_config.read_text())
     shared = run['shared_training']
     target_updates = shared['optimizer_updates']
+    assert not args.resource_guard or supplemental
     if supplemental:
         from small_training_contract import validate_run
         validate_run(root, run)
@@ -202,6 +204,19 @@ def main(supplemental=False):
         write_json(output/('resume_execution_%d.json'%os.getpid()) if args.resume else output/'execution_lock.json',execution)
         with (records.local/'metrics.jsonl').open('a',buffering=1) as log,sharding.set_mesh(gpu_mesh):
             for step in range(first_update,target_updates):
+                if args.resource_guard:
+                    import shutil, subprocess
+                    while True:
+                        free_mib=int(subprocess.check_output(['nvidia-smi',
+                            '--id='+os.environ['CUDA_VISIBLE_DEVICES'],
+                            '--query-gpu=memory.free','--format=csv,noheader,nounits'],text=True).strip())
+                        disk_gib=shutil.disk_usage(output).free/1024**3
+                        if free_mib>=60000 and disk_gib>=100:
+                            break
+                        status.update(stage='waiting_resource_headroom',gpu_free_mib=free_mib,
+                                      archive_free_gib=disk_gib)
+                        write_json(status_path,status)
+                        time.sleep(20)
                 start=time.time();indices=update_indices(len(dataset),run['seed'],step)
                 status.update(stage='preparing_batch',current_optimizer_update=step+1);write_json(status_path,status)
                 entries=[transform(cue_adapter.prepare(dataset[int(index)])) for index in indices]
@@ -220,7 +235,7 @@ def main(supplemental=False):
                 log.write(json.dumps(record)+'\n');print(json.dumps(record),flush=True)
                 status.update(stage='training',optimizer_updates=step+1,latest_metrics=record);write_json(status_path,status)
                 # Keep all six complete checkpoints; no deletion from Dataset2.
-                if (step+1)%5000==0:
+                if ((step+1) in shared['checkpoint_updates'] if supplemental else (step+1)%5000==0):
                     status['stage']='saving_checkpoint';write_json(status_path,status)
                     # Serialize large CPU snapshots and RAM staging across independent GPU workers.
                     with (root/'outputs/main_comparison/checkpoint_staging.lock').open('w') as save_lock:
@@ -247,6 +262,10 @@ def main(supplemental=False):
                         shutil.rmtree(stage)
                         manager,_=checkpoints.initialize_checkpoint_dir(stage,keep_period=None,overwrite=False,resume=False)
                     status['latest_checkpoint']=str(destination);write_json(status_path,status)
+                    if supplemental:
+                        from rulervla.training.checkpoint_retention import prune_verified_checkpoints
+                        prune_verified_checkpoints(output, shared['checkpoint_updates'],
+                            shared['checkpoint_retention'], step+1, verify_checkpoint)
         manager.close();status.update(state='complete',stage='complete',finished_at_unix=time.time(),final_checkpoint=str(output/str(target_updates-1)))
     except BaseException as error:
         status.update(state='failed',error=repr(error),finished_at_unix=time.time());raise

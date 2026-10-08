@@ -21,10 +21,11 @@ def validate_run(root, run, require_gpu_gate=True):
     assert (shared['micro_batch'], shared['gradient_accumulation'], shared['effective_batch']) == (1, 32, 32)
     reference = json.loads((root/'experiments/main_comparison_v1/runs/libero_spatial_baseline_seed42.json').read_text())['shared_training']
     metadata = {'optimizer_updates', 'micro_batch', 'gradient_accumulation', 'data_parallel_replicas',
-        'memory_configuration_status', 'checkpoint_updates', 'formal_checkpoint_index', 'training_seeds'}
+        'memory_configuration_status', 'checkpoint_updates', 'checkpoint_retention', 'formal_checkpoint_index', 'training_seeds'}
     assert {k:v for k,v in shared.items() if k not in metadata} == {
         k:v for k,v in reference.items() if k not in metadata}, 'Common settings differ from L06'
-    assert shared['checkpoint_updates'] == list(range(5000, shared['optimizer_updates']+1, 5000))
+    assert shared['checkpoint_updates'] == [100] + list(range(1000, shared['optimizer_updates']+1, 1000))
+    assert shared['checkpoint_retention'] == {'latest': 2, 'milestone_updates': [10000, 20000, 30000]}
     assert shared['formal_checkpoint_index'] == shared['optimizer_updates']-1
     assert shared['training_seeds'] == [42] and shared['data_parallel_replicas'] == 1
     assert Path(run['checkpoint_root']).is_relative_to('/home/Dataset2/yqt/rulervla/small_ablation_v1/checkpoints')
