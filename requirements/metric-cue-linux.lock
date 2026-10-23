@@ -1,6 +1,6 @@
 # Tested Linux CPython 3.11 environment; captured for G2.
 # openpi and openpi_client are vendored under src/. Install this repository with --no-deps after sync.
---extra-index-url https://download.pytorch.org/whl/cu126
+--extra-index-url https://download.pytorch.org/whl/cu128
 absl-py==2.3.0
 addict==2.4.0
 aiohappyeyeballs==2.6.1
