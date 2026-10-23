@@ -16,6 +16,10 @@ smoke = ["h5py>=3"]
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+openpi = ["LICENSE"]
+openpi_client = ["LICENSE"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]

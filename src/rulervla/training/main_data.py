@@ -28,8 +28,23 @@ def file_sha(path):
     return result.hexdigest()
 
 
+def action_chunk_indices(frame, frame_count, horizon=10):
+    """Actions t..t+h-1; repeat only the same episode's final action."""
+    if frame_count < 1 or horizon < 1:
+        raise ValueError('Positive episode length and action horizon required')
+    if not isinstance(frame, (int, np.integer)) or not 0 <= frame < frame_count:
+        raise IndexError(frame)
+    unpadded = int(frame) + np.arange(horizon, dtype=np.int64)
+    return np.minimum(unpadded, frame_count-1), unpadded < frame_count
+
+
 class SpatialDataset:
-    def __init__(self, rgbd_root, geometry_root, max_cache_bytes=None):
+    def __init__(self, rgbd_root, geometry_root, max_cache_bytes=None, *, path_mappings=None):
+        self.path_mappings = dict(path_mappings or {})
+        self.manifest_hashes = {
+            'rgbd': file_sha(Path(rgbd_root)/'regen_manifest.json'),
+            'geometry': file_sha(Path(geometry_root)/'manifest.json'),
+        }
         self.rows = sorted(json.loads((Path(rgbd_root)/'regen_manifest.json').read_text())['episodes'],
             key=lambda row: row['episode_index'])
         geometry = json.loads((Path(geometry_root)/'manifest.json').read_text())
@@ -37,11 +52,43 @@ class SpatialDataset:
         self.geometry = {row['episode_index']: row for row in geometry['episodes']}
         assert [row['episode_index'] for row in self.rows] == list(range(1261,1693))
         assert set(self.geometry) == set(range(1261,1693))
+        for row in self.rows:
+            paired = self.geometry[row['episode_index']]
+            if paired.get('frames', row['frames']) != row['frames']:
+                raise ValueError('RGB-D and geometry episode lengths differ')
+            if paired.get('rgbd_sha256', row['npz_sha256']) != row['npz_sha256']:
+                raise ValueError('Geometry was generated from a different RGB-D source')
         self.ends = np.cumsum([row['frames'] for row in self.rows])
         assert int(self.ends[-1]) == 52970
         self.cache = OrderedDict()
         self.max_cache_bytes = max_cache_bytes
         self.cache_bytes = 0
+
+    def resolve_source(self, path):
+        """Map a byte-verified local cache without rewriting original manifests."""
+        for source, destination in sorted(getattr(self, 'path_mappings', {}).items(),
+                                           key=lambda item: len(item[0]), reverse=True):
+            try:
+                relative = Path(path).relative_to(source)
+            except ValueError:
+                continue
+            return str(Path(destination)/relative)
+        return str(path)
+
+    def sample_identity(self, index):
+        if not 0 <= index < len(self):
+            raise IndexError(index)
+        number = int(np.searchsorted(self.ends, index, side='right'))
+        row = self.rows[number]
+        frame = int(index-(self.ends[number-1] if number else 0))
+        indices, valid = action_chunk_indices(frame, row['frames'])
+        geo = self.geometry[row['episode_index']]
+        return dict(global_index=int(index), episode_index=row['episode_index'], frame_index=frame,
+                    episode_frames=row['frames'], task=row['task'],
+                    action_frame_indices=indices.tolist(), action_valid_mask=valid.tolist(),
+                    rgbd_source=row.get('npz'), rgbd_sha256=row.get('npz_sha256'),
+                    geometry_source=geo.get('geometry_npz'), geometry_sha256=geo.get('geometry_sha256'),
+                    manifest_sha256=getattr(self, 'manifest_hashes', {}))
 
     def __len__(self):
         return int(self.ends[-1])
@@ -54,7 +101,12 @@ class SpatialDataset:
         frame = int(index - (self.ends[number-1] if number else 0))
         ep = row['episode_index']
         if ep not in self.cache:
-            loaded = retry_io(lambda: self._load_episode(row, self.geometry[ep]))
+            io_row, io_geometry = dict(row), dict(self.geometry[ep])
+            if 'npz' in io_row:
+                io_row['npz'] = self.resolve_source(io_row['npz'])
+            if 'geometry_npz' in io_geometry:
+                io_geometry['geometry_npz'] = self.resolve_source(io_geometry['geometry_npz'])
+            loaded = retry_io(lambda: self._load_episode(io_row, io_geometry))
             size = sum(value.nbytes for value in loaded.values())
             if self.max_cache_bytes is not None:
                 while self.cache and self.cache_bytes + size > self.max_cache_bytes:
@@ -65,7 +117,7 @@ class SpatialDataset:
         self.cache.move_to_end(ep)
         arrays = self.cache[ep]
         sample = {key: value[frame].copy() for key,value in arrays.items() if key != 'actions'}
-        indices = np.minimum(frame+np.arange(10), row['frames']-1)
+        indices, _ = action_chunk_indices(frame, row['frames'])
         sample.update(actions=arrays['actions'][indices].copy(), task=row['task'])
         return sample
 
@@ -101,6 +153,12 @@ class SpatialDataset:
             arrays.update({key: z[key] for key in ('state8','eef_quaternion_xyzw','wrist_depth_m','intrinsic',
                 'camera_to_world','wrist_intrinsic','wrist_camera_to_world')})
         assert all(len(value) == row['frames'] for value in arrays.values())
+        if arrays['actions'].shape != (row['frames'], 7) or not np.isfinite(arrays['actions']).all():
+            raise ValueError('LIBERO episode actions must be finite [frames,7]')
+        if arrays['state8'].shape != (row['frames'], 8) or not np.isfinite(arrays['state8']).all():
+            raise ValueError('Episode state8 must be finite [frames,8]')
+        if not np.allclose(arrays['state8'][:, :3], arrays['ee_world_m'], atol=2e-6, rtol=0):
+            raise ValueError('RGB-D EE and geometry state8 are not synchronized')
         for value in arrays.values():
             value.setflags(write=False)
         return arrays

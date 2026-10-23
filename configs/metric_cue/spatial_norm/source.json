@@ -1,0 +1,7 @@
+{
+  "episodes": 432,
+  "frames": 52970,
+  "rgbd_manifest_sha256": "02e428d9a3735bb959cdc29c1ca415cde73c2b9f6763ce1545603f385b8e127c",
+  "geometry_manifest_sha256": "f09a5d2b021058d51f54e54fb54e1222f8d1202eff805c6ba96efee00cbb0e9e",
+  "sample_policy": "all training frames; action horizon repeat-last within episode"
+}
