@@ -5,10 +5,33 @@ import os
 from pathlib import Path
 import time
 from uuid import uuid4
+from zipfile import BadZipFile
 
 
 TRANSIENT = {errno.EIO, errno.EHOSTDOWN, errno.EHOSTUNREACH, errno.ENOTCONN,
              errno.ETIMEDOUT, errno.ECONNRESET, errno.ESTALE}
+
+
+def _transient_storage_cause(error):
+    """Recognize only actual underlying transient OS errors, even if wrapped.
+
+    zipfile may translate a CIFS EHOSTDOWN raised during ZIP-end-directory
+    reads into BadZipFile, preserving the OSError as __context__. A genuinely
+    corrupted NPZ must still fail fast rather than silently skip samples.
+    """
+    pending = [error]
+    visited = set()
+    while pending:
+        current = pending.pop()
+        if id(current) in visited:
+            continue
+        visited.add(id(current))
+        if isinstance(current, OSError) and current.errno in TRANSIENT:
+            return current
+        for nested in (current.__cause__, current.__context__):
+            if nested is not None:
+                pending.append(nested)
+    return None
 
 
 def retry_io(operation, *, timeout=300, interval=10):
@@ -16,10 +39,12 @@ def retry_io(operation, *, timeout=300, interval=10):
     while True:
         try:
             return operation()
-        except OSError as error:
-            if error.errno not in TRANSIENT or time.monotonic() >= deadline:
+        except (OSError, BadZipFile) as error:
+            underlying = _transient_storage_cause(error)
+            if underlying is None or time.monotonic() >= deadline:
                 raise
-            print('Transient Dataset2 I/O; preserving state and retrying: '+repr(error), flush=True)
+            print('Transient Dataset2 I/O; preserving state and retrying: ' +
+                  repr(underlying) + ' (raised as ' + type(error).__name__ + ')', flush=True)
             time.sleep(interval)
 
 

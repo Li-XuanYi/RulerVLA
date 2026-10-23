@@ -1,0 +1,19 @@
+geometry_contract: v03_geometry.json
+metric_ruler:
+  enabled: true
+  origin: ee_tcp
+  frame: action_world_xyz
+  axis_extent_m:
+    x: [-0.30, 0.30]
+    y: [-0.30, 0.30]
+    z: [-0.30, 0.30]
+  tick_spacing_m: 0.05
+  major_tick_every: 2
+  positive_style: solid_filled
+  negative_style: dashed_hollow
+  near_clip_m: 0.001
+  line_width: 2
+  tick_radius: 2
+motion_echo:
+  enabled: false
+  history_steps: 5

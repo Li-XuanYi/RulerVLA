@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 from rulervla.training.storage_io import retry_io
+from rulervla.cues.motion_echo import MotionHistory
 
 
 def update_indices(frame_count, seed, update, batch_size=32):
@@ -28,7 +29,7 @@ def file_sha(path):
 
 
 class SpatialDataset:
-    def __init__(self, rgbd_root, geometry_root):
+    def __init__(self, rgbd_root, geometry_root, max_cache_bytes=None):
         self.rows = sorted(json.loads((Path(rgbd_root)/'regen_manifest.json').read_text())['episodes'],
             key=lambda row: row['episode_index'])
         geometry = json.loads((Path(geometry_root)/'manifest.json').read_text())
@@ -39,6 +40,8 @@ class SpatialDataset:
         self.ends = np.cumsum([row['frames'] for row in self.rows])
         assert int(self.ends[-1]) == 52970
         self.cache = OrderedDict()
+        self.max_cache_bytes = max_cache_bytes
+        self.cache_bytes = 0
 
     def __len__(self):
         return int(self.ends[-1])
@@ -51,12 +54,39 @@ class SpatialDataset:
         frame = int(index - (self.ends[number-1] if number else 0))
         ep = row['episode_index']
         if ep not in self.cache:
-            self.cache[ep] = retry_io(lambda: self._load_episode(row, self.geometry[ep]))
+            loaded = retry_io(lambda: self._load_episode(row, self.geometry[ep]))
+            size = sum(value.nbytes for value in loaded.values())
+            if self.max_cache_bytes is not None:
+                while self.cache and self.cache_bytes + size > self.max_cache_bytes:
+                    _, evicted = self.cache.popitem(last=False)
+                    self.cache_bytes -= sum(value.nbytes for value in evicted.values())
+            self.cache[ep] = loaded
+            self.cache_bytes += size
+        self.cache.move_to_end(ep)
         arrays = self.cache[ep]
         sample = {key: value[frame].copy() for key,value in arrays.items() if key != 'actions'}
         indices = np.minimum(frame+np.arange(10), row['frames']-1)
         sample.update(actions=arrays['actions'][indices].copy(), task=row['task'])
         return sample
+
+    def get_history(self, index, *, history_steps=5):
+        """Frame offsets are recorded environment control steps within one episode."""
+        if not isinstance(history_steps, int) or history_steps < 1:
+            raise ValueError("history_steps must be positive")
+        if not 0 <= index < len(self):
+            raise IndexError(index)
+        number = int(np.searchsorted(self.ends, index, side='right'))
+        row = self.rows[number]
+        frame = int(index - (self.ends[number-1] if number else 0))
+        episode = row['episode_index']
+        self[index]  # Load and cache the verified episode without crossing its boundary.
+        current = self.cache[episode]['ee_world_m'][frame].copy()
+        past_frame = frame - history_steps
+        if past_frame < 0:
+            return MotionHistory(False, episode, frame, past_frame, current, None,
+                                 'insufficient_history')
+        past = self.cache[episode]['ee_world_m'][past_frame].copy()
+        return MotionHistory(True, episode, frame, past_frame, current, past)
 
     @staticmethod
     def _load_episode(row, geometry):
@@ -89,3 +119,5 @@ class SuiteDataset(SpatialDataset):
         self.ends=np.cumsum([row['frames'] for row in self.rows])
         assert int(self.ends[-1])==manifest['total_frames']==expected['frames']
         self.cache=OrderedDict()
+        self.max_cache_bytes=None
+        self.cache_bytes=0

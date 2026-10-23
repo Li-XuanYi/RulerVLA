@@ -30,10 +30,14 @@ class LiberoAdapter:
         validate_sample(sample)
         return sample
 
-    def camera(self, sample):
-        intrinsic = np.array(sample["intrinsic"], dtype=np.float64, copy=True)
+    def camera(self, sample, view="agentview"):
+        if view not in {"agentview", "wrist"}:
+            raise ValueError("Unknown calibrated camera view")
+        intrinsic_key = "intrinsic" if view == "agentview" else "wrist_intrinsic"
+        transform_key = "camera_to_world" if view == "agentview" else "wrist_camera_to_world"
+        intrinsic = np.array(sample[intrinsic_key], dtype=np.float64, copy=True)
         intrinsic[:2, 2] += self.contract["principal_point_offset_pixels"]
-        return Camera(intrinsic, sample["camera_to_world"], (256, 256))
+        return Camera(intrinsic, sample[transform_key], (256, 256))
 
 
 def rigid_surface_points_from_sim(sim, ee_world_m, ee_rotation_world,
