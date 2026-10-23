@@ -6,6 +6,8 @@
 
 当前方法只导入本仓库 `src/openpi` 和 `src/openpi_client`。完整源代码由 Git tree 固定，上游比较 commit、历史快照和项目补丁见 [OPENPI_SOURCE.json](OPENPI_SOURCE.json)；不能只从比较 commit 重建未知历史补丁。Linux CPython 3.11 依赖固定在 `requirements/metric-cue-linux.lock`，包括不可变的 LeRobot Git commit。
 
+锁文件排除由本仓库提供的两个 OpenPI 包和共享环境中未用于本方法的 RLinf。RLinf 的依赖在共享环境中不完整，不能据此声称整个共享环境无依赖冲突。构建检查从已提交的 Git tree 生成 wheel，并隔离导入其中的三个包；全新依赖环境安装尚未实测。
+
 原环境含四个 Transformers 4.53.2 补丁，模板与 SHA-256 清单已提交。以下步骤在新环境执行；本轮没有重装共享环境。overlay 写入仅允许仓库内虚拟环境，默认检查只读。
 
 ```bash
