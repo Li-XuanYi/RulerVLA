@@ -85,15 +85,14 @@ def profile(config, name):
 
 def load_metric_cue_config(path):
     """Read one new-method ruler definition without altering archived configs."""
-    path = Path(path).resolve()
-    value = yaml.safe_load(path.read_text())
-    geometry = json.loads((path.parent / value["geometry_contract"]).read_text())
-    validate_contract(geometry)
-    return geometry, MetricCueConfig.from_mapping(value["metric_ruler"])
+    geometry, ruler, _ = load_metric_method_config(path)
+    return geometry, ruler
 
 
 def load_metric_method_config(path):
     path = Path(path).resolve()
     value = yaml.safe_load(path.read_text())
-    geometry, ruler = load_metric_cue_config(path)
+    geometry = json.loads((path.parent / value["geometry_contract"]).read_text())
+    validate_contract(geometry)
+    ruler = MetricCueConfig.from_mapping(value["metric_ruler"])
     return geometry, ruler, MotionEchoConfig(**value.get("motion_echo", {}))

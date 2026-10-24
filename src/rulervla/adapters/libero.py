@@ -1,7 +1,7 @@
 """Same-state raw LIBERO to the frozen V0.3 stored sample convention."""
 import numpy as np
 
-from rulervla.data.schema import Camera, validate_sample
+from rulervla.data.schema import Camera, observation_index, validate_sample
 from rulervla.geometry.action_coord import raster, validate_contract
 
 
@@ -30,26 +30,33 @@ class LiberoAdapter:
         validate_sample(sample)
         return sample
 
-    def from_metric_observation(self, observation, *, depth_m, intrinsic, camera_to_world,
-                                wrist_depth_m, wrist_intrinsic, wrist_camera_to_world,
-                                state8, instruction, episode_index, control_step, calibration_step):
-        """Live two-view ingress; matrices and images must be read at one control step.
-
-        Both depth arrays are already metric optical Z in raw simulator raster.
-        The caller refreshes wrist extrinsics after every actual environment step.
-        This method preserves the stored-sample convention used by SpatialDataset.
-        """
-        if control_step < 0 or calibration_step != control_step:
+    def from_metric_observation(self, observation, *, intrinsic, camera_to_world,
+                                wrist_intrinsic, wrist_camera_to_world, state8, instruction,
+                                episode_index, control_step, calibration_step,
+                                depth_m=None, wrist_depth_m=None):
+        """两路图像、状态和相机标定必须来自同一个控制步；深度和四元数可选。"""
+        episode_index = observation_index(episode_index)
+        control_step = observation_index(control_step)
+        calibration_step = observation_index(calibration_step)
+        if calibration_step != control_step:
             raise ValueError('Images, state and both camera calibrations must use the same control step')
-        sample = self.from_observation(observation, depth_m=depth_m, intrinsic=intrinsic,
-            camera_to_world=camera_to_world, state8=state8, instruction=instruction)
-        wrist_depth = np.asarray(wrist_depth_m)
-        if wrist_depth.shape != (256, 256) or not np.issubdtype(wrist_depth.dtype, np.floating):
-            raise ValueError('Wrist depth must be metric floating [256,256]')
-        sample.update(wrist_depth_m=raster(wrist_depth, 'rot180'),
-                      wrist_intrinsic=np.asarray(wrist_intrinsic).copy(),
-                      wrist_camera_to_world=np.asarray(wrist_camera_to_world).copy(),
-                      episode_index=int(episode_index), frame_index=int(control_step))
+        sample = dict(
+            agentview_rgb=raster(np.asarray(observation["agentview_image"]), "rot180"),
+            wrist_rgb=raster(np.asarray(observation["robot0_eye_in_hand_image"]), "rot180"),
+            intrinsic=np.asarray(intrinsic).copy(),
+            camera_to_world=np.asarray(camera_to_world).copy(),
+            wrist_intrinsic=np.asarray(wrist_intrinsic).copy(),
+            wrist_camera_to_world=np.asarray(wrist_camera_to_world).copy(),
+            ee_world_m=np.asarray(observation["robot0_eef_pos"]).copy(),
+            state8=np.asarray(state8, dtype=np.float32).copy(), task=instruction,
+            episode_index=episode_index, frame_index=control_step,
+        )
+        for key, depth in (("agentview_depth_m", depth_m), ("wrist_depth_m", wrist_depth_m)):
+            if depth is not None:
+                sample[key] = raster(np.asarray(depth), "rot180")
+        if "robot0_eef_quat" in observation:
+            sample["eef_quaternion_xyzw"] = np.asarray(observation["robot0_eef_quat"]).copy()
+        validate_sample(sample, require_depth=False)
         self.camera(sample, 'wrist')
         return sample
 

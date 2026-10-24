@@ -149,7 +149,6 @@ class MetricTrainer:
         gradients = jax.device_put(gradients, self.optimizer_device)
         updated = self._update(state, gradients)
         jax.block_until_ready(updated)
-        require_cue_optimizer(updated.opt_state)
         return updated, info
 
 
@@ -232,7 +231,9 @@ class MetricPolicy:
         return self.infer(sample, noise=noise)
 
     def infer(self, sample, *, noise=None):
-        inputs = self.prepare(sample)
+        return self.infer_prepared(self.prepare(sample), noise=noise)
+
+    def infer_prepared(self, inputs, *, noise=None):
         batched = jax.tree.map(lambda value: jnp.asarray(value)[None], inputs)
         observation = model_lib.Observation.from_dict(batched)
         self.rng, rng = jax.random.split(self.rng)

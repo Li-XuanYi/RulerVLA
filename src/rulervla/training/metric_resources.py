@@ -52,6 +52,43 @@ def query_gpus():
         return {'error': str(error)}
 
 
+def _gpu_status(resource, gpu_query=query_gpus):
+    gpus = gpu_query()
+    reasons = []
+    if isinstance(gpus, dict):
+        reasons.append('GPU query unavailable: '+gpus['error'])
+    else:
+        indexed = {row['index']: row for row in gpus}
+        for index in resource['gpu_indices']:
+            if index not in indexed or indexed[index]['free_mib'] < resource['min_free_mib']:
+                reasons.append(f'GPU {index} requires {resource["min_free_mib"]} MiB free')
+    return gpus, reasons
+
+
+def inference_preflight(value, checkpoint=None, *, g1_weights_bridge=False):
+    if g1_weights_bridge and checkpoint is None:
+        raise ValueError('G1 weights bridge requires a checkpoint')
+    gpus, reasons = _gpu_status(value['resources'])
+    checked = {}
+    if checkpoint is not None:
+        directory = Path(checkpoint)
+        names = ['params/_METADATA']
+        if not g1_weights_bridge:
+            names.append('metric_workflow.json')
+        for name in names:
+            checked[name] = probe_file(directory/name)
+    if checkpoint is None or g1_weights_bridge:
+        checked['cue_config'] = probe_file(value['cue_config'])
+        checked['norm_stats'] = probe_file(Path(value['norm_stats_dir'])/'norm_stats.json')
+        if checked['norm_stats'].get('sha256') != value['norm_stats_sha256']:
+            reasons.append('Normalization statistics unavailable or hash mismatch')
+    for name, result in checked.items():
+        if 'error' in result:
+            reasons.append(f'Inference input unavailable: {name}: {result["error"]}')
+    return dict(schema='rulervla_metric_inference_preflight_v1', launch_allowed=not reasons,
+                blockers=reasons, inputs=checked, gpu_snapshot=gpus, gpu_job_started=False)
+
+
 def preflight(value, *, gpu_query=query_gpus, file_probe=probe_file):
     reasons, data = [], {}
     for name, filename in (('rgbd', 'regen_manifest.json'), ('geometry', 'manifest.json')):
@@ -85,15 +122,9 @@ def preflight(value, *, gpu_query=query_gpus, file_probe=probe_file):
     elif checkpoint.get('sha256') != next((item['sha256'] for item in receipt.get('json', {}).get('files', [])
                                           if item['path'] == '_METADATA'), None):
         reasons.append('Initial checkpoint metadata does not match the verified base artifact')
-    gpus = gpu_query()
     resource = value['resources']
-    if isinstance(gpus, dict):
-        reasons.append('GPU query unavailable: '+gpus['error'])
-    else:
-        indexed = {row['index']: row for row in gpus}
-        for index in resource['gpu_indices']:
-            if index not in indexed or indexed[index]['free_mib'] < resource['min_free_mib']:
-                reasons.append(f'GPU {index} requires {resource["min_free_mib"]} MiB free')
+    gpus, gpu_reasons = _gpu_status(resource, gpu_query)
+    reasons.extend(gpu_reasons)
     available = None
     meminfo = Path('/proc/meminfo')
     if meminfo.exists():

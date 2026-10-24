@@ -4,14 +4,6 @@ import pytest
 from rulervla.adapters.metric_cue import SixChannelInputs
 
 
-class StubLiberoInputs:
-    def __call__(self, data):
-        return {'state': data['observation/state'], 'prompt': data['prompt'],
-                'image': {'base_0_rgb': data['observation/image'],
-                          'left_wrist_0_rgb': data['observation/wrist_image']},
-                'image_mask': {'base_0_rgb': np.bool_(True), 'left_wrist_0_rgb': np.bool_(True)}}
-
-
 def prepared():
     return {'observation/image': np.full((224, 224, 3), 128, np.uint8),
             'observation/wrist_image': np.full((224, 224, 3), 255, np.uint8),
@@ -23,7 +15,7 @@ def prepared():
 def test_each_valid_view_is_normalized_rgb_then_independent_cue():
     data = prepared()
     source = data['observation/image'].copy()
-    result = SixChannelInputs(base_transform=StubLiberoInputs())(data)
+    result = SixChannelInputs()(data)
     assert list(result['image']) == ['base_0_rgb', 'left_wrist_0_rgb',
                                      'right_wrist_0_rgb', 'aux_wrist_cue_rgb']
     assert [bool(result['image_mask'][key]) for key in result['image']] == [True, True, False, False]
@@ -41,8 +33,26 @@ def test_nonfinite_cue_and_wrong_shape_fail_closed():
     data = prepared()
     data['observation/agent_cue'][0, 0, 0] = np.nan
     with pytest.raises(ValueError):
-        SixChannelInputs(base_transform=StubLiberoInputs())(data)
+        SixChannelInputs()(data)
     data = prepared()
     data['observation/wrist_cue'] = data['observation/wrist_cue'][..., :2]
     with pytest.raises(ValueError):
-        SixChannelInputs(base_transform=StubLiberoInputs())(data)
+        SixChannelInputs()(data)
+
+
+@pytest.mark.parametrize('model_type', [None, 'pi0', 'pi05'])
+def test_real_conversion_preserves_state_prompt_and_optional_actions(model_type):
+    data = prepared()
+    data['observation/state'] = np.arange(8, dtype=np.float64)
+    data['actions'] = np.arange(70, dtype=np.float32).reshape(10, 7)
+    result = SixChannelInputs(model_type=model_type)(data)
+    assert set(result) == {'state', 'prompt', 'actions', 'image', 'image_mask'}
+    assert result['state'] is data['observation/state']
+    assert result['state'].dtype == np.float64
+    assert result['prompt'] == data['prompt']
+    assert result['actions'] is data['actions']
+    np.testing.assert_array_equal(result['actions'], np.arange(70, dtype=np.float32).reshape(10, 7))
+    del data['actions']
+    del data['prompt']
+    result = SixChannelInputs(model_type=model_type)(data)
+    assert set(result) == {'state', 'image', 'image_mask'}

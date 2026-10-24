@@ -136,23 +136,26 @@ class MetricCueProjection:
 def project_metric_cue(ee_world_m, camera: Camera, config: MetricCueConfig):
     """Project signed, fixed-metre world ticks into one calibrated current view."""
     origin = finite(ee_world_m, (3,), "EE world position")
-    origin_uv, origin_z = camera.project(origin[None])
-    height, width = camera.resolution
-    ticks = []
-    diagnostics = {}
-    for axis, name in enumerate("xyz"):
-        low, high = config.axis_extent_m[axis]
+    points = [origin]
+    tick_keys = []
+    axes = np.eye(3)
+    for axis, (low, high) in enumerate(config.axis_extent_m):
         negative = range(-1, -int(np.floor((-low + 1e-10) / config.tick_spacing_m)) - 1, -1)
         positive = range(1, int(np.floor((high + 1e-10) / config.tick_spacing_m)) + 1)
-        axis_ticks = []
         for index in (*negative, *positive):
-            point = origin + np.eye(3)[axis] * (index * config.tick_spacing_m)
-            uv, z = camera.project(point[None])
-            uv, z = uv[0], float(z[0])
-            visible = bool(z >= config.near_clip_m and np.isfinite(uv).all()
-                           and 0 <= uv[0] <= width-1 and 0 <= uv[1] <= height-1)
-            axis_ticks.append(MetricCueTick(axis, index, point, uv, z, visible))
-        ticks.extend(axis_ticks)
+            points.append(origin + axes[axis] * (index * config.tick_spacing_m))
+            tick_keys.append((axis, index))
+    uv, depth = camera.project(np.stack(points))
+    origin_uv, origin_z = uv[:1], depth[:1]
+    height, width = camera.resolution
+    ticks = []
+    for i, (axis, index) in enumerate(tick_keys, start=1):
+        visible = bool(depth[i] >= config.near_clip_m and np.isfinite(uv[i]).all()
+                       and 0 <= uv[i, 0] <= width-1 and 0 <= uv[i, 1] <= height-1)
+        ticks.append(MetricCueTick(axis, index, points[i], uv[i], float(depth[i]), visible))
+    diagnostics = {}
+    for axis, name in enumerate("xyz"):
+        axis_ticks = [tick for tick in ticks if tick.axis == axis]
         adjacent = []
         visible_length = 0.
         origin_visible = bool(origin_z[0] >= config.near_clip_m and np.isfinite(origin_uv[0]).all()
@@ -201,28 +204,30 @@ def render_metric_cue(ee_world_m, camera: Camera, config: MetricCueConfig):
     origin = finite(ee_world_m, (3,), "EE world position")
     for axis in range(3):
         draw = ImageDraw.Draw(planes[axis])
-        # Complete the axis lines before cutting hollow tick interiors out of them.
+        # 先完成轴线，再绘制空心刻度，避免后续线段覆盖空心内部。
         for sign in (-1, 1):
             previous_world = origin
+            previous_uv = info.origin_uv
             previous_z = info.origin_optical_depth_m
             for item in sorted((t for t in info.ticks if t.axis == axis and t.index * sign > 0),
                                key=lambda t: abs(t.index)):
                 current_world, current_z = item.world_m, item.optical_depth_m
                 if max(previous_z, current_z) >= config.near_clip_m:
-                    start, end = previous_world.copy(), current_world.copy()
+                    uv = (previous_uv, item.uv)
                     if min(previous_z, current_z) < config.near_clip_m:
+                        start, end = previous_world.copy(), current_world.copy()
                         fraction = (config.near_clip_m - previous_z) / (current_z - previous_z)
                         crossing = start + fraction * (end - start)
                         if previous_z < config.near_clip_m:
                             start = crossing
                         else:
                             end = crossing
-                    with np.errstate(over="ignore", divide="ignore", invalid="ignore"):
-                        uv, _ = camera.project(np.stack((start, end)))
+                        with np.errstate(over="ignore", divide="ignore", invalid="ignore"):
+                            uv, _ = camera.project(np.stack((start, end)))
                     clipped = clip_segment_to_viewport(*uv, camera.resolution)
                     if clipped is not None:
                         _draw_segment(draw, *clipped, dashed=sign < 0, width=config.line_width)
-                previous_world, previous_z = current_world, current_z
+                previous_world, previous_uv, previous_z = current_world, item.uv, current_z
         for item in (t for t in info.ticks if t.axis == axis and t.visible):
             u, v = item.uv
             radius = config.tick_radius + (1 if abs(item.index) % config.major_tick_every == 0 else 0)

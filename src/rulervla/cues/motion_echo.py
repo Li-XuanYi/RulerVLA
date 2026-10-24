@@ -5,7 +5,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 from rulervla.cues.adaptive_metric_ruler import clip_segment_to_viewport
-from rulervla.data.schema import Camera, finite
+from rulervla.data.schema import Camera, finite, observation_index
 
 
 @dataclass(frozen=True)
@@ -63,8 +63,7 @@ class EpisodeHistoryBuffer:
     def observe(self, control_step, ee_world_m):
         if self.episode_index is None:
             raise ValueError("Reset history at episode start")
-        if not isinstance(control_step, int) or control_step < 0:
-            raise ValueError("Control step must be a nonnegative integer")
+        control_step = observation_index(control_step)
         position = finite(ee_world_m, (3,), "Measured EE").copy()
         if self._last_step is not None and control_step != self._last_step + 1:
             self._positions.clear()

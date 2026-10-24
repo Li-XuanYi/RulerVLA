@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import operator
 
 import numpy as np
 
@@ -12,6 +13,18 @@ def finite(value, shape, name):
     if array.shape != shape or not np.isfinite(array).all():
         raise ValueError(f"{name} must be finite with shape {shape}")
     return array
+
+
+def observation_index(value):
+    if isinstance(value, (bool, np.bool_)):
+        raise ValueError("Observation identities must be nonnegative integer scalars")
+    try:
+        index = operator.index(value)
+    except TypeError as error:
+        raise ValueError("Observation identities must be nonnegative integer scalars") from error
+    if index < 0:
+        raise ValueError("Observation identities must be nonnegative integer scalars")
+    return index
 
 
 @dataclass(frozen=True)
@@ -95,14 +108,17 @@ def rotation_from_xyzw(quaternion):
     ])
 
 
-def validate_sample(sample):
+def validate_sample(sample, *, require_depth=True):
     for key in ("agentview_rgb", "wrist_rgb"):
         image = np.asarray(sample[key])
         if image.shape != (256, 256, 3) or image.dtype != np.uint8:
             raise ValueError(f"{key} must be uint8[256,256,3]")
-    depth = np.asarray(sample["agentview_depth_m"])
-    if depth.shape != (256, 256) or not np.issubdtype(depth.dtype, np.floating):
-        raise ValueError("Depth must be metric floating [256,256]; not a simulator depth buffer")
+    for key in ("agentview_depth_m", "wrist_depth_m"):
+        if key not in sample and (key != "agentview_depth_m" or not require_depth):
+            continue
+        depth = np.asarray(sample[key])
+        if depth.shape != (256, 256) or not np.issubdtype(depth.dtype, np.floating):
+            raise ValueError(f"{key} must be metric floating [256,256]; not a simulator depth buffer")
     state = finite(sample["state8"], (8,), "state8")
     ee = finite(sample["ee_world_m"], (3,), "EE world position")
     if not np.allclose(state[:3], ee, atol=2e-6, rtol=0):

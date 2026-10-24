@@ -33,7 +33,9 @@ PYTHONPATH=src JAX_PLATFORMS=cpu CUDA_VISIBLE_DEVICES='' \
 
 两个模式共用 MetricViewAdapter、SixChannelInputs 和 Prompt Builder。有效槽是 base_0_rgb、left_wrist_0_rgb；其余两槽全零且 mask=false。RGB 为 [-1,1] float32，Cue 为 [0,1] float32；state8 归一化后补齐到 32，Prompt 拒绝超过 200 token 的截断。G2 要求 Echo 关闭。
 
-实时调用 `MetricPolicy.infer_observation(observation, ...)` 经 `LiberoAdapter.from_metric_observation` 接入同一链路。调用方必须提供当前两路公制 depth、K/T、state8、episode_index、control_step 和 calibration_step；标定步与当前步不一致即拒绝。此接口不读取未来动作，不执行机器人控制。
+实时调用 `MetricPolicy.infer_observation(observation, ...)` 经 `LiberoAdapter.from_metric_observation` 接入同一处理流程。调用方提供当前两路 RGB、K/T、state8、episode_index、control_step 和 calibration_step；身份字段必须是非负整数，标定步与当前步不一致即拒绝。深度和末端四元数为可选字段，提供深度时继续校验形状与类型。完整 RGB-D 数据集入口保留原深度要求。
+
+固定几何契约下，存储 RGB 直接缩放；公制刻度批量投影并复用已投影端点，近面交点按实际需要投影。Echo 关闭时直接使用 Ruler。SixChannelInputs 一次生成最终四槽六通道图像与 masks。预处理版本与指纹保持 v2，真实样本输出逐值一致。
 
 动作目标是同 episode 的 actions[t:t+10]，到尾部才重复该 episode 最后一条动作；同时记录动作 frame 索引和 valid mask。该 mask 用于诊断，重复末尾目标继续参与原动作 loss，保持既有 SpatialDataset 语义。训练身份包含 manifest、RGB-D／几何哈希和 episode/frame。七维动作归一化后补零为 32 维；推理先用同一统计反归一化，再取前七维，不额外转换动作参考系或隐式裁剪。
 
@@ -57,7 +59,7 @@ PYTHONPATH=src /path/to/python scripts/metric_cue_infer.py \
   --sample /path/to/current_observation.npz --out outputs/metric_cue_pilot/new_inference
 ```
 
-G2 推理从 checkpoint 自身恢复几何、Ruler、Prompt 参数、SentencePiece 模型字节和统计，并核对 contract 哈希；tokenizer 不依赖恢复时的网络下载内容。显式 `--g1-weights-bridge` 仅供既有 G1 六通道权重的工程检查，不恢复 G1 优化器。
+G2 推理从 checkpoint 自身恢复几何、Ruler、Prompt 参数、SentencePiece 模型字节和统计，并核对 contract 哈希。predict 模式恢复一次策略和预处理，通过 `MetricPolicy.infer_prepared` 使用同一次准备的模型输入。GPU 推理预检检查目标 checkpoint 和选定 GPU，预处理 assets 由恢复函数校验。训练数据和初始基座的可用性由训练入口检查。显式 `--g1-weights-bridge` 必须提供 checkpoint，用于既有 G1 六通道权重的工程检查。
 
 ## G3 接口
 

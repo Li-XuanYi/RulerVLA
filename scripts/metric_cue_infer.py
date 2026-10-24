@@ -19,11 +19,15 @@ def main():
     parser.add_argument('--backend', choices=('cpu', 'gpu'), default='cpu')
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
-    from rulervla.training.metric_resources import load_run_config, preflight
+    if args.mode == 'predict' and args.checkpoint is None:
+        raise ValueError('Prediction requires a six-channel checkpoint')
+    if args.g1_weights_bridge and args.checkpoint is None:
+        raise ValueError('G1 weights bridge requires a checkpoint')
+    from rulervla.training.metric_resources import load_run_config, inference_preflight
     run = load_run_config(args.config)
     args.out.mkdir(parents=True, exist_ok=False)
     if args.backend == 'gpu':
-        admission = preflight(run)
+        admission = inference_preflight(run, args.checkpoint, g1_weights_bridge=args.g1_weights_bridge)
         (args.out/'preflight.json').write_text(json.dumps(admission, indent=2))
         if not admission['launch_allowed']:
             raise RuntimeError('GPU admission blocked: '+str(admission['blockers']))
@@ -39,7 +43,12 @@ def main():
     with np.load(args.sample, allow_pickle=False) as archive:
         sample = {key: archive[key] for key in archive.files}
     sample['task'] = str(sample['task'])
-    if args.checkpoint and not args.g1_weights_bridge:
+    if args.mode == 'predict':
+        explicit = (MetricPipeline.from_files(run['cue_config'], run['norm_stats_dir'])
+                    if args.g1_weights_bridge else None)
+        policy = load_metric_policy(args.checkpoint, explicit_pipeline=explicit, sampling_steps=10)
+        pipeline = policy.pipeline
+    elif args.checkpoint and not args.g1_weights_bridge:
         pipeline, _ = pipeline_from_checkpoint(args.checkpoint)
     else:
         pipeline = MetricPipeline.from_files(run['cue_config'],run['norm_stats_dir'])
@@ -51,11 +60,7 @@ def main():
     result = dict(state='prepared', backend=args.backend, pipeline_sha256=pipeline.fingerprint(),
                   source=source_provenance(ROOT), policy_rollouts=0, robot_actions_executed=0)
     if args.mode == 'predict':
-        if args.checkpoint is None:
-            raise ValueError('Prediction requires a six-channel checkpoint')
-        policy = load_metric_policy(args.checkpoint, explicit_pipeline=pipeline,
-                                    sampling_steps=10)
-        prediction = policy.infer(sample)
+        prediction = policy.infer_prepared(prepared)
         np.savez_compressed(args.out/'prediction.npz',**prediction)
         result.update(state='predicted',actions_shape=list(prediction['actions'].shape),
                       actions_dtype=str(prediction['actions'].dtype),

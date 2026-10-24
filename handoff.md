@@ -80,7 +80,7 @@ RulerVLA 已有实验总览、协议、run matrix 和 36 项历史实验索引�
 - [Experiment] 新增回归在旧实现上16 failed / 9 passed；修复后83 passed。修复空心负刻度被后续线段覆盖、Echo抹除Z通道、近裁剪面丢线和视口边界假箭头、静止/不可见Echo的Prompt矛盾，以及同位置旧帧历史被接受。
 - [Code] Echo默认与G2启用限制保留；未接通新实验样式、位移数值文本、辅助训练头或正式训练。np.maximum仅避免覆盖，不代表Echo获得独立通道。
 - [Code] 默认Cue像素发生修正，预处理版本升级metric_cue_observation_v2；旧v1 checkpoint须使用原提交运行时，新恢复入口拒绝静默版本替换。
-- [Experiment] CPU轻量测试记录位于outputs/metric_cue_pilot/review_fixes/；没有GPU作业、大型G1重跑或rollout。真实样本输入一致性将在源码提交后记录。
+- [Experiment] CPU轻量测试与真实样本输入一致性记录位于 outputs/metric_cue_pilot/review_fixes/；四个真实样本核验完成。
 
 
 ## 2026-10-24 Metric Cue 审计修复完成记录
@@ -89,4 +89,13 @@ RulerVLA 已有实验总览、协议、run matrix 和 36 项历史实验索引�
 - [Experiment] 最终 91 passed / 94 warnings；旧实现新增回归 16 failed / 9 passed。四个真实样本 20/108/109/110 的训练与推理逐值一致，动作块不跨 episode，反归一化最大误差 1.1920928955078125e-7。
 - [Experiment] 与保存的 v1 当前模型输入比较，RGB/state/tokens/masks 不变；base/wrist Cue 分别 54/16 个通道值修正，预处理为 v2，pipeline SHA256=84631c2391dc7c99814be998972cdef9c6d7deaf8b2fa1041506c30ea57fdfd8。旧 v1 checkpoint 使用原运行时，新入口拒绝静默版本迁移。
 - [Experiment] 历史 runtime 123/123、G1 证据 9/9 哈希相符。未启动 GPU、正式训练或 rollout，未重复大型 G1 CPU 检查；没有重新检查 Dataset2/GPU 资源。原脏工作区保留。
-- [Code] 本轮提交只保存在隔离审计工作树与可恢复 bundle，未 push，也未创建远程功能分支。源码沿既有 main 提交历史，GitHub main 未自动更新。
+- [Code] 审计修复通过提交 23b231821b4ded18ebb5ca0580b2bda1a554cc59 交付至远程 main，保留既有提交历史。
+
+## 2026-10-24 Metric Cue 代码精简
+
+- [Code] 公制刻度批量投影并复用端点；RGB 直接缩放；Echo 关闭时直接使用 Ruler；六通道转换一次生成四槽与 masks。
+- [Code] 实时 Metric Cue 入口的深度和四元数可选，身份和同步标定严格校验；完整 RGB-D 数据入口保留原要求。推理预检按目标 checkpoint 和 GPU 检查，配置、策略和模型输入各准备一次。
+- [Experiment] 四个真实样本 20/108/109/110 的 v2 模型输入与精简前逐值相同；训练／推理及实时入口逐值相同。预处理指纹仍为 84631c2391dc7c99814be998972cdef9c6d7deaf8b2fa1041506c30ea57fdfd8。
+- [Experiment] 141 项回归通过；CPU/GPU 两种 CLI 参数检查通过。真实样本投影调用 142→3；同一环境预处理中位耗时 19.594→13.292 ms，测量范围为 CPU 预处理。
+- [Code] 六通道权重迁移、模型源码和 checkpoint 预处理契约保留；预处理 assets 保存与恢复核验完成。详细报告见 reports/metric_cue/simplification.md，证据位于 outputs/metric_cue_pilot/simplification/。
+- [Experiment] 本轮训练更新、GPU 模型作业和 rollout 数量均为 0。交付分支为 main。

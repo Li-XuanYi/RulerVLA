@@ -49,6 +49,23 @@ def test_online_buffer_clears_on_reset_and_step_gap():
     assert not buffer.history().valid
 
 
+@pytest.mark.parametrize('control_step', [True, np.bool_(True), 0., .9, -1, '0'])
+def test_online_history_rejects_noninteger_control_identity(control_step):
+    buffer = EpisodeHistoryBuffer()
+    buffer.reset('episode_a')
+    with pytest.raises(ValueError, match='integer scalars'):
+        buffer.observe(control_step, [0., 0., 1.])
+
+
+def test_online_history_accepts_numpy_integer_control_identity():
+    buffer = EpisodeHistoryBuffer(history_steps=1)
+    buffer.reset('episode_a')
+    buffer.observe(np.int64(0), [0., 0., 1.])
+    buffer.observe(np.int64(1), [.01, 0., 1.])
+    assert buffer.history().valid
+    assert buffer.history().episode_index == 'episode_a'
+
+
 def test_valid_stationary_differs_from_missing_history_and_current_camera_is_used():
     buffer = EpisodeHistoryBuffer(history_steps=5)
     buffer.reset('one')
