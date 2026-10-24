@@ -30,7 +30,8 @@ def metric_model_config():
 
 
 class MetricPipeline:
-    version = 'metric_cue_observation_v1'
+    # Rendering changes affect Cue pixels even when the geometric units stay fixed.
+    version = 'metric_cue_observation_v2'
 
     def __init__(self, geometry, ruler, norm_stats, *, echo=MotionEchoConfig(), tokenizer=None):
         if echo.enabled:

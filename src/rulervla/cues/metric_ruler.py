@@ -201,6 +201,7 @@ def render_metric_cue(ee_world_m, camera: Camera, config: MetricCueConfig):
     origin = finite(ee_world_m, (3,), "EE world position")
     for axis in range(3):
         draw = ImageDraw.Draw(planes[axis])
+        # Complete the axis lines before cutting hollow tick interiors out of them.
         for sign in (-1, 1):
             previous_world = origin
             previous_z = info.origin_optical_depth_m
@@ -221,15 +222,15 @@ def render_metric_cue(ee_world_m, camera: Camera, config: MetricCueConfig):
                     clipped = clip_segment_to_viewport(*uv, camera.resolution)
                     if clipped is not None:
                         _draw_segment(draw, *clipped, dashed=sign < 0, width=config.line_width)
-                if item.visible:
-                    u, v = item.uv
-                    radius = config.tick_radius + (1 if abs(item.index) % config.major_tick_every == 0 else 0)
-                    bounds = (u-radius, v-radius, u+radius, v+radius)
-                    if sign > 0:
-                        draw.ellipse(bounds, fill=255)
-                    else:
-                        draw.ellipse(bounds, fill=0, outline=255, width=1)
                 previous_world, previous_z = current_world, current_z
+        for item in (t for t in info.ticks if t.axis == axis and t.visible):
+            u, v = item.uv
+            radius = config.tick_radius + (1 if abs(item.index) % config.major_tick_every == 0 else 0)
+            bounds = (u-radius, v-radius, u+radius, v+radius)
+            if item.index > 0:
+                draw.ellipse(bounds, fill=255)
+            else:
+                draw.ellipse(bounds, fill=0, outline=255, width=1)
         if info.origin_optical_depth_m >= config.near_clip_m and np.isfinite(info.origin_uv).all():
             u, v = info.origin_uv
             draw.ellipse((u-2, v-2, u+2, v+2), fill=255)

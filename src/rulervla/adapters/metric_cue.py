@@ -24,10 +24,16 @@ class MetricViewAdapter:
     def prepare(self, sample, *, history: MotionHistory | None = None):
         validate_sample(sample)
         if self.echo.enabled and history is not None and history.valid:
-            if (history.current_step - history.past_step != self.echo.history_steps
+            if (not isinstance(history.current_step, (int, np.integer))
+                    or not isinstance(history.past_step, (int, np.integer))
+                    or history.past_step < 0
+                    or history.current_step - history.past_step != self.echo.history_steps
                     or not np.allclose(history.current_m, sample["ee_world_m"], atol=2e-6, rtol=0)
+                    or ("frame_index" in sample and history.current_step != int(sample["frame_index"]))
                     or ("episode_index" in sample and history.episode_index != int(sample["episode_index"]))):
                 raise ValueError("Echo history must match the current observation and episode")
+        if history is None:
+            history = MotionHistory(False, None, None, None, None, None, "no_history")
         to_policy = self.geometry["canonical_to_policy"]
         prepared = {}
         diagnostics = {}
@@ -38,9 +44,9 @@ class MetricViewAdapter:
             canonical = raster(sample[rgb_key], self.geometry["stored_rgb_to_canonical"])
             camera = self.libero.camera(sample, view)
             ruler_cue, projection = render_metric_cue(sample["ee_world_m"], camera, self.ruler)
-            if history is None:
-                history = MotionHistory(False, None, None, None, None, None, "no_history")
             echo_cue, echo_info = render_motion_echo(history, camera, self.echo)
+            echo_info["policy_visible"] = bool(self.echo.enabled and echo_info["rendered"]
+                and np.any(resize_float_map(raster(echo_cue, to_policy))))
             cue = compose_cues(ruler_cue, echo_cue, enabled=self.echo.enabled)
             prepared[image_key] = resize_rgb(raster(canonical, to_policy))
             prepared[cue_key] = resize_float_map(raster(cue, to_policy))
@@ -48,7 +54,11 @@ class MetricViewAdapter:
         prepared["observation/state"] = np.asarray(sample["state8"], np.float32).copy()
         prepared["prompt"] = build_scale_prompt(sample["task"], self.ruler,
             echo_history_steps=self.echo.history_steps if self.echo.enabled else None,
-            echo_valid=history.valid if self.echo.enabled else None)
+            echo_valid=history.valid if self.echo.enabled else None,
+            echo_stationary=any(view["echo"].get("stationary", False) for view in diagnostics.values()),
+            echo_rendered=any(view["echo"]["policy_visible"] for view in diagnostics.values()),
+            echo_arrow_visible=any(view["echo"]["policy_visible"] and view["echo"].get("arrowhead_drawn", False)
+                                   for view in diagnostics.values()))
         if "actions" in sample:
             prepared["actions"] = np.asarray(sample["actions"], np.float32).copy()
         prepared["diagnostics"] = diagnostics

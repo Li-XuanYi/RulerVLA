@@ -3,7 +3,8 @@ from rulervla.cues.metric_ruler import MetricCueConfig
 
 
 def build_scale_prompt(task: str, ruler: MetricCueConfig, *, echo_history_steps: int | None = None,
-                       echo_valid: bool | None = None):
+                       echo_valid: bool | None = None, echo_stationary: bool = False,
+                       echo_rendered: bool | None = None, echo_arrow_visible: bool | None = None):
     if not isinstance(task, str) or not task.strip():
         raise ValueError("Task instruction must be nonempty")
     if not ruler.enabled:
@@ -26,6 +27,13 @@ def build_scale_prompt(task: str, ruler: MetricCueConfig, *, echo_history_steps:
         lines.append("Motion Echo:")
         if echo_valid is False:
             lines.append("No valid Motion Echo is available for this observation.")
+        elif echo_stationary:
+            lines.append("Measured motion is below the Motion Echo display threshold; no arrow is drawn.")
+        elif echo_rendered is False:
+            lines.append("No Motion Echo is visible in the current camera views.")
+        elif echo_arrow_visible is False:
+            lines.extend(["Visible yellow line segments show the measured end-effector displacement.",
+                          "Clipped endpoints do not mark the current end-effector position."])
         else:
             lines.extend(["The yellow arrow shows the measured end-effector displacement",
                           f"from {echo_history_steps} environment control steps ago to the current position."])

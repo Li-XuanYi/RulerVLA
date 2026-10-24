@@ -72,3 +72,12 @@ RulerVLA 已有实验总览、协议、run matrix 和 36 项历史实验索引�
 - [Code] 依赖锁270项，OpenPI及client均由本仓库源码提供；共享环境未使用的RLinf排除。wheel由提交tree构建并隔离导入，119个Python文件与提交源码相符；全新依赖环境安装尚未实测。
 - [Experiment] GPU smoke未启动：Dataset2的两个manifest报Host is down，GPU7空闲21351MiB低于45000MiB门槛。实际preflight jax_imported=false。GPU数值误差未测，预先容差atol=rtol=0.02，不宣称GPU位级等价。
 - [Inference] G2整体尚未完成GPU验收；先修复数据访问并提供足够显存，再显式执行新入口的1–3更新smoke。G3只保留objective/embed_prefix/身份接口，未添加新头、loss或启动正式M0–M3、30k训练、批量rollout、历史队列。
+
+
+## 2026-10-24 Metric Cue 审计修复（G2 限制保留）
+
+- [Code] 基于 main 的4bc1466在独立detached工作树修复；原有脏工作区、历史证据和checkpoint不改。
+- [Experiment] 新增回归在旧实现上16 failed / 9 passed；修复后83 passed。修复空心负刻度被后续线段覆盖、Echo抹除Z通道、近裁剪面丢线和视口边界假箭头、静止/不可见Echo的Prompt矛盾，以及同位置旧帧历史被接受。
+- [Code] Echo默认与G2启用限制保留；未接通新实验样式、位移数值文本、辅助训练头或正式训练。np.maximum仅避免覆盖，不代表Echo获得独立通道。
+- [Code] 默认Cue像素发生修正，预处理版本升级metric_cue_observation_v2；旧v1 checkpoint须使用原提交运行时，新恢复入口拒绝静默版本替换。
+- [Experiment] CPU轻量测试记录位于outputs/metric_cue_pilot/review_fixes/；没有GPU作业、大型G1重跑或rollout。真实样本输入一致性将在源码提交后记录。

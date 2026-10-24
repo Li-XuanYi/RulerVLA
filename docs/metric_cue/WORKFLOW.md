@@ -2,6 +2,10 @@
 
 本页定义 G2 工程入口；正式 M0–M3 协议留待 G4。默认训练命令只报告资源门槛。
 
+## 预处理版本
+
+当前版本为 `metric_cue_observation_v2`。本轮修复改为先绘轴线再绘刻度，负刻度的空心中心不会再被下一段线覆盖；公制几何、相机约定、六通道 shape 和权重迁移方式不变，但部分 Cue 像素会变化。旧 v1 checkpoint 必须使用其原提交的运行时，不能自动套用 v2 渲染；新入口会拒绝该版本不匹配。历史证据和 checkpoint 保留。G2 仍拒绝开启 Echo；新的负半轴样式、位移数值提示和训练实验不属于本轮修复。
+
 ## 来源重建
 
 当前方法只导入本仓库 `src/openpi` 和 `src/openpi_client`。完整源代码由 Git tree 固定，上游比较 commit、历史快照和项目补丁见 [OPENPI_SOURCE.json](OPENPI_SOURCE.json)；不能只从比较 commit 重建未知历史补丁。Linux CPython 3.11 依赖固定在 `requirements/metric-cue-linux.lock`，包括不可变的 LeRobot Git commit。

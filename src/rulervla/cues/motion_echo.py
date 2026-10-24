@@ -90,20 +90,45 @@ def render_motion_echo(history: MotionHistory, camera: Camera, config: MotionEch
     height, width = camera.resolution
     blank = np.zeros((height, width, 3), np.float32)
     if not config.enabled:
-        return blank, {"rendered": False, "reason": "disabled"}
+        return blank, {"rendered": False, "arrowhead_drawn": False, "reason": "disabled"}
     if not history.valid:
-        return blank, {"rendered": False, "reason": history.reason or "invalid_history"}
+        return blank, {"rendered": False, "arrowhead_drawn": False,
+                       "reason": history.reason or "invalid_history"}
     displacement = history.displacement_m
     if np.linalg.norm(displacement) < config.min_displacement_m:
-        return blank, {"rendered": False, "stationary": True, "reason": "valid_stationary"}
-    points = np.stack((history.past_m, history.current_m))
-    uv, depth = camera.project(points)
-    info = {"rendered": False, "stationary": False, "past_uv": uv[0].tolist(),
+        return blank, {"rendered": False, "arrowhead_drawn": False, "stationary": True,
+                       "reason": "valid_stationary", "displacement_m": displacement.tolist()}
+    points = np.asarray((history.past_m, history.current_m), dtype=np.float64)
+    with np.errstate(over="ignore", divide="ignore", invalid="ignore"):
+        uv, depth = camera.project(points)
+    info = {"rendered": False, "arrowhead_drawn": False, "stationary": False, "past_uv": uv[0].tolist(),
             "current_uv": uv[1].tolist(), "displacement_m": displacement.tolist()}
-    if not np.isfinite(uv).all() or np.any(depth < config.near_clip_m):
+    if not np.isfinite(depth).all():
+        info["reason"] = "nonfinite_projection"
+        return blank, info
+    if np.max(depth) < config.near_clip_m:
         info["reason"] = "behind_near_plane"
         return blank, info
-    clipped = clip_segment_to_viewport(*uv, camera.resolution)
+
+    # Endpoint visibility is checked before clipping: a boundary intersection
+    # must never acquire an arrowhead that impersonates the measured current EE.
+    current_visible = bool(depth[1] >= config.near_clip_m and np.isfinite(uv[1]).all()
+                           and 0 <= uv[1, 0] <= width-1 and 0 <= uv[1, 1] <= height-1)
+    past_near_clipped = bool(depth[0] < config.near_clip_m)
+    current_near_clipped = bool(depth[1] < config.near_clip_m)
+    if past_near_clipped or current_near_clipped:
+        fraction = (config.near_clip_m-depth[0]) / (depth[1]-depth[0])
+        crossing = points[0] + fraction * (points[1]-points[0])
+        points[0 if past_near_clipped else 1] = crossing
+    with np.errstate(over="ignore", divide="ignore", invalid="ignore"):
+        segment_uv, _ = camera.project(points)
+    info.update(past_near_plane_clipped=past_near_clipped,
+                current_near_plane_clipped=current_near_clipped,
+                clipped_past_uv=segment_uv[0].tolist(), clipped_current_uv=segment_uv[1].tolist())
+    if not np.isfinite(segment_uv).all():
+        info["reason"] = "nonfinite_projection"
+        return blank, info
+    clipped = clip_segment_to_viewport(*segment_uv, camera.resolution)
     if clipped is None:
         info["reason"] = "outside_view"
         return blank, info
@@ -115,16 +140,21 @@ def render_motion_echo(history: MotionHistory, camera: Camera, config: MotionEch
         return blank, info
     direction /= norm
     normal = np.array([-direction[1], direction[0]])
-    back = end - direction * min(config.arrow_head_px, norm)
     mask = Image.new("L", (width, height), 0)
     draw = ImageDraw.Draw(mask)
     draw.line([tuple(start), tuple(end)], fill=255, width=config.arrow_width)
-    draw.polygon([tuple(end), tuple(back + normal * config.arrow_head_px/2),
-                  tuple(back - normal * config.arrow_head_px/2)], fill=255)
+    if current_visible:
+        back = end - direction * min(config.arrow_head_px, norm)
+        draw.polygon([tuple(end), tuple(back + normal * config.arrow_head_px/2),
+                      tuple(back - normal * config.arrow_head_px/2)], fill=255)
+        info["arrowhead_drawn"] = True
     yellow = np.asarray(mask, dtype=np.float32) / 255.
     blank[..., 0] = yellow
     blank[..., 1] = yellow
     info["rendered"] = True
+    if not current_visible:
+        info["reason"] = ("current_endpoint_behind_near_plane" if current_near_clipped
+                          else "current_endpoint_outside_view")
     return blank, info
 
 
@@ -136,7 +166,7 @@ def compose_cues(ruler, echo, *, enabled):
             or not np.isfinite(echo).all() or ruler.min() < 0 or ruler.max() > 1
             or echo.min() < 0 or echo.max() > 1):
         raise ValueError("Composer needs matching finite float32 HWC3 cues in [0,1]")
-    output = ruler.copy()
-    if enabled:
-        output[echo.max(axis=-1) > 0] = echo[echo.max(axis=-1) > 0]
-    return output
+    if not enabled:
+        return ruler.copy()
+    # Yellow remains the Echo color; its zero blue channel must not erase Z.
+    return np.maximum(ruler, echo)

@@ -200,6 +200,8 @@ def pipeline_from_checkpoint(directory):
     if metadata.get('schema') != CHECKPOINT_SCHEMA:
         raise ValueError('Unsupported metric checkpoint schema')
     contract = metadata['pipeline']
+    if contract.get('version') != MetricPipeline.version:
+        raise ValueError('Checkpoint preprocessing version differs; use its original committed runtime')
     if contract['model'] != dataclasses.asdict(metric_model_config()):
         raise ValueError('Checkpoint model differs from the validated pi05 six-channel contract')
     # Norm statistics are saved by OpenPI beside inference params; never use the caller's mutable stats.
