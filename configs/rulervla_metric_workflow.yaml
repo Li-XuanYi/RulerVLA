@@ -1,0 +1,36 @@
+schema: rulervla_metric_workflow_v1
+cue_config: configs/rulervla_metric_cue.yaml
+norm_stats_dir: configs/metric_cue/spatial_norm
+norm_stats_sha256: b5e3345ee3d2a4698348ea8f8988031f2d003fdcd36c4716a7f7abc2d0834820
+initial_checkpoint: outputs/metric_cue_pilot/checkpoint_cache/pi05_base/params
+checkpoint_receipt: outputs/metric_cue_pilot/checkpoint_cache/pi05_base/SOURCE_VERIFIED.json
+checkpoint_receipt_sha256: d048e7298f3cfe1687d1025ad886a28581a77f353253853aa8740e15c0793005
+data:
+  rgbd_root: /home/Dataset2/yqt/openpi-aimbot/spatialcue_depth_source/regenerated_rgbd_v02
+  geometry_root: /home/Dataset2/yqt/rulervla/main_comparison_v1/data_preparation/spatial_geometry
+  required_mount: /home/Dataset2
+  rgbd_manifest_sha256: 02e428d9a3735bb959cdc29c1ca415cde73c2b9f6763ce1545603f385b8e127c
+  geometry_manifest_sha256: f09a5d2b021058d51f54e54fb54e1222f8d1202eff805c6ba96efee00cbb0e9e
+training:
+  seed: 42
+  batch_size: 1
+  num_steps: 2
+  learning_rate: 1.0e-05
+  optimizer:
+    b1: 0.9
+    b2: 0.95
+    eps: 1.0e-08
+    weight_decay: 1.0e-10
+    clip_gradient_norm: 1.0
+resources:
+  gpu_indices:
+  - 7
+  min_free_mib: 45000
+  min_cpu_available_gib: 100
+  cpu_optimizer: true
+gpu_equivalence:
+  vision_atol: 0.02
+  vision_rtol: 0.02
+  action_atol: 0.02
+  action_rtol: 0.02
+path_mappings: {}

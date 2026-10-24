@@ -109,7 +109,11 @@ class OpenPIAdapter:
         self.last_diagnostics = {"correction": result, "reliability": reliability,
                                  "reference": reference, "corrected_actioncoord_m": spatial_m,
                                  "ruler_rendered": ruler_rendered,
-                                 "reference_source": ruler.get("reference", "corrected_ee") if ruler_rendered else None}
+                                 "reference_source": ruler.get("reference", "corrected_ee") if ruler_rendered else None,
+                                 # This is diagnostic metadata, not a model-side per-pixel mask.
+                                 "valid_depth_fraction": float(np.mean(maps["valid"])),
+                                 "invalid_depth_pixels": int(np.count_nonzero(~maps["valid"])),
+                                 "per_pixel_validity_forwarded_to_policy": False}
         validate_prepared(output)
         return output
 

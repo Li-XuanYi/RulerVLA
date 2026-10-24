@@ -1,0 +1,26 @@
+{
+  "schema": "rulervla_vendored_openpi_v1",
+  "upstream_repository": "https://github.com/Physical-Intelligence/openpi",
+  "comparison_commit": "f781c5575811c365000e520b324e7b66be9e405f",
+  "comparison_commit_is_exact_frozen_origin": false,
+  "source_snapshot": "outputs/main_comparison/runtime_v3",
+  "frozen_manifest_sha256": "d626bac66bc43cfc8950a16724ac6f34b76be5c4b20b5d7709e190b7a937e616",
+  "build_rule": "All vendored source bytes are tracked in this Git tree. Do not reconstruct unknown historical patches from comparison_commit alone.",
+  "openpi_source_root": "src/openpi",
+  "client_source_root": "src/openpi_client",
+  "project_model_patches": [
+    "src/openpi/models/pi0_config.py",
+    "src/openpi/models/siglip.py",
+    "src/openpi/training/weight_loaders.py"
+  ],
+  "transformers_version": "4.53.2",
+  "transformers_override_sha256": {
+    "transformers/models/gemma/configuration_gemma.py": "26fd0d0f52730ab32b6f337eb73ae9a26cb71ae0915bc49eced1d0e2ed8d0ec6",
+    "transformers/models/gemma/modeling_gemma.py": "17eeb54e277939e58cd6f8a92719a275e36baf0c9f463b2754227d42f87aedde",
+    "transformers/models/paligemma/modeling_paligemma.py": "c945d330b829264f927f3ee5339f977238631772de07a28e855e265bb85fd53c",
+    "transformers/models/siglip/modeling_siglip.py": "ef2e99500f263fdd78db9d4d9a255e29d844eb92f53c25ad640f8056700ef84b"
+  },
+  "dependencies": "requirements/metric-cue-linux.lock",
+  "lerobot_commit": "0cf864870cf29f4738d3ade893e6fd13fbd7cdb5",
+  "historical_git_state": "G1 ran on dirty source at c6ddada0fbbc9b98fb7523c62f3c3fca0fa1945f; its original source manifest is retained."
+}
