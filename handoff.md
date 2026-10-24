@@ -81,3 +81,12 @@ RulerVLA 已有实验总览、协议、run matrix 和 36 项历史实验索引�
 - [Code] Echo默认与G2启用限制保留；未接通新实验样式、位移数值文本、辅助训练头或正式训练。np.maximum仅避免覆盖，不代表Echo获得独立通道。
 - [Code] 默认Cue像素发生修正，预处理版本升级metric_cue_observation_v2；旧v1 checkpoint须使用原提交运行时，新恢复入口拒绝静默版本替换。
 - [Experiment] CPU轻量测试记录位于outputs/metric_cue_pilot/review_fixes/；没有GPU作业、大型G1重跑或rollout。真实样本输入一致性将在源码提交后记录。
+
+
+## 2026-10-24 Metric Cue 审计修复完成记录
+
+- [Code] 修复提交 c865768e、777f1e87；完整逐项判断、文件和限制见 reports/metric_cue/review_fixes.md。保留 G2 Echo 关闭与拒绝启用规则，没有加入新样式、位移数值文本或 G3。
+- [Experiment] 最终 91 passed / 94 warnings；旧实现新增回归 16 failed / 9 passed。四个真实样本 20/108/109/110 的训练与推理逐值一致，动作块不跨 episode，反归一化最大误差 1.1920928955078125e-7。
+- [Experiment] 与保存的 v1 当前模型输入比较，RGB/state/tokens/masks 不变；base/wrist Cue 分别 54/16 个通道值修正，预处理为 v2，pipeline SHA256=84631c2391dc7c99814be998972cdef9c6d7deaf8b2fa1041506c30ea57fdfd8。旧 v1 checkpoint 使用原运行时，新入口拒绝静默版本迁移。
+- [Experiment] 历史 runtime 123/123、G1 证据 9/9 哈希相符。未启动 GPU、正式训练或 rollout，未重复大型 G1 CPU 检查；没有重新检查 Dataset2/GPU 资源。原脏工作区保留。
+- [Code] 本轮提交只保存在隔离审计工作树与可恢复 bundle，未 push，也未创建远程功能分支。源码沿既有 main 提交历史，GitHub main 未自动更新。
