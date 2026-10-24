@@ -46,6 +46,35 @@ def test_history_from_a_different_current_frame_is_rejected_even_at_same_positio
         adapter.prepare(sample, history=history)
 
 
+@pytest.mark.parametrize('bad_index', [10.9, 10., True, np.bool_(True), np.array([10]), '10'])
+def test_noninteger_frame_identity_is_not_silently_coerced(sample, config, bad_index):
+    sample = setup_sample(sample)
+    sample['frame_index'] = bad_index
+    history = MotionHistory(True, 3, 10, 5, sample['ee_world_m'], sample['ee_world_m'])
+    adapter = MetricViewAdapter(config['geometry'], MetricCueConfig(), MotionEchoConfig(enabled=True))
+    with pytest.raises(ValueError, match='integer scalars'):
+        adapter.prepare(sample, history=history)
+
+
+def test_numpy_integer_scalar_metadata_is_supported(sample, config):
+    sample = setup_sample(sample)
+    sample['frame_index'] = np.array(10, dtype=np.int64)
+    sample['episode_index'] = np.int64(3)
+    history = MotionHistory(True, np.int64(3), np.int64(10), np.int64(5),
+                            sample['ee_world_m'], sample['ee_world_m'])
+    adapter = MetricViewAdapter(config['geometry'], MetricCueConfig(), MotionEchoConfig(enabled=True))
+    assert 'below the Motion Echo display threshold' in adapter.prepare(sample, history=history)['prompt']
+
+
+def test_noninteger_episode_identity_is_not_silently_coerced(sample, config):
+    sample = setup_sample(sample)
+    sample['episode_index'] = 3.9
+    history = MotionHistory(True, 3, 10, 5, sample['ee_world_m'], sample['ee_world_m'])
+    adapter = MetricViewAdapter(config['geometry'], MetricCueConfig(), MotionEchoConfig(enabled=True))
+    with pytest.raises(ValueError, match='integer scalars'):
+        adapter.prepare(sample, history=history)
+
+
 def test_clipped_shaft_prompt_does_not_locate_current_ee_at_the_border(sample, config):
     sample = setup_sample(sample)
     sample['camera_to_world'][0, 3] = -1.

@@ -1,5 +1,6 @@
 """Synchronized two-view RGB and separate metric cue preparation."""
 from dataclasses import dataclass
+import operator
 import numpy as np
 
 from rulervla.adapters.libero import LiberoAdapter
@@ -10,6 +11,18 @@ from rulervla.cues.metric_prompt import build_scale_prompt
 from rulervla.cues.motion_echo import MotionEchoConfig, MotionHistory, compose_cues, render_motion_echo
 from rulervla.data.schema import validate_sample
 from rulervla.geometry.action_coord import raster
+
+
+def _observation_index(value):
+    if isinstance(value, (bool, np.bool_)):
+        raise ValueError("Echo observation identities must be nonnegative integer scalars")
+    try:
+        index = operator.index(value)
+    except TypeError as error:
+        raise ValueError("Echo observation identities must be nonnegative integer scalars") from error
+    if index < 0:
+        raise ValueError("Echo observation identities must be nonnegative integer scalars")
+    return index
 
 
 class MetricViewAdapter:
@@ -24,13 +37,13 @@ class MetricViewAdapter:
     def prepare(self, sample, *, history: MotionHistory | None = None):
         validate_sample(sample)
         if self.echo.enabled and history is not None and history.valid:
-            if (not isinstance(history.current_step, (int, np.integer))
-                    or not isinstance(history.past_step, (int, np.integer))
-                    or history.past_step < 0
-                    or history.current_step - history.past_step != self.echo.history_steps
+            current_step = _observation_index(history.current_step)
+            past_step = _observation_index(history.past_step)
+            if (current_step - past_step != self.echo.history_steps
                     or not np.allclose(history.current_m, sample["ee_world_m"], atol=2e-6, rtol=0)
-                    or ("frame_index" in sample and history.current_step != int(sample["frame_index"]))
-                    or ("episode_index" in sample and history.episode_index != int(sample["episode_index"]))):
+                    or ("frame_index" in sample and current_step != _observation_index(sample["frame_index"]))
+                    or ("episode_index" in sample and _observation_index(history.episode_index)
+                        != _observation_index(sample["episode_index"]))):
                 raise ValueError("Echo history must match the current observation and episode")
         if history is None:
             history = MotionHistory(False, None, None, None, None, None, "no_history")
