@@ -66,6 +66,14 @@ def flat_params(state):
     return flax.traverse_util.flatten_dict(state, sep='/')
 
 
+def rgb_state_from_six(params6):
+    state = nnx.State(params6)
+    rgb_kernel = flat_params(params6)[STEM][..., :3, :]
+    state.replace_by_pure_dict(flax.traverse_util.unflatten_dict(
+        {tuple(STEM.split('/')): rgb_kernel}))
+    return state
+
+
 def require_trainable_cue(params, trainable_filter):
     selected = params.filter(trainable_filter)
     kernel = flat_params(selected).get(STEM)
@@ -399,7 +407,6 @@ def source_provenance(root):
 def gpu_equivalence(config, params6, batch, device, tolerances, *, mesh=None):
     """Measure on the actual GPU; CPU exactness is not an assumed GPU result."""
     import gc
-    from openpi.training.weight_loaders import merge_six_channel_params
     # 等价检查只需要真实样本中的一条，避免把完整有效批次同时送入视觉与动作推理。
     observation = jax.tree.map(lambda value: value[:1], batch.observation)
     zero = dataclasses.replace(observation, images={
@@ -411,12 +418,8 @@ def gpu_equivalence(config, params6, batch, device, tolerances, *, mesh=None):
     for channels, obs in ((3, rgb), (6, zero)):
         cfg = dataclasses.replace(config.model, image_channels=channels)
         if channels == 3:
-            reference = nnx.state(nnx.eval_shape(cfg.create, jax.random.key(42))).to_pure_dict()
-            loaded = model_lib.restore_params(config.weight_loader.params_path, restore_type=np.ndarray)
-            loaded = merge_six_channel_params(loaded, reference, missing_regex='(?!)')
-            with jax.default_device(jax.devices('cpu')[0]):
-                graph, state = nnx.split(cfg.load(loaded, remove_extra_params=False))
-            del loaded
+            graph = nnx.split(nnx.eval_shape(cfg.create, jax.random.key(42)))[0]
+            state = rgb_state_from_six(params6)
         else:
             graph = nnx.split(nnx.eval_shape(cfg.create, jax.random.key(42)))[0]
             state = params6

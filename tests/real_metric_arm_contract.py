@@ -158,7 +158,7 @@ def main():
         if args.check_sharding_shape:
             import flax.nnx as nnx
             from openpi.training import sharding
-            from rulervla.training.metric_workflow import STEM, flat_params
+            from rulervla.training.metric_workflow import STEM, flat_params, rgb_state_from_six
             if len(jax.devices("cpu")) != 2:
                 raise AssertionError("分片结构检查需要两台真实 CPU 设备")
             graph, params = nnx.split(model)
@@ -172,6 +172,11 @@ def main():
             rgb_sharding = sharding.fsdp_sharding(rgb_reference, mesh)
             if not any("fsdp" in item.spec for item in flat_params(rgb_sharding).values()):
                 raise AssertionError("三通道视觉模型没有跨设备分片")
+            rgb_state = rgb_state_from_six(params)
+            if flat_params(rgb_state)[STEM].shape[2] != 3 or flat_params(params)[STEM].shape[2] != 6:
+                raise AssertionError("三通道对照状态改变了六通道训练参数")
+            rgb_graph = nnx.split(nnx.eval_shape(rgb_config.create, jax.random.key(42)))[0]
+            nnx.merge(rgb_graph, rgb_state)
             observations = jax.tree.map(lambda value: value.reshape((32, 1) + value.shape[1:]),
                                         formal_batch.observation)
             actions = formal_batch.actions.reshape((32, 1, 10, 32))
