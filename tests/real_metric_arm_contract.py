@@ -7,6 +7,7 @@ import numpy as np
 from openpi.shared import normalize
 from rulervla.adapters.metric_pipeline import MetricPipeline
 from rulervla.config import load_metric_method_config
+from rulervla.cues.metric_prompt import build_scale_prompt
 from rulervla.cues.motion_echo import EpisodeHistoryBuffer, MetricInferenceHistory
 from rulervla.training.main_data import SpatialDataset, action_chunk_indices
 from rulervla.training.metric_resources import load_run_config
@@ -48,6 +49,13 @@ def main():
     results = {}
     for name, (arm_ruler, arm_echo) in arms.items():
         pipeline = MetricPipeline(geometry, arm_ruler, statistics, echo=arm_echo)
+        for instruction in {row["task"] for row in dataset.rows}:
+            prompt = build_scale_prompt(
+                instruction, arm_ruler,
+                echo_history_steps=arm_echo.history_steps if arm_echo.enabled else None,
+                echo_valid=True if arm_echo.enabled else None,
+            )
+            pipeline.tokenizer.tokenize(prompt)
         current_history = history if arm_echo.enabled else None
         trained = pipeline.prepare_train(sample, history=current_history)
         inferred = pipeline.prepare_inference(sample, history=current_history)
