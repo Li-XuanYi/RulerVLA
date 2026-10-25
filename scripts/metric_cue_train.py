@@ -118,7 +118,8 @@ def main():
         indices = update_indices(len(dataset), config.seed, 0, batch_size=config.batch_size)
         first_batch = prepare_batch(dataset, indices, pipeline)
         stage('gpu_zero_cue_equivalence')
-        measured = gpu_equivalence(config, state.params, first_batch, gpu, run['gpu_equivalence'])
+        measured = gpu_equivalence(config, state.params, first_batch, gpu,
+                                   run['gpu_equivalence'], mesh=mesh)
         (args.out/'gpu_equivalence.json').write_text(json.dumps(measured, indent=2))
     trainer = MetricTrainer(config, state.model_def, gradient_device=gpu,
                             optimizer_device=cpu, gradient_mesh=mesh)

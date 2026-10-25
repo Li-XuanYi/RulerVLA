@@ -384,7 +384,7 @@ def source_provenance(root):
                 dependency_lock_sha256=hashlib.sha256((root/'requirements/metric-cue-linux.lock').read_bytes()).hexdigest())
 
 
-def gpu_equivalence(config, params6, batch, device, tolerances):
+def gpu_equivalence(config, params6, batch, device, tolerances, *, mesh=None):
     """Measure on the actual GPU; CPU exactness is not an assumed GPU result."""
     import gc
     from openpi.training.weight_loaders import merge_six_channel_params
@@ -413,8 +413,19 @@ def gpu_equivalence(config, params6, batch, device, tolerances):
             prediction = policy.sample_actions(jax.random.key(123), current,
                                                noise=jnp.asarray(noise), num_steps=10)
             return prefix, prediction
-        compiled = jax.jit(evaluate)
-        values = jax.block_until_ready(compiled(jax.device_put(state, device), jax.device_put(obs, device)))
+        if mesh is None:
+            compiled = jax.jit(evaluate)
+            values = compiled(jax.device_put(state, device), jax.device_put(obs, device))
+        else:
+            shapes = jax.tree.map(lambda value: jax.ShapeDtypeStruct(value.shape, value.dtype), state)
+            param_sharding = sharding.fsdp_sharding(shapes, mesh)
+            replicated = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec())
+            compiled = jax.jit(evaluate, in_shardings=(param_sharding, replicated),
+                               out_shardings=(replicated, replicated))
+            with sharding.set_mesh(mesh):
+                values = compiled(jax.device_put(state, param_sharding),
+                                  jax.device_put(obs, replicated))
+        values = jax.block_until_ready(values)
         outputs.append(tuple(np.asarray(value, np.float32) for value in values))
         del state, values, compiled
         gc.collect()

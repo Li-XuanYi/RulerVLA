@@ -1,4 +1,5 @@
 import argparse
+import dataclasses
 import json
 from pathlib import Path
 
@@ -166,6 +167,11 @@ def main():
             trainer.configure_sharding(params)
             if "fsdp" not in flat_params(trainer.parameter_sharding)[STEM].spec:
                 raise AssertionError("六通道视觉卷积参数没有跨设备分片")
+            rgb_config = dataclasses.replace(formal_config.model, image_channels=3)
+            rgb_reference = nnx.state(nnx.eval_shape(rgb_config.create, jax.random.key(42)))
+            rgb_sharding = sharding.fsdp_sharding(rgb_reference, mesh)
+            if not any("fsdp" in item.spec for item in flat_params(rgb_sharding).values()):
+                raise AssertionError("三通道视觉模型没有跨设备分片")
             observations = jax.tree.map(lambda value: value.reshape((32, 1) + value.shape[1:]),
                                         formal_batch.observation)
             actions = formal_batch.actions.reshape((32, 1, 10, 32))
