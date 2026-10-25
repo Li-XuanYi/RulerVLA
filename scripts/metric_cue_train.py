@@ -97,6 +97,20 @@ def main():
         status.update(stage=name, **values)
         (args.out/'status.json').write_text(json.dumps(status, indent=2, allow_nan=False))
         print(json.dumps({'stage':name, **values}), flush=True)
+    def require_current_gpu_capacity(phase):
+        current_gpus = query_gpus()
+        selected = run['resources']['gpu_indices']
+        required_free = admission['selected_gpu_min_free_mib']
+        if isinstance(current_gpus, dict):
+            blockers = ['GPU query unavailable during ' + phase]
+        else:
+            available = {item['index']: item['free_mib'] for item in current_gpus}
+            blockers = [f'GPU {index} requires {required_free} MiB free during {phase}'
+                        for index in selected if available.get(index, 0) < required_free]
+        if blockers:
+            stage('resource_gate_closed', state='blocked', blockers=blockers,
+                  gpu_snapshot=current_gpus)
+            raise RuntimeError('; '.join(blockers))
     if len(jax.devices('gpu')) != len(run['resources']['gpu_indices']):
         raise ValueError('JAX did not expose every selected GPU')
     gpu, cpu = jax.devices('gpu')[0], jax.devices('cpu')[0]
@@ -105,6 +119,7 @@ def main():
     stage('load_real_base_and_six_channel_optimizer')
     with jax.default_device(cpu):
         state = create_training_state(config, load_initial_model(config), optimizer_device=cpu)
+    require_current_gpu_capacity('model loading')
     manager, resuming = checkpoints.initialize_checkpoint_dir(
         args.out/'checkpoints', keep_period=10000 if args.mode == 'train' else 1,
         overwrite=False, resume=args.resume)
@@ -125,22 +140,9 @@ def main():
         measured = gpu_equivalence(config, state.params, first_batch, gpu,
                                    run['gpu_equivalence'], mesh=mesh)
         (args.out/'gpu_equivalence.json').write_text(json.dumps(measured, indent=2))
+        require_current_gpu_capacity('GPU equivalence')
     trainer = MetricTrainer(config, state.model_def, gradient_device=gpu,
                             optimizer_device=cpu, gradient_mesh=mesh)
-    current_gpus = query_gpus()
-    selected = run['resources']['gpu_indices']
-    required_free = admission['selected_gpu_min_free_mib']
-    if isinstance(current_gpus, dict):
-        blockers = ['GPU query unavailable before parameter update']
-    else:
-        available = {item['index']: item['free_mib'] for item in current_gpus}
-        blockers = [f'GPU {index} requires {required_free} MiB free before parameter update'
-                    for index in selected if available.get(index, 0) < required_free]
-    if blockers:
-        stage('resource_gate_closed', state='blocked', blockers=blockers,
-              gpu_snapshot=current_gpus)
-        manager.close()
-        return 2
     saved = None
     for update in range(int(state.step), steps):
         indices = update_indices(len(dataset), config.seed, update, batch_size=config.batch_size)
