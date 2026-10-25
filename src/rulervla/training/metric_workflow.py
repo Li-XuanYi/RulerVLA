@@ -388,12 +388,13 @@ def gpu_equivalence(config, params6, batch, device, tolerances, *, mesh=None):
     """Measure on the actual GPU; CPU exactness is not an assumed GPU result."""
     import gc
     from openpi.training.weight_loaders import merge_six_channel_params
-    observation = batch.observation
+    # 等价检查只需要真实样本中的一条，避免把完整有效批次同时送入视觉与动作推理。
+    observation = jax.tree.map(lambda value: value[:1], batch.observation)
     zero = dataclasses.replace(observation, images={
         key: np.concatenate((np.asarray(image)[..., :3], np.zeros_like(np.asarray(image)[..., 3:])), axis=-1)
         for key, image in observation.images.items()})
     rgb = dataclasses.replace(observation, images={key: value[..., :3] for key, value in zero.images.items()})
-    noise = np.asarray(jax.random.normal(jax.random.key(77), batch.actions.shape))
+    noise = np.asarray(jax.random.normal(jax.random.key(77), batch.actions[:1].shape))
     outputs = []
     for channels, obs in ((3, rgb), (6, zero)):
         cfg = dataclasses.replace(config.model, image_channels=channels)
