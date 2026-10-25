@@ -20,8 +20,8 @@ from openpi.training import checkpoints, config as config_lib, optimizer, weight
 from openpi.training.utils import TrainState
 from rulervla.adapters.metric_pipeline import MetricPipeline, metric_model_config, tokenizer_from_asset
 from rulervla.cues.metric_ruler import MetricCueConfig
-from rulervla.cues.motion_echo import MotionEchoConfig
-from rulervla.training.accumulation import apply_gradients
+from rulervla.cues.motion_echo import MetricInferenceHistory, MotionEchoConfig
+from rulervla.training.accumulation import accumulated_gradients, apply_gradients
 
 STEM = 'PaliGemma/img/embedding/kernel'
 CHECKPOINT_SCHEMA = 'rulervla_metric_checkpoint_v1'
@@ -38,12 +38,22 @@ class ConstantLearningRate:
 def make_training_config(run):
     policy = metric_model_config()
     training = run['training']
+    schedule = training.get('scheduler')
+    if schedule is None:
+        lr_schedule = ConstantLearningRate(training['learning_rate'])
+    elif schedule['name'] == 'warmup_cosine':
+        lr_schedule = optimizer.CosineDecaySchedule(
+            warmup_steps=schedule['warmup_updates'], peak_lr=schedule['peak_lr'],
+            decay_steps=schedule['decay_updates'], decay_lr=schedule['end_lr'])
+    else:
+        raise ValueError('Unknown Metric Cue learning-rate schedule')
     return dataclasses.replace(config_lib.get_config('pi05_libero'), model=policy,
-        batch_size=training['batch_size'], seed=training['seed'], ema_decay=None,
+        batch_size=training['batch_size'], seed=training['seed'],
+        ema_decay=training.get('ema_decay'),
         freeze_filter=policy.get_freeze_filter(), wandb_enabled=False,
         num_train_steps=training['num_steps'],
         optimizer=optimizer.AdamW(**training['optimizer']),
-        lr_schedule=ConstantLearningRate(training['learning_rate']),
+        lr_schedule=lr_schedule,
         weight_loader=weight_loaders.SixChannelCheckpointWeightLoader(run['initial_checkpoint'],
                                                                        missing_regex='(?!)'))
 
@@ -95,7 +105,8 @@ def create_training_state(config, policy, *, optimizer_device=None):
     require_cue_optimizer(opt_state)
     step = jax.device_put(jnp.asarray(0, jnp.int32), optimizer_device)
     return TrainState(step=step, params=params, model_def=graph, tx=tx,
-                      opt_state=opt_state, ema_decay=None)
+                      opt_state=opt_state, ema_decay=config.ema_decay,
+                      ema_params=params if config.ema_decay is not None else None)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -106,7 +117,12 @@ class MetricBatch:
 
 
 def prepare_batch(dataset, indices, pipeline):
-    values = [pipeline.prepare_train(dataset[int(index)]) for index in indices]
+    values = []
+    for index in indices:
+        index = int(index)
+        history = (dataset.get_history(index, history_steps=pipeline.echo.history_steps)
+                   if pipeline.echo.enabled else None)
+        values.append(pipeline.prepare_train(dataset[index], history=history))
     batched = jax.tree.map(lambda *leaves: np.stack(leaves), *values)
     labels = batched.pop('actions')
     return MetricBatch(model_lib.Observation.from_dict(batched), labels,
@@ -135,13 +151,36 @@ class MetricTrainer:
             return gradients, dict(loss=loss, grad_norm=optax.global_norm(gradients),
                                    cue_grad_l2=jnp.linalg.norm(cue), gradients_finite=finite)
         self._backward = jax.jit(backward)
+        def accumulated_backward(params, observation, actions, step):
+            gradients, info = accumulated_gradients(config, jax.random.key(config.seed), model_def,
+                                                     params, step, (observation, actions))
+            cue = flat_params(gradients)[STEM][..., 3:, :]
+            info['cue_grad_l2'] = jnp.linalg.norm(cue)
+            info['gradients_finite'] = jnp.all(jnp.stack(
+                [jnp.all(jnp.isfinite(x)) for x in jax.tree.leaves(gradients)]))
+            return gradients, info
+        self._accumulated_backward = jax.jit(accumulated_backward)
         self._update = jax.jit(lambda state, gradient: apply_gradients(config, state, gradient))
 
-    def step(self, state, batch):
-        rng = jax.random.fold_in(jax.random.key(self.config.seed), state.step)
-        params, observation, labels, rng = jax.device_put(
-            (state.params, batch.observation, batch.actions, rng), self.gradient_device)
-        gradients, metrics = self._backward(params, observation, labels, rng)
+    def step(self, state, batch, *, micro_batch_size=None):
+        if micro_batch_size is None:
+            rng = jax.random.fold_in(jax.random.key(self.config.seed), state.step)
+            params, observation, labels, rng = jax.device_put(
+                (state.params, batch.observation, batch.actions, rng), self.gradient_device)
+            gradients, metrics = self._backward(params, observation, labels, rng)
+        else:
+            if (micro_batch_size < 1 or self.config.batch_size % micro_batch_size
+                    or batch.actions.shape[0] != self.config.batch_size):
+                raise ValueError('Effective batch must equal microbatch times accumulation steps')
+            count = self.config.batch_size // micro_batch_size
+            def reshape(value):
+                return value.reshape((count, micro_batch_size) + value.shape[1:])
+            observations = jax.tree.map(reshape, batch.observation)
+            labels = reshape(batch.actions)
+            params, observations, labels = jax.device_put(
+                (state.params, observations, labels), self.gradient_device)
+            gradients, metrics = self._accumulated_backward(
+                params, observations, labels, state.step)
         jax.block_until_ready(gradients)
         info = {key: float(value) for key, value in jax.device_get(metrics).items()}
         if not info['gradients_finite'] or not np.isfinite(info['loss']):
@@ -185,7 +224,8 @@ def restore_training_checkpoint(manager, state, pipeline, config, *, step, expec
     if metadata['pipeline']['model']['image_channels'] != 6:
         raise ValueError('Three-channel optimizer state cannot resume a six-channel model')
     if expected_manifest is not None:
-        for key in ('dataset_manifests', 'loaded_source_sha256', 'dependency_lock_sha256'):
+        for key in ('run_config', 'dataset_manifests', 'loaded_source_sha256',
+                    'dependency_lock_sha256'):
             if metadata['run_manifest'].get(key) != expected_manifest.get(key):
                 raise ValueError('Checkpoint data/source identity differs: '+key)
     restored = checkpoints.restore_state(manager, state, None, step=step)
@@ -219,9 +259,25 @@ class MetricPolicy:
         self._sample = module_jit(policy.sample_actions, static_argnames=('num_steps',))
         self.sampling_steps = sampling_steps
         self.rng = jax.random.key(seed)
+        self.online_history = MetricInferenceHistory(pipeline.echo) if pipeline.echo.enabled else None
+
+    def reset_episode(self, episode_index):
+        if self.online_history is not None:
+            self.online_history.reset_episode(episode_index)
+
+    def observe_control_step(self, sample):
+        if self.online_history is not None:
+            self.online_history.observe_sample(sample)
+
+    def observe_observation(self, observation, **synchronized_calibration):
+        from rulervla.adapters.libero import LiberoAdapter
+        sample = LiberoAdapter(self.pipeline.geometry).from_metric_observation(
+            observation, **synchronized_calibration)
+        self.observe_control_step(sample)
 
     def prepare(self, sample):
-        return self.pipeline.prepare_inference(sample)
+        history = self.online_history.for_sample(sample) if self.online_history is not None else None
+        return self.pipeline.prepare_inference(sample, history=history)
 
     def infer_observation(self, observation, *, noise=None, **synchronized_calibration):
         from rulervla.adapters.libero import LiberoAdapter

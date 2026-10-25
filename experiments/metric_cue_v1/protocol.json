@@ -1,0 +1,81 @@
+{
+  "schema": "rulervla_metric_cue_v1",
+  "experiment_id": "L09",
+  "status": "blocked_gpu_validation",
+  "research_plan_sha256": "9239b62fe26f9702731dfaecbf16c82f3915fedfbbf34f6193d91f3be1051a9b",
+  "research_question": "六通道动作坐标方向、公制刻度和实测五步历史位移对 LIBERO Spatial 任务成功率的贡献",
+  "arms": {
+    "M0": "configs/rulervla_metric_cue_m0.yaml",
+    "M1": "configs/rulervla_metric_cue_m1.yaml",
+    "M2": "configs/rulervla_metric_cue.yaml",
+    "M3": "configs/rulervla_metric_cue_m3.yaml"
+  },
+  "training": {
+    "seeds": [42, 43, 44],
+    "num_steps": 30000,
+    "batch_size": 32,
+    "micro_batch_size": 1,
+    "gradient_accumulation": 32,
+    "finetuning": "full",
+    "ema_decay": 0.999,
+    "action_horizon": 10,
+    "image_channels": 6,
+    "scheduler": {
+      "name": "warmup_cosine",
+      "warmup_updates": 1000,
+      "peak_lr": 0.00005,
+      "end_lr": 0.000005,
+      "decay_updates": 30000
+    },
+    "optimizer": {
+      "b1": 0.9,
+      "b2": 0.95,
+      "eps": 1e-8,
+      "weight_decay": 1e-10,
+      "clip_gradient_norm": 1.0
+    },
+    "checkpoint_updates": [10000, 20000, 30000],
+    "checkpoint_selection": "30000 updates for every arm and seed"
+  },
+  "data": {
+    "suite": "libero_spatial",
+    "episodes": 432,
+    "frames": 52970,
+    "rgbd_manifest_sha256": "02e428d9a3735bb959cdc29c1ca415cde73c2b9f6763ce1545603f385b8e127c",
+    "geometry_manifest_sha256": "f09a5d2b021058d51f54e54fb54e1222f8d1202eff805c6ba96efee00cbb0e9e",
+    "norm_stats_sha256": "b5e3345ee3d2a4698348ea8f8988031f2d003fdcd36c4716a7f7abc2d0834820",
+    "shared_across_arms": true
+  },
+  "evaluation": {
+    "suite": "libero_spatial",
+    "tasks": 10,
+    "initial_states_per_task": 50,
+    "paired_initial_states": true,
+    "settling_control_steps": 10,
+    "replan_control_steps": 5,
+    "maximum_control_steps": 220,
+    "success_denominator": "all planned rollouts, including execution failures",
+    "primary_metric": "complete_task_success_rate",
+    "primary_comparisons": ["M1-M0", "M2-M1", "M3-M2"],
+    "reporting": ["task_counts", "seed_counts", "macro_sr", "micro_sr", "paired_difference", "clustered_confidence_interval", "engineering_failures"]
+  },
+  "position_generalization": {
+    "experiment_id": "S29",
+    "task": "black_bowl_libero_spatial_task_index_2",
+    "scene_lock": "pending_geometry_visibility_collision_and_placement_checks",
+    "groups": ["training_support", "inside_holdout", "outside_feasible"],
+    "planned_independent_variable": "target_object_xy_position",
+    "keep_fixed": ["task_instruction", "robot_initial_state", "other_object_states", "camera_calibration", "policy_checkpoint"]
+  },
+  "launch_gates": [
+    "real_arm_input_contract",
+    "full_dataset_integrity",
+    "full_model_gpu_zero_cue_equivalence",
+    "full_model_gpu_gradient_and_optimizer_update",
+    "full_state_checkpoint_restore",
+    "paired_scene_manifest_lock",
+    "position_scene_validity_lock",
+    "simulator_runtime_verified",
+    "resource_preflight"
+  ]
+}

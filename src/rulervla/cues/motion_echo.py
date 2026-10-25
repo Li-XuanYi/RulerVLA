@@ -86,6 +86,37 @@ class EpisodeHistoryBuffer:
                              current.copy(), self._positions[target].copy())
 
 
+class MetricInferenceHistory:
+    def __init__(self, config: MotionEchoConfig):
+        if not config.enabled:
+            raise ValueError("Online history requires enabled Motion Echo")
+        self.buffer = EpisodeHistoryBuffer(config.history_steps)
+
+    def reset_episode(self, episode_index):
+        self.buffer.reset(int(episode_index))
+
+    def observe_sample(self, sample):
+        episode_index = int(sample["episode_index"])
+        step = int(sample["frame_index"])
+        if self.buffer.episode_index != episode_index:
+            raise ValueError("Reset history before observing a new episode")
+        if self.buffer._last_step is None:
+            if step != 0:
+                raise ValueError("Episode history must begin at control step zero")
+        elif step != self.buffer._last_step + 1:
+            raise ValueError("Observe every environment control step")
+        self.buffer.observe(step, sample["ee_world_m"])
+
+    def for_sample(self, sample):
+        history = self.buffer.history()
+        if (history.episode_index != int(sample["episode_index"])
+                or history.current_step != int(sample["frame_index"])
+                or history.current_m is None
+                or not np.allclose(history.current_m, sample["ee_world_m"], atol=2e-6, rtol=0)):
+            raise ValueError("Inference history must match the current observation")
+        return history
+
+
 def render_motion_echo(history: MotionHistory, camera: Camera, config: MotionEchoConfig):
     height, width = camera.resolution
     blank = np.zeros((height, width, 3), np.float32)

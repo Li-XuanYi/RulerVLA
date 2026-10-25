@@ -118,7 +118,8 @@ class SpatialDataset:
         arrays = self.cache[ep]
         sample = {key: value[frame].copy() for key,value in arrays.items() if key != 'actions'}
         indices, _ = action_chunk_indices(frame, row['frames'])
-        sample.update(actions=arrays['actions'][indices].copy(), task=row['task'])
+        sample.update(actions=arrays['actions'][indices].copy(), task=row['task'],
+                      episode_index=int(ep), frame_index=frame)
         return sample
 
     def get_history(self, index, *, history_steps=5):

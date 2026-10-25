@@ -1,6 +1,7 @@
 geometry_contract: v03_geometry.json
 metric_ruler:
   enabled: true
+  mode: metric
   origin: ee_tcp
   frame: action_world_xyz
   axis_extent_m:
@@ -14,6 +15,7 @@ metric_ruler:
   near_clip_m: 0.001
   line_width: 2
   tick_radius: 2
+  direction_length_px: 28
 motion_echo:
   enabled: false
   history_steps: 5

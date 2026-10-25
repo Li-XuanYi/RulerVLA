@@ -33,8 +33,6 @@ class MetricPipeline:
     version = 'metric_cue_observation_v1'
 
     def __init__(self, geometry, ruler, norm_stats, *, echo=MotionEchoConfig(), tokenizer=None):
-        if echo.enabled:
-            raise ValueError('G2 workflow requires motion_echo.enabled=false')
         self.geometry, self.ruler, self.echo = geometry, ruler, echo
         self.model_config = metric_model_config()
         self.norm_stats = norm_stats
@@ -69,10 +67,12 @@ class MetricPipeline:
         value=json.dumps(self.contract(), sort_keys=True, separators=(',', ':'), allow_nan=False)
         return hashlib.sha256(value.encode()).hexdigest()
 
-    def _current(self, sample):
+    def _current(self, sample, *, history=None):
         # Future targets and sample identity remain outside the model input path.
+        if self.echo.enabled and history is None:
+            raise ValueError('Motion Echo requires an explicit same-episode history record')
         current = {key: value for key, value in sample.items() if key != 'actions'}
-        prepared = self.adapter.prepare(current)
+        prepared = self.adapter.prepare(current, history=history)
         self.last_prompt = prepared['prompt']
         structured = self.inputs(prepared)
         structured = transforms.Normalize({'state': self.norm_stats['state']},
@@ -84,18 +84,18 @@ class MetricPipeline:
         structured['tokenized_prompt_mask'] = np.asarray(structured['tokenized_prompt_mask'], np.bool_)
         return structured
 
-    def prepare_train(self, sample):
+    def prepare_train(self, sample, *, history=None):
         actions = np.asarray(sample['actions'])
         if actions.shape != (10, 7) or not np.issubdtype(actions.dtype, np.floating) or not np.isfinite(actions).all():
             raise ValueError('Real action chunk must be finite floating (10, 7)')
-        result = self._current(sample)
+        result = self._current(sample, history=history)
         normalized = transforms.Normalize({'actions': self.norm_stats['actions']},
             use_quantiles=True, strict=True)({'actions': actions.copy()})['actions']
         result['actions'] = np.asarray(transforms.pad_to_dim(normalized, 32), np.float32)
         return result
 
-    def prepare_inference(self, sample):
-        return self._current(sample)
+    def prepare_inference(self, sample, *, history=None):
+        return self._current(sample, history=history)
 
     def postprocess_actions(self, actions):
         actions = np.asarray(actions)

@@ -78,6 +78,7 @@ class MetricCueConfig:
     """One physical ruler definition shared by projection, rendering and prompt."""
 
     enabled: bool = True
+    mode: str = "metric"
     origin: str = "ee_tcp"
     frame: str = "action_world_xyz"
     axis_extent_m: tuple[tuple[float, float], ...] = ((-.30, .30),) * 3
@@ -88,10 +89,13 @@ class MetricCueConfig:
     near_clip_m: float = .001
     line_width: int = 2
     tick_radius: int = 2
+    direction_length_px: int = 28
 
     def __post_init__(self):
         if not isinstance(self.enabled, bool) or self.origin != "ee_tcp" or self.frame != "action_world_xyz":
             raise ValueError("Metric cue requires EE TCP and world action XYZ")
+        if self.mode not in {"blank", "direction", "metric"} or self.enabled != (self.mode != "blank"):
+            raise ValueError("Cue mode and enabled switch must describe the same arm")
         extents = np.asarray(self.axis_extent_m, dtype=np.float64)
         if extents.shape != (3, 2) or not np.isfinite(extents).all() or np.any(extents[:, 0] >= 0) or np.any(extents[:, 1] <= 0):
             raise ValueError("Each axis extent must be finite [negative, positive] metres")
@@ -103,7 +107,7 @@ class MetricCueConfig:
             raise ValueError("Unsupported direction style")
         if not np.isfinite(self.near_clip_m) or self.near_clip_m <= 0:
             raise ValueError("Near clip must be positive finite optical metres")
-        if self.line_width < 1 or self.tick_radius < 1:
+        if self.line_width < 1 or self.tick_radius < 1 or self.direction_length_px < 1:
             raise ValueError("Stroke sizes must be positive")
         object.__setattr__(self, "axis_extent_m", tuple(tuple(float(x) for x in row) for row in extents))
 
@@ -189,6 +193,19 @@ def _draw_segment(draw, start, end, *, dashed, width):
         draw.line([tuple(first), tuple(last)], fill=255, width=width)
 
 
+def _draw_arrowhead(draw, start, end, *, width):
+    vector = np.asarray(end, dtype=np.float64) - np.asarray(start, dtype=np.float64)
+    distance = float(np.linalg.norm(vector))
+    if distance < 3:
+        return
+    direction = vector / distance
+    normal = np.array((-direction[1], direction[0]))
+    head = min(7., distance / 2)
+    base = np.asarray(end) - direction * head
+    draw.polygon((tuple(end), tuple(base + normal * head / 2),
+                  tuple(base - normal * head / 2)), fill=255)
+
+
 def render_metric_cue(ee_world_m, camera: Camera, config: MetricCueConfig):
     """Return independent float32 RGB-semantic cue in [0,1] and diagnostics."""
     from rulervla.cues.adaptive_metric_ruler import clip_segment_to_viewport
@@ -196,14 +213,39 @@ def render_metric_cue(ee_world_m, camera: Camera, config: MetricCueConfig):
     info = project_metric_cue(ee_world_m, camera, config)
     height, width = camera.resolution
     planes = [Image.new("L", (width, height), 0) for _ in range(3)]
-    if not config.enabled:
+    if config.mode == "blank":
         return np.zeros((height, width, 3), np.float32), info
     origin = finite(ee_world_m, (3,), "EE world position")
+    if config.mode == "direction":
+        if info.origin_optical_depth_m < config.near_clip_m or not np.isfinite(info.origin_uv).all():
+            return np.zeros((height, width, 3), np.float32), info
+        for axis in range(3):
+            draw = ImageDraw.Draw(planes[axis])
+            for sign in (-1, 1):
+                probe = origin + np.eye(3)[axis] * sign * config.tick_spacing_m
+                projected, depth = camera.project(probe[None])
+                if depth[0] < config.near_clip_m or not np.isfinite(projected).all():
+                    continue
+                vector = projected[0] - info.origin_uv
+                distance = float(np.linalg.norm(vector))
+                if distance < 1e-6:
+                    continue
+                endpoint = info.origin_uv + vector / distance * config.direction_length_px
+                clipped = clip_segment_to_viewport(info.origin_uv, endpoint, camera.resolution)
+                if clipped is None:
+                    continue
+                _draw_segment(draw, *clipped, dashed=sign < 0, width=config.line_width)
+                if sign > 0:
+                    _draw_arrowhead(draw, *clipped, width=config.line_width)
+            u, v = info.origin_uv
+            draw.ellipse((u-2, v-2, u+2, v+2), fill=255)
+        return np.stack([np.asarray(plane, dtype=np.float32)/255. for plane in planes], axis=-1), info
     for axis in range(3):
         draw = ImageDraw.Draw(planes[axis])
         for sign in (-1, 1):
             previous_world = origin
             previous_z = info.origin_optical_depth_m
+            arrow_segment = None
             for item in sorted((t for t in info.ticks if t.axis == axis and t.index * sign > 0),
                                key=lambda t: abs(t.index)):
                 current_world, current_z = item.world_m, item.optical_depth_m
@@ -221,6 +263,8 @@ def render_metric_cue(ee_world_m, camera: Camera, config: MetricCueConfig):
                     clipped = clip_segment_to_viewport(*uv, camera.resolution)
                     if clipped is not None:
                         _draw_segment(draw, *clipped, dashed=sign < 0, width=config.line_width)
+                        if sign > 0:
+                            arrow_segment = clipped
                 if item.visible:
                     u, v = item.uv
                     radius = config.tick_radius + (1 if abs(item.index) % config.major_tick_every == 0 else 0)
@@ -230,6 +274,8 @@ def render_metric_cue(ee_world_m, camera: Camera, config: MetricCueConfig):
                     else:
                         draw.ellipse(bounds, fill=0, outline=255, width=1)
                 previous_world, previous_z = current_world, current_z
+            if sign > 0 and arrow_segment is not None:
+                _draw_arrowhead(draw, *arrow_segment, width=config.line_width)
         if info.origin_optical_depth_m >= config.near_clip_m and np.isfinite(info.origin_uv).all():
             u, v = info.origin_uv
             draw.ellipse((u-2, v-2, u+2, v+2), fill=255)

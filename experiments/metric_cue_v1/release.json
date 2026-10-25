@@ -1,0 +1,22 @@
+{
+  "schema": "rulervla_metric_cue_release_v1",
+  "protocol_sha256": "2474cc8ee9880c624d4b2e1ccd63dc574b4eb1c2c1647bffc2e1d90f50351980",
+  "training_released": false,
+  "evaluation_released": false,
+  "gate_status": {
+    "real_arm_input_contract": true,
+    "full_dataset_integrity": true,
+    "full_model_gpu_zero_cue_equivalence": false,
+    "full_model_gpu_gradient_and_optimizer_update": false,
+    "full_state_checkpoint_restore": false,
+    "paired_scene_manifest_lock": false,
+    "position_scene_validity_lock": false,
+    "simulator_runtime_verified": false,
+    "resource_preflight": false
+  },
+  "data_audit_status": "outputs/metric_cue_pilot/full_data_audit_20261025/status.json",
+  "data_audit_receipts_sha256": "73dbf88aa9abb7b412f8cbe5468e88dc928708466f87cbd510b2acfe693a1849",
+  "gpu_smoke_receipt": null,
+  "paired_scene_manifest": null,
+  "position_scene_manifest": null
+}

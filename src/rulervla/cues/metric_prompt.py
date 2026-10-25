@@ -6,20 +6,28 @@ def build_scale_prompt(task: str, ruler: MetricCueConfig, *, echo_history_steps:
                        echo_valid: bool | None = None):
     if not isinstance(task, str) or not task.strip():
         raise ValueError("Task instruction must be nonempty")
-    if not ruler.enabled:
-        raise ValueError("Scale-aware prompt requires an enabled ruler")
-    spacing_cm = ruler.tick_spacing_m * 100
-    lines = [
-        f"Task: {task.strip()}",
-        "Spatial Reference:",
-        "Origin: Current end-effector TCP.",
-        "Axes: Robot world XYZ.",
-        "The auxiliary cue uses red for X, green for Y, and blue for Z.",
-        "Solid lines and filled ticks indicate positive directions.",
-        "Dashed lines and hollow ticks indicate negative directions.",
-        f"One basic tick interval represents {spacing_cm:g} cm in physical space.",
-        f"Every {ruler.major_tick_every} tick is a major tick.",
-    ]
+    lines = [f"Task: {task.strip()}"]
+    if ruler.mode != "blank":
+        lines.extend([
+            "Spatial Reference:",
+            "Origin: Current end-effector TCP.",
+            "Axes: Robot world XYZ.",
+            "The auxiliary cue uses red for X, green for Y, and blue for Z.",
+        ])
+        if ruler.mode == "metric":
+            spacing_cm = ruler.tick_spacing_m * 100
+            lines.extend([
+                "Solid lines and filled ticks indicate positive directions.",
+                "Dashed lines and hollow ticks indicate negative directions.",
+                "Arrows indicate positive directions.",
+                f"One basic tick interval represents {spacing_cm:g} cm in physical space.",
+                f"A major tick appears every {ruler.major_tick_every} basic tick intervals.",
+            ])
+        else:
+            lines.extend([
+                "Solid lines and arrows indicate positive directions.",
+                "Dashed lines indicate negative directions.",
+            ])
     if echo_history_steps is not None:
         if not isinstance(echo_history_steps, int) or echo_history_steps < 1:
             raise ValueError("Echo history must be positive control steps")
