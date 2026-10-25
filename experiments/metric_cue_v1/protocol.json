@@ -16,6 +16,11 @@
     "batch_size": 32,
     "micro_batch_size": 1,
     "gradient_accumulation": 32,
+    "gradient_sharding": {
+      "strategy": "fsdp",
+      "devices": 2,
+      "optimizer_device": "cpu"
+    },
     "finetuning": "full",
     "ema_decay": 0.999,
     "action_horizon": 10,

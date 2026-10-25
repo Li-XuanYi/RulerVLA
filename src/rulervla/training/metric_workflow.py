@@ -17,7 +17,7 @@ import optax
 from openpi_client import image_tools
 from openpi.models import model as model_lib
 from openpi.shared import normalize
-from openpi.training import checkpoints, config as config_lib, optimizer, weight_loaders
+from openpi.training import checkpoints, config as config_lib, optimizer, sharding, weight_loaders
 from openpi.training.utils import TrainState
 from rulervla.adapters.metric_pipeline import MetricPipeline, metric_model_config, tokenizer_from_asset
 from rulervla.cues.metric_ruler import MetricCueConfig
@@ -53,6 +53,7 @@ def make_training_config(run):
         ema_decay=training.get('ema_decay'),
         freeze_filter=policy.get_freeze_filter(), wandb_enabled=False,
         num_train_steps=training['num_steps'],
+        fsdp_devices=len(run['resources']['gpu_indices']),
         optimizer=optimizer.AdamW(**training['optimizer']),
         lr_schedule=lr_schedule,
         weight_loader=weight_loaders.SixChannelCheckpointWeightLoader(run['initial_checkpoint'],
@@ -137,10 +138,12 @@ def action_loss(policy, rng, observation, actions):
 
 class MetricTrainer:
     def __init__(self, config, model_def, *, gradient_device=None, optimizer_device=None,
-                 objective=action_loss):
+                 gradient_mesh=None, objective=action_loss):
         self.config = config
         self.gradient_device = gradient_device
         self.optimizer_device = optimizer_device
+        self.gradient_mesh = gradient_mesh
+        self.parameter_sharding = None
         def backward(params, observation, actions, rng):
             policy = nnx.merge(model_def, params)
             policy.train()
@@ -160,8 +163,25 @@ class MetricTrainer:
             info['gradients_finite'] = jnp.all(jnp.stack(
                 [jnp.all(jnp.isfinite(x)) for x in jax.tree.leaves(gradients)]))
             return gradients, info
+        self._accumulated_backward_fn = accumulated_backward
         self._accumulated_backward = jax.jit(accumulated_backward)
         self._update = jax.jit(lambda state, gradient: apply_gradients(config, state, gradient))
+
+    def configure_sharding(self, params):
+        if self.gradient_mesh is None:
+            raise ValueError('Gradient mesh is required for multi-GPU sharding')
+        if self.parameter_sharding is not None:
+            return
+        mesh = self.gradient_mesh
+        self.parameter_sharding = sharding.fsdp_sharding(jax.eval_shape(lambda: params), mesh)
+        gradient_sharding = self.parameter_sharding.filter(self.config.trainable_filter)
+        self.replicated_sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec())
+        self._accumulated_backward = jax.jit(
+            self._accumulated_backward_fn,
+            in_shardings=(self.parameter_sharding, self.replicated_sharding,
+                          self.replicated_sharding, self.replicated_sharding),
+            out_shardings=(gradient_sharding, self.replicated_sharding),
+        )
 
     def step(self, state, batch, *, micro_batch_size=None):
         if micro_batch_size is None:
@@ -178,10 +198,21 @@ class MetricTrainer:
                 return value.reshape((count, micro_batch_size) + value.shape[1:])
             observations = jax.tree.map(reshape, batch.observation)
             labels = reshape(batch.actions)
-            params, observations, labels = jax.device_put(
-                (state.params, observations, labels), self.gradient_device)
-            gradients, metrics = self._accumulated_backward(
-                params, observations, labels, state.step)
+            if self.gradient_mesh is None:
+                params, observations, labels = jax.device_put(
+                    (state.params, observations, labels), self.gradient_device)
+                gradients, metrics = self._accumulated_backward(
+                    params, observations, labels, state.step)
+            else:
+                self.configure_sharding(state.params)
+                params = jax.device_put(state.params, self.parameter_sharding)
+                observations = jax.device_put(observations, self.replicated_sharding)
+                labels = jax.device_put(labels, self.replicated_sharding)
+                step = jax.device_put(state.step, self.replicated_sharding)
+                with sharding.set_mesh(self.gradient_mesh):
+                    gradients, metrics = self._accumulated_backward(
+                        params, observations, labels, step)
+                del params
         jax.block_until_ready(gradients)
         info = {key: float(value) for key, value in jax.device_get(metrics).items()}
         if not info['gradients_finite'] or not np.isfinite(info['loss']):

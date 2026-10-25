@@ -45,7 +45,16 @@ PYTHONPATH=src /path/to/python scripts/metric_cue_train.py \
   --mode smoke --steps 2 --out outputs/metric_cue_pilot/new_gpu_smoke
 ```
 
-完整 manifest、固定统计、基座身份、CPU 内存和选定 GPU 显存全部通过后，才允许初始化 GPU。当前训练实现为单 GPU 计算梯度、CPU 管理 AdamW，45000 MiB 空闲显存是保守准入阈值，实际峰值待 GPU smoke 验证。GPU 视觉与动作等价预先使用 atol=0.02、rtol=0.02，记录实测误差；不从 CPU 逐值相同推断 GPU 位级等价，不自动放宽容差。
+完整 manifest、固定统计、基座身份、CPU 内存和选定 GPU 显存全部通过后，才允许初始化 GPU。单 GPU 路径沿用 45000 MiB 准入阈值；两张 GPU 的 FSDP 路径把大参数张量和梯度分片，AdamW 与 EMA 状态留在 CPU，当前准入阈值为每张 GPU 空闲 32768 MiB。该阈值仍需完整模型 GPU 更新核验。正式 L09 协议固定两张 GPU 参与梯度计算，每次运行可用 `--gpu-indices` 指定实际卡号。GPU 视觉与动作等价预先使用 atol=0.02、rtol=0.02，记录实测误差；不从 CPU 逐值相同推断 GPU 位级等价，不自动放宽容差。
+
+```bash
+PYTHONPATH=src /path/to/python scripts/metric_cue_train.py \
+  --mode preflight --arm M3 --gpu-indices 4 5 \
+  --out outputs/metric_cue_pilot/preflight_M3_fsdp
+PYTHONPATH=src /path/to/python scripts/metric_cue_train.py \
+  --mode smoke --arm M3 --gpu-indices 4 5 --steps 2 \
+  --out outputs/metric_cue_pilot/smoke_M3_fsdp
+```
 
 正式训练使用显式 `--mode train --arm M0|M1|M2|M3 --seed 42|43|44` 和协议指定的 30000 次更新、有效批量 32、一次更新累积 32 个真实样本。入口要求 `release.json` 中全部发布条件通过，以及完整模型 GPU 更新和恢复记录。训练在 10000、20000、30000 次更新保存参数、完整 Adam 状态、EMA、step、输入 contract、规范化 assets、Git 和源码哈希；`--resume` 仅恢复同一运行身份的完整状态。当前发布条件未通过，因此未执行正式训练。
 

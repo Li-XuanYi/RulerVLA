@@ -46,6 +46,11 @@ def load_formal_metric_run(root, arm, seed, run):
             or training['action_horizon'] != 10
             or training['checkpoint_updates'][-1] != training['num_steps']):
         raise ValueError('Formal Metric Cue training recipe is inconsistent')
+    layout = training['gradient_sharding']
+    if (layout['strategy'] != 'fsdp' or layout['optimizer_device'] != 'cpu'
+            or len(run['resources']['gpu_indices']) != layout['devices']
+            or not run['resources']['cpu_optimizer']):
+        raise ValueError('Formal Metric Cue GPU and optimizer layout differs from the protocol')
     if (run['data']['rgbd_manifest_sha256'] != protocol['data']['rgbd_manifest_sha256']
             or run['data']['geometry_manifest_sha256'] != protocol['data']['geometry_manifest_sha256']
             or run['norm_stats_sha256'] != protocol['data']['norm_stats_sha256']):

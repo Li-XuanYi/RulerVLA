@@ -1,6 +1,5 @@
 """Linux resource/data admission checks. This module never imports JAX or CUDA."""
 import csv
-import hashlib
 import io
 import json
 from pathlib import Path
@@ -87,13 +86,16 @@ def preflight(value, *, gpu_query=query_gpus, file_probe=probe_file):
         reasons.append('Initial checkpoint metadata does not match the verified base artifact')
     gpus = gpu_query()
     resource = value['resources']
+    selected = resource['gpu_indices']
+    min_free_mib = (resource['min_free_mib'] if len(selected) == 1
+                    else resource['min_free_mib_fsdp'])
     if isinstance(gpus, dict):
         reasons.append('GPU query unavailable: '+gpus['error'])
     else:
         indexed = {row['index']: row for row in gpus}
-        for index in resource['gpu_indices']:
-            if index not in indexed or indexed[index]['free_mib'] < resource['min_free_mib']:
-                reasons.append(f'GPU {index} requires {resource["min_free_mib"]} MiB free')
+        for index in selected:
+            if index not in indexed or indexed[index]['free_mib'] < min_free_mib:
+                reasons.append(f'GPU {index} requires {min_free_mib} MiB free')
     available = None
     meminfo = Path('/proc/meminfo')
     if meminfo.exists():
@@ -104,4 +106,6 @@ def preflight(value, *, gpu_query=query_gpus, file_probe=probe_file):
     return dict(schema='rulervla_metric_preflight_v1', launch_allowed=not reasons, blockers=reasons,
                 data=data, norm_stats=norm, norm_source={k:v for k,v in norm_source.items() if k!='json'},
                 checkpoint_metadata=checkpoint, checkpoint_receipt={k:v for k,v in receipt.items() if k!='json'},
-                gpu_snapshot=gpus, cpu_available_gib=available, gpu_job_started=False)
+                gpu_snapshot=gpus, selected_gpu_indices=selected,
+                selected_gpu_min_free_mib=min_free_mib,
+                cpu_available_gib=available, gpu_job_started=False)

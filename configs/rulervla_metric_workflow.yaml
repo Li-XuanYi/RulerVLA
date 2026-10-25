@@ -26,6 +26,7 @@ resources:
   gpu_indices:
   - 7
   min_free_mib: 45000
+  min_free_mib_fsdp: 32768
   min_cpu_available_gib: 100
   cpu_optimizer: true
 gpu_equivalence:

@@ -18,9 +18,14 @@ def main():
     parser.add_argument('--arm', choices=('M0', 'M1', 'M2', 'M3'))
     parser.add_argument('--seed', type=int)
     parser.add_argument('--resume', action='store_true')
+    parser.add_argument('--gpu-indices', type=int, nargs='+')
     args = parser.parse_args()
     from rulervla.training.metric_resources import load_run_config, preflight
     run = load_run_config(args.config)
+    if args.gpu_indices is not None:
+        if len(set(args.gpu_indices)) != len(args.gpu_indices) or any(index < 0 for index in args.gpu_indices):
+            raise ValueError('GPU indices must be distinct nonnegative integers')
+        run['resources']['gpu_indices'] = args.gpu_indices
     protocol = None
     if args.mode == 'train':
         if args.arm is None or args.seed is None or args.steps is not None:
@@ -46,19 +51,19 @@ def main():
         (args.out/'status.json').write_text(json.dumps(result, indent=2))
         print(json.dumps(result), flush=True)
         return 0 if args.mode == 'preflight' else 2
-    if len(run['resources']['gpu_indices']) != 1 or not run['resources']['cpu_optimizer']:
-        raise ValueError('This entry uses one GPU for gradients and a CPU AdamW optimizer')
+    if not run['resources']['gpu_indices'] or not run['resources']['cpu_optimizer']:
+        raise ValueError('Training requires GPU gradients and a CPU AdamW optimizer')
     steps = args.steps if args.steps is not None else run['training']['num_steps']
     if steps < 1 or (args.mode == 'smoke' and steps > 3):
         raise ValueError('Smoke requires 1..3 updates; larger runs need explicit --mode train')
     run['training']['num_steps'] = steps
     (args.out/'workflow_config.json').write_text(json.dumps(run, indent=2))
-    os.environ['CUDA_VISIBLE_DEVICES'] = str(run['resources']['gpu_indices'][0])
+    os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(map(str, run['resources']['gpu_indices']))
     os.environ['JAX_PLATFORMS'] = 'cuda,cpu'
     os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = 'false'
     os.environ['XLA_PYTHON_CLIENT_ALLOCATOR'] = 'platform'
     import jax
-    from openpi.training import checkpoints
+    from openpi.training import checkpoints, sharding
     from rulervla.adapters.metric_pipeline import MetricPipeline
     from rulervla.training.main_data import SpatialDataset, update_indices
     from rulervla.training.metric_workflow import (MetricTrainer, create_training_state, gpu_equivalence,
@@ -89,7 +94,11 @@ def main():
         status.update(stage=name, **values)
         (args.out/'status.json').write_text(json.dumps(status, indent=2, allow_nan=False))
         print(json.dumps({'stage':name, **values}), flush=True)
+    if len(jax.devices('gpu')) != len(run['resources']['gpu_indices']):
+        raise ValueError('JAX did not expose every selected GPU')
     gpu, cpu = jax.devices('gpu')[0], jax.devices('cpu')[0]
+    mesh = (sharding.make_mesh(len(run['resources']['gpu_indices']))
+            if len(run['resources']['gpu_indices']) > 1 else None)
     stage('load_real_base_and_six_channel_optimizer')
     state = create_training_state(config, load_initial_model(config), optimizer_device=cpu)
     manager, resuming = checkpoints.initialize_checkpoint_dir(
@@ -111,14 +120,16 @@ def main():
         stage('gpu_zero_cue_equivalence')
         measured = gpu_equivalence(config, state.params, first_batch, gpu, run['gpu_equivalence'])
         (args.out/'gpu_equivalence.json').write_text(json.dumps(measured, indent=2))
-    trainer = MetricTrainer(config, state.model_def, gradient_device=gpu, optimizer_device=cpu)
+    trainer = MetricTrainer(config, state.model_def, gradient_device=gpu,
+                            optimizer_device=cpu, gradient_mesh=mesh)
     saved = None
     for update in range(int(state.step), steps):
         indices = update_indices(len(dataset), config.seed, update, batch_size=config.batch_size)
         batch = first_batch if update == 0 and first_batch is not None else prepare_batch(dataset, indices, pipeline)
         started = time.monotonic()
-        state, metrics = trainer.step(state, batch, micro_batch_size=(
-            protocol['training']['micro_batch_size'] if args.mode == 'train' else None))
+        micro_batch_size = (protocol['training']['micro_batch_size'] if args.mode == 'train'
+                            else 1 if mesh is not None else None)
+        state, metrics = trainer.step(state, batch, micro_batch_size=micro_batch_size)
         if args.mode == 'smoke' and metrics['cue_grad_l2'] <= 0:
             raise ValueError('Real action loss did not produce nonzero Cue kernel gradients')
         record = dict(update=int(state.step), seconds=time.monotonic()-started,
