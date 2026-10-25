@@ -72,3 +72,29 @@ RulerVLA 已有实验总览、协议、run matrix 和 36 项历史实验索引�
 - [Code] 依赖锁270项，OpenPI及client均由本仓库源码提供；共享环境未使用的RLinf排除。wheel由提交tree构建并隔离导入，119个Python文件与提交源码相符；全新依赖环境安装尚未实测。
 - [Experiment] GPU smoke未启动：Dataset2的两个manifest报Host is down，GPU7空闲21351MiB低于45000MiB门槛。实际preflight jax_imported=false。GPU数值误差未测，预先容差atol=rtol=0.02，不宣称GPU位级等价。
 - [Inference] G2整体尚未完成GPU验收；先修复数据访问并提供足够显存，再显式执行新入口的1–3更新smoke。G3只保留objective/embed_prefix/身份接口，未添加新头、loss或启动正式M0–M3、30k训练、批量rollout、历史队列。
+
+## 2026-10-25 当前 Plan 与实现审计
+
+- 当前实际开发树为 `/home/lixuanyi/XuanyiLi/work/worktrees/rulervla-metric-cue`，HEAD `a09e04a052f4bf5dd581a2569bfea4edaab63db2`。本轮按本地2026-10-24 `reaserch.md` 审计，完整报告见 `docs/metric_cue/PLAN_AUDIT_20261025.zh.md`，原始Plan和核验产物在 `outputs/metric_cue_pilot/plan_audit_20261025/`。
+- [Code] 核心六通道公制Cue架构基本符合Plan；M0关闭Ruler被Prompt Builder拒绝，M1尚无独立Direction实现，M3被统一Pipeline拒绝且未贯通history。正方向箭头尚未绘制。M0与M3的拒绝路径已实际复现。
+- [Experiment] 使用真实缓存两个episode的4个样本重新运行data audit：真实连续actions、repeat-last、Train/Inference全部输入一致；反归一化误差最大1.192092896e-7。环境及4个Transformers补丁检查通过；冻结runtime按snapshot manifest核验123/123匹配。
+- [Experiment] 当前preflight读取到Dataset2两份manifest且哈希匹配；尚未逐文件核验整个数据集。当前阻塞是GPU7空闲3857MiB低于45000MiB、CPU可用67.89GiB低于100GiB。旧Host is down和旧环境路径为历史状态；Python现为 `/home/lixuanyi/XuanyiLi/code/openpi/.venv/bin/python`。无GPU初始化或作业启动。
+- [Code] 当前Plan仅使用原FM loss，旧G2记录里的G3辅助head/loss不作为当前Plan必需项。正式训练预算、M0–M3配置、位置split和六通道rollout协议仍待冻结；CLI当前只有末尾保存，正式长训练还需确定周期保存与恢复流程。
+- AutoResearch在主仓库／开发树状态均为not_initialized；本轮调用其状态核验并采用ARS审计，未开始自动优化。报告记录H1–H3的主要对照和固定像素控制、Prompt公平性、配对场景及分层重复单位，尚未成为正式协议。
+- 本轮未修改模型／训练源码、registry或冻结协议，未启动GPU smoke、训练、policy inference、rollout或历史队列；保留已有未提交内容和全部历史证据。
+
+## 2026-10-25 research.md 符合性复核
+
+- 本地 `reaserch.md` 的 SHA-256 仍为 `9239b62fe26f9702731dfaecbf16c82f3915fedfbbf34f6193d91f3be1051a9b`；开发树 HEAD 仍为 `a09e04a052f4bf5dd581a2569bfea4edaab63db2`。复核了当前 Metric Ruler、Prompt、Motion Echo、统一输入及训练入口。
+- [Code] M0 关闭标尺时被 Prompt Builder 拒绝；M1 缺少独立 Direction Cue；M3 在统一 Pipeline 中被拒绝，训练和推理入口尚未传递历史状态；正方向箭头尚未绘制。正式 M0–M3 协议和位置泛化评测仍缺少可执行记录。
+- [Experiment] 使用真实缓存样本 20、108、109、110 再次运行 CPU 数据审计，产物位于 `outputs/metric_cue_pilot/recheck_20261025/`。4 个样本的训练与推理输入逐值一致，动作反归一化最大误差为 `1.1920928955078125e-7`；没有启动 GPU 作业、训练或 rollout。
+
+## 2026-10-25 六通道实验准备
+
+- [Code] 开发工作树 `/home/lixuanyi/XuanyiLi/work/worktrees/rulervla-metric-cue` 增加 M0 空白、M1 固定像素方向、M2 双向公制刻度和 M3 公制刻度加五步实测 Motion Echo。四组共用六通道模型、归一化和原 Flow Matching 动作目标；M3 从同一 episode 的真实历史读取训练输入，在线入口要求逐环境控制步观测及 episode 重置。
+- [Code] `experiments/metric_cue_v1/` 保存 L09 四组、三训练种子的协议、运行矩阵和关闭状态的发布门槛；S29 黑碗位置泛化继续等待场景有效性检查。正式训练入口固定有效批量 32、微批量 1、梯度累积 32、30000 次更新、EMA 0.999、10000／20000／30000 次完整状态保存与恢复。未通过发布门槛时入口立即拒绝启动。
+- [Experiment] 使用来源哈希已核对的真实缓存样本验证 M0–M3 训练／推理输入一致、M3 五步位移、真实 32 条动作训练批次、完整基座模型 CPU 载入及完整模型梯度累积的静态形状；使用真实连续观测和完整基座模型取得有限的在线十步动作块。逐一读取全部 432 个训练 episode 和 52970 帧，核对 RGB-D／几何哈希及内容，432 条 receipt 的 SHA-256 为 `73dbf88aa9abb7b412f8cbe5468e88dc928708466f87cbd510b2acfe693a1849`。未执行完整模型 GPU 更新。
+- [Experiment] 2026-10-25 新 preflight 中数据 manifest、统计量、基座来源检查通过；GPU 7 空闲显存低于 45000 MiB，训练和 GPU smoke 均未启动。在线评测服务与 Spatial 配对场景客户端已加入，发布门槛关闭时均会拒绝启动。Python 3.11 模型环境当前没有 LIBERO 与 robosuite；协议指定的 LIBERO 源码路径对当前 SSH 用户不可读取，正式模拟器入口和 S29 场景锁定仍待验证。
+- [Inference] 当前证据确认输入、协议和启动保护可检查；完整模型 GPU 数值检查、真实更新及 checkpoint 恢复、在线 simulator rollout、位置场景有效性和 SR 仍未取得证据。`release.json` 保持关闭。
+- [Code] 本单元实现提交为 `6efe098`、`42a4fd5`、`fc871fb`、`23a4745`、`5961485`；旧数据审计入口保留，完整数据核验使用新入口 `scripts/metric_cue_full_data_audit.py`。`experiments/experiment_registry.json` 已在开发树补入 L09／S29，主工作树内容保持原位。在线策略按 episode 身份重置采样随机状态，配对场景使用相同的噪声起点。
+- [Experiment] 最后一次 GPU 查询显示 GPU 7 空闲 3862 MiB，GPU 4 空闲 38153 MiB，均低于当前 45000 MiB 准入门槛。完整数据核验发布条件已通过，其余 GPU、模拟器和场景发布条件继续关闭。
