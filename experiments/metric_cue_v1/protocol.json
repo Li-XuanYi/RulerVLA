@@ -51,6 +51,7 @@
     "tasks": 10,
     "initial_states_per_task": 50,
     "paired_initial_states": true,
+    "policy_noise_seed": 42,
     "settling_control_steps": 10,
     "replan_control_steps": 5,
     "maximum_control_steps": 220,

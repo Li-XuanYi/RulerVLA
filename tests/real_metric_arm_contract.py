@@ -2,6 +2,7 @@ import argparse
 import json
 from pathlib import Path
 
+import jax
 import numpy as np
 
 from openpi.shared import normalize
@@ -124,6 +125,12 @@ def main():
         if args.check_policy:
             policy = MetricPolicy(model, m3_pipeline)
             policy.reset_episode(1261)
+            paired_rng = np.asarray(jax.random.key_data(policy.rng))
+            policy.reset_episode(1262)
+            if np.array_equal(jax.random.key_data(policy.rng), paired_rng):
+                raise AssertionError("不同场景不应复用相同推理随机状态")
+            policy.reset_episode(1261)
+            np.testing.assert_array_equal(jax.random.key_data(policy.rng), paired_rng)
             for step in range(21):
                 policy.observe_control_step(dataset[step])
             prepared = policy.prepare(dataset[20])
@@ -134,7 +141,6 @@ def main():
                 np.testing.assert_array_equal(prepared["image"][slot], expected["image"][slot])
         if args.check_accumulation_shape:
             import flax.nnx as nnx
-            import jax
             graph, params = nnx.split(model)
             trainer = MetricTrainer(formal_config, graph)
             observations = jax.tree.map(lambda value: value.reshape((32, 1) + value.shape[1:]),

@@ -1,6 +1,6 @@
 {
   "schema": "rulervla_metric_cue_release_v1",
-  "protocol_sha256": "2474cc8ee9880c624d4b2e1ccd63dc574b4eb1c2c1647bffc2e1d90f50351980",
+  "protocol_sha256": "b64919f0b28a5af0d8d60e471a45d583f7a1c878e9c6dcebff4b3e306734cf0e",
   "training_released": false,
   "evaluation_released": false,
   "gate_status": {

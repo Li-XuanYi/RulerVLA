@@ -40,7 +40,7 @@ def main():
     from openpi.serving.websocket_policy_server import WebsocketPolicyServer
     from rulervla.evaluation.metric_rollout import MetricRolloutSession
     from rulervla.training.metric_workflow import load_metric_policy
-    policy = load_metric_policy(checkpoint)
+    policy = load_metric_policy(checkpoint, seed=protocol['evaluation']['policy_noise_seed'])
     session = MetricRolloutSession(policy)
     WebsocketPolicyServer(session, host=args.host, port=args.port,
                           metadata={'experiment_id': 'L09', 'run_id': run_id,

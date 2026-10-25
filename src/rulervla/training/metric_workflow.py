@@ -259,10 +259,12 @@ class MetricPolicy:
         self.pipeline = pipeline
         self._sample = module_jit(policy.sample_actions, static_argnames=('num_steps',))
         self.sampling_steps = sampling_steps
+        self.seed = seed
         self.rng = jax.random.key(seed)
         self.online_history = MetricInferenceHistory(pipeline.echo) if pipeline.echo.enabled else None
 
     def reset_episode(self, episode_index):
+        self.rng = jax.random.fold_in(jax.random.key(self.seed), int(episode_index))
         if self.online_history is not None:
             self.online_history.reset_episode(episode_index)
 
@@ -299,7 +301,7 @@ class MetricPolicy:
         return dict(actions=self.pipeline.postprocess_actions(normalized), normalized_actions=normalized)
 
 
-def load_metric_policy(directory, *, explicit_pipeline=None, sampling_steps=10):
+def load_metric_policy(directory, *, explicit_pipeline=None, sampling_steps=10, seed=42):
     directory = Path(directory)
     if (directory/'metric_workflow.json').exists():
         pipeline, _ = pipeline_from_checkpoint(directory)
@@ -312,7 +314,7 @@ def load_metric_policy(directory, *, explicit_pipeline=None, sampling_steps=10):
         raise ValueError('A G2 checkpoint with saved preprocessing is required')
     params = model_lib.restore_params(directory/'params', restore_type=np.ndarray)
     policy = pipeline.model_config.load(params, remove_extra_params=False)
-    return MetricPolicy(policy, pipeline, sampling_steps=sampling_steps)
+    return MetricPolicy(policy, pipeline, sampling_steps=sampling_steps, seed=seed)
 
 
 def state_signatures(state):
