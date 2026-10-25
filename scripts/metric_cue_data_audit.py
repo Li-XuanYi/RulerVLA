@@ -68,9 +68,7 @@ def main():
                     equals_repeated_current_action=bool(np.array_equal(sample['actions'],
                         np.repeat(sample['actions'][:1],10,axis=0))))
         if not records:
-            np.savez_compressed(args.out/'real_training_sample.npz',**sample,
-                                episode_index=np.int64(identity['episode_index']),
-                                frame_index=np.int64(identity['frame_index']))
+            np.savez_compressed(args.out/'real_training_sample.npz',**sample)
             if args.reference_g1_frame:
                 with np.load(args.reference_g1_frame,allow_pickle=False) as old:
                     for key in ('agentview_rgb','wrist_rgb','ee_world_m','state8','intrinsic','camera_to_world',
