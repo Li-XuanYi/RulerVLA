@@ -20,7 +20,7 @@ def main():
     parser.add_argument('--resume', action='store_true')
     parser.add_argument('--gpu-indices', type=int, nargs='+')
     args = parser.parse_args()
-    from rulervla.training.metric_resources import load_run_config, preflight
+    from rulervla.training.metric_resources import load_run_config, preflight, query_gpus
     run = load_run_config(args.config)
     if args.gpu_indices is not None:
         if len(set(args.gpu_indices)) != len(args.gpu_indices) or any(index < 0 for index in args.gpu_indices):
@@ -62,6 +62,9 @@ def main():
     os.environ['JAX_PLATFORMS'] = 'cuda,cpu'
     os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = 'false'
     os.environ['XLA_PYTHON_CLIENT_ALLOCATOR'] = 'platform'
+    cache_dir = ROOT/'outputs/metric_cue_pilot/jax_compilation_cache'
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    os.environ['JAX_COMPILATION_CACHE_DIR'] = str(cache_dir)
     import jax
     from openpi.training import checkpoints, sharding
     from rulervla.adapters.metric_pipeline import MetricPipeline
@@ -124,6 +127,20 @@ def main():
         (args.out/'gpu_equivalence.json').write_text(json.dumps(measured, indent=2))
     trainer = MetricTrainer(config, state.model_def, gradient_device=gpu,
                             optimizer_device=cpu, gradient_mesh=mesh)
+    current_gpus = query_gpus()
+    selected = run['resources']['gpu_indices']
+    required_free = admission['selected_gpu_min_free_mib']
+    if isinstance(current_gpus, dict):
+        blockers = ['GPU query unavailable before parameter update']
+    else:
+        available = {item['index']: item['free_mib'] for item in current_gpus}
+        blockers = [f'GPU {index} requires {required_free} MiB free before parameter update'
+                    for index in selected if available.get(index, 0) < required_free]
+    if blockers:
+        stage('resource_gate_closed', state='blocked', blockers=blockers,
+              gpu_snapshot=current_gpus)
+        manager.close()
+        return 2
     saved = None
     for update in range(int(state.step), steps):
         indices = update_indices(len(dataset), config.seed, update, batch_size=config.batch_size)
