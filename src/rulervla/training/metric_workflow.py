@@ -91,6 +91,14 @@ def require_cue_optimizer(state):
     return sorted(found)
 
 
+def require_training_state_device(state, device):
+    if device is None:
+        return
+    if any(isinstance(value, jax.Array) and value.devices() != {device}
+           for value in jax.tree.leaves(state)):
+        raise ValueError('Training parameters or optimizer state are on the wrong device')
+
+
 def load_initial_model(config):
     reference = nnx.state(nnx.eval_shape(config.model.create, jax.random.key(config.seed))).to_pure_dict()
     params = config.weight_loader.load(reference)
@@ -103,12 +111,14 @@ def create_training_state(config, policy, *, optimizer_device=None):
         params = jax.device_put(params, optimizer_device)
     selected = require_trainable_cue(params, config.trainable_filter)
     tx = config.optimizer.create(config.lr_schedule.create())
-    opt_state = jax.jit(tx.init)(selected)
+    opt_state = jax.jit(tx.init, device=optimizer_device)(selected)
     require_cue_optimizer(opt_state)
     step = jax.device_put(jnp.asarray(0, jnp.int32), optimizer_device)
-    return TrainState(step=step, params=params, model_def=graph, tx=tx,
-                      opt_state=opt_state, ema_decay=config.ema_decay,
-                      ema_params=params if config.ema_decay is not None else None)
+    state = TrainState(step=step, params=params, model_def=graph, tx=tx,
+                       opt_state=opt_state, ema_decay=config.ema_decay,
+                       ema_params=params if config.ema_decay is not None else None)
+    require_training_state_device(state, optimizer_device)
+    return state
 
 
 @dataclasses.dataclass(frozen=True)
@@ -165,7 +175,8 @@ class MetricTrainer:
             return gradients, info
         self._accumulated_backward_fn = accumulated_backward
         self._accumulated_backward = jax.jit(accumulated_backward)
-        self._update = jax.jit(lambda state, gradient: apply_gradients(config, state, gradient))
+        self._update = jax.jit(lambda state, gradient: apply_gradients(config, state, gradient),
+                               device=optimizer_device)
 
     def configure_sharding(self, params):
         if self.gradient_mesh is None:
@@ -220,6 +231,7 @@ class MetricTrainer:
         gradients = jax.device_put(gradients, self.optimizer_device)
         updated = self._update(state, gradients)
         jax.block_until_ready(updated)
+        require_training_state_device(updated, self.optimizer_device)
         require_cue_optimizer(updated.opt_state)
         return updated, info
 
@@ -402,7 +414,8 @@ def gpu_equivalence(config, params6, batch, device, tolerances, *, mesh=None):
             reference = nnx.state(nnx.eval_shape(cfg.create, jax.random.key(42))).to_pure_dict()
             loaded = model_lib.restore_params(config.weight_loader.params_path, restore_type=np.ndarray)
             loaded = merge_six_channel_params(loaded, reference, missing_regex='(?!)')
-            graph, state = nnx.split(cfg.load(loaded, remove_extra_params=False))
+            with jax.default_device(jax.devices('cpu')[0]):
+                graph, state = nnx.split(cfg.load(loaded, remove_extra_params=False))
             del loaded
         else:
             graph = nnx.split(nnx.eval_shape(cfg.create, jax.random.key(42)))[0]

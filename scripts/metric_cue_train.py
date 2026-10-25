@@ -100,7 +100,8 @@ def main():
     mesh = (sharding.make_mesh(len(run['resources']['gpu_indices']))
             if len(run['resources']['gpu_indices']) > 1 else None)
     stage('load_real_base_and_six_channel_optimizer')
-    state = create_training_state(config, load_initial_model(config), optimizer_device=cpu)
+    with jax.default_device(cpu):
+        state = create_training_state(config, load_initial_model(config), optimizer_device=cpu)
     manager, resuming = checkpoints.initialize_checkpoint_dir(
         args.out/'checkpoints', keep_period=10000 if args.mode == 'train' else 1,
         overwrite=False, resume=args.resume)
