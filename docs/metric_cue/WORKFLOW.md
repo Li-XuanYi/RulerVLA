@@ -45,7 +45,7 @@ PYTHONPATH=src /path/to/python scripts/metric_cue_train.py \
   --mode smoke --steps 2 --out outputs/metric_cue_pilot/new_gpu_smoke
 ```
 
-完整 manifest、固定统计、基座身份、CPU 内存和选定 GPU 显存全部通过后，才允许初始化 GPU。单 GPU 路径沿用 45000 MiB 准入阈值；两张 GPU 的 FSDP 路径把大参数张量和梯度分片，AdamW 与 EMA 状态留在 CPU，当前准入阈值为每张 GPU 空闲 32768 MiB。该阈值仍需完整模型 GPU 更新核验。正式 L09 协议固定两张 GPU 参与梯度计算，每次运行可用 `--gpu-indices` 指定实际卡号。GPU 视觉与动作等价预先使用 atol=0.02、rtol=0.02，记录实测误差；不从 CPU 逐值相同推断 GPU 位级等价，不自动放宽容差。
+完整 manifest、固定统计、基座身份、CPU 内存和选定 GPU 显存全部通过后，才允许初始化 GPU。单 GPU 路径沿用 45000 MiB 准入阈值；两张 GPU 的 FSDP 路径把大参数张量和梯度分片，AdamW 与 EMA 状态明确放在 CPU，当前准入阈值为每张 GPU 空闲 32768 MiB。模型载入后及等价检查后再次核对显存。JAX 编译缓存位于被 Git 忽略的 `outputs/metric_cue_pilot/jax_compilation_cache/`。该阈值仍需完整模型 GPU 更新核验。正式 L09 协议固定两张 GPU 参与梯度计算，每次运行可用 `--gpu-indices` 指定实际卡号。GPU 视觉与动作等价使用一条真实样本及六通道参数中的 RGB 权重，预先使用 atol=0.02、rtol=0.02，记录实测误差；不从 CPU 逐值相同推断 GPU 位级等价，不自动放宽容差。
 
 ```bash
 PYTHONPATH=src /path/to/python scripts/metric_cue_train.py \

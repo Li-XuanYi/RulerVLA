@@ -98,3 +98,10 @@ RulerVLA 已有实验总览、协议、run matrix 和 36 项历史实验索引�
 - [Inference] 当前证据确认输入、协议和启动保护可检查；完整模型 GPU 数值检查、真实更新及 checkpoint 恢复、在线 simulator rollout、位置场景有效性和 SR 仍未取得证据。`release.json` 保持关闭。
 - [Code] 本单元实现提交为 `6efe098`、`42a4fd5`、`fc871fb`、`23a4745`、`5961485`；旧数据审计入口保留，完整数据核验使用新入口 `scripts/metric_cue_full_data_audit.py`。`experiments/experiment_registry.json` 已在开发树补入 L09／S29，主工作树内容保持原位。在线策略按 episode 身份重置采样随机状态，配对场景使用相同的噪声起点。
 - [Experiment] 最后一次 GPU 查询显示 GPU 7 空闲 3862 MiB，GPU 4 空闲 38153 MiB，均低于当前 45000 MiB 准入门槛。完整数据核验发布条件已通过，其余 GPU、模拟器和场景发布条件继续关闭。
+
+## 2026-10-26 六通道模型双 GPU 分片
+
+- [Code] 开发工作树分支 `research/metric-cue-pilot` 的提交 `fcd7149`、`f3f0b38`、`45e8326`、`efb922d`、`ef3c277`、`e62d2b5`、`14f7cd4` 实现可选择 GPU 的 FSDP 参数／梯度分片，CPU 上的 AdamW／EMA 状态，以及三通道／六通道等价检查。三通道对照直接使用六通道参数中的 RGB 权重。正式协议固定两张 GPU，允许每次运行选择具体设备并在 manifest 中记录。
+- [Code] 资源检查对所选设备逐卡要求空闲 32768 MiB；模型载入之后和等价检查之后再次检查。JAX 编译缓存写在被 Git 忽略的 `outputs/metric_cue_pilot/jax_compilation_cache/`。单设备原有 45000 MiB 门槛保留。门槛属于启动保护，完整更新通过后须结合实际峰值显存核验。
+- [Experiment] 两个真实 CPU JAX 设备、完整基座模型参数及真实 32 条 Spatial 样本通过分片结构、三通道参数构造和梯度累积形状检查；Ruff 与 `git diff --check` 通过。GPU 0／2 的真实完整模型等价检查进入 XLA 编译，两卡中本进程各占约 7 GiB；其他作业随后占用了两卡，进程在执行参数更新之前终止。没有取得等价检查数值、完整 GPU 梯度更新、checkpoint 恢复或峰值显存。最近一次 preflight 对 GPU 0／2 返回 `blocked`，`jax_imported=false`、`gpu_job_started=false`。
+- [Experiment] `experiments/metric_cue_v1/release.json` 中 GPU 与训练发布条件继续关闭。两张设备均满足门槛且能持续供给时，执行真实完整模型 GPU smoke、参数更新、保存恢复及显存峰值检查；保持现有其他 GPU 任务和未提交文件原样。
