@@ -1,6 +1,6 @@
 {
   "schema": "rulervla_experiment_registry_v1",
-  "audited_date": "2026-10-07",
+  "audited_date": "2026-10-11",
   "naming_rule": "S/L + two digits + underscore + <=5 Chinese characters",
   "historical_paths_preserved": true,
   "entries": [
@@ -16,7 +16,10 @@
       "details": [
         "三组独立 pi05_base → 30k，batch 4；已完成、归档。不是当前 full-FT/batch32 主协议。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "组件一：公制标尺",
+      "current_status_note": "Spatial三臂30k LoRA、batch4；已完成归档",
+      "current_role": "已有标尺相关checkpoint来源"
     },
     {
       "experiment_id": "L02",
@@ -30,7 +33,10 @@
       "details": [
         "567 rollouts：A0 181/189，A1 173/189，A2 186/189。旧朝向错误的 formal_567 是同实验无效 attempt，保留审计、不用于比较。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "组件一：公制标尺",
+      "current_status_note": "A0 181/189、A1 173/189、A2 186/189；错误朝向attempt隔离",
+      "current_role": "A2对A1有配对证据；对A0的scene CI触零"
     },
     {
       "experiment_id": "L03",
@@ -44,7 +50,10 @@
       "details": [
         "30k LoRA，训练集刻度中位数固定为 12.69/17.65/14.17 px；完成、归档。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "组件一：公制标尺",
+      "current_status_note": "30k LoRA；训练集像素间距统计已保存",
+      "current_role": "公制尺度对照模型来源"
     },
     {
       "experiment_id": "L04",
@@ -58,7 +67,10 @@
       "details": [
         "A2 186/189，A3 首次 180/189；后续景深零位移复测 A3 178/189。保留复现波动，不挑成绩。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "组件一：公制标尺",
+      "current_status_note": "A2 186/189；A3首次180/189、复测178/189",
+      "current_role": "保留波动，不择优报分"
     },
     {
       "experiment_id": "L05",
@@ -72,7 +84,10 @@
       "details": [
         "1890 raw JSON/NPZ 对已完成归档。四档 OOD：A2 729/756、A3 725/756；真实 metric sparse ruler 没有稳定的景深优势证据。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "组件一：公制标尺",
+      "current_status_note": "已完成；OOD A2 729/756、A3 725/756",
+      "current_role": "公制标尺没有稳定景深优势的负证据"
     },
     {
       "experiment_id": "L06",
@@ -81,12 +96,19 @@
       "legacy_ids": [
         "Main_Comparison_v1"
       ],
-      "status": "running",
+      "status": "paused_no_complete_main_table",
       "purpose": "Main Comparison v1",
       "details": [
-        "Spatial/Object/Goal/Long × 四方法 × 三 seeds = 48 模型；full FT、30k、effective batch32。Spatial Baseline/AimBot 正在训练；其他训练在资源队列，无完整主表。"
+        "历史full-FT有部分训练记录；当前JSON修订为LoRA、preflight pending；后续记录为暂停；无完整主表"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "主方法效果与组件组合",
+      "current_status_note": "历史full-FT有部分训练记录；当前JSON修订为LoRA、preflight pending；后续记录为暂停；无完整主表",
+      "current_role": "完整方法的主效果实验，尚未完成",
+      "historical_status": "running",
+      "historical_details": [
+        "Spatial/Object/Goal/Long × 四方法 × 三 seeds = 48 模型；full FT、30k、effective batch32。Spatial Baseline/AimBot 正在训练；其他训练在资源队列，无完整主表。"
+      ]
     },
     {
       "experiment_id": "L07",
@@ -95,12 +117,16 @@
       "legacy_ids": [
         "Main_LIBERO_Plus_v1"
       ],
-      "status": "planned",
+      "status": "planned_waiting_checkpoint",
       "purpose": "Main LIBERO-Plus v1",
       "details": [
         "Level2、七类别，正式协议 2202 条任务/训练 seed；待相应 L06 checkpoint。历史单任务 Camera pilot 不能替代此主表。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "主方法效果与组件组合",
+      "current_status_note": "计划中，等待对应L06 checkpoint",
+      "current_role": "泛化评测；不使用旧相机pilot代替",
+      "historical_status": "planned"
     },
     {
       "experiment_id": "S01",
@@ -114,7 +140,10 @@
       "details": [
         "simulator RGB 朝向错误已修复；无效结果隔离。沿用正确链路，不重新跑旧错误流水线。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "数据与工程核验",
+      "current_status_note": "已修复；无效结果隔离",
+      "current_role": "有效评测流水线的来源"
     },
     {
       "experiment_id": "S02",
@@ -129,7 +158,10 @@
       "details": [
         "官方 base、Spatial 432 episodes/52970 frames、最终 29999 身份记录可复用；不下载或训练新的官方 base。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "数据与工程核验",
+      "current_status_note": "身份/数据证据已记录",
+      "current_role": "来源核验，不是方法收益"
     },
     {
       "experiment_id": "S03",
@@ -143,7 +175,10 @@
       "details": [
         "三臂 smoke 各 0/4；pilot 各 0/40。仅旧诊断记录，cue/环境路由与主协议适配未得到等价验收，不用作正式方法比较、不重跑。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "数据与工程核验",
+      "current_status_note": "旧零成功诊断；路由等价性未验收",
+      "current_role": "只留诊断历史，不用于正式比较"
     },
     {
       "experiment_id": "S04",
@@ -157,7 +192,10 @@
       "details": [
         "现存 40 条/arm、零工程错误：A0 13/40，A1 6/40，A2 5/40；单任务旧 exploratory 条件，不扩样、不充当 L07。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "组件一：公制标尺",
+      "current_status_note": "A0 13/40、A1 6/40、A2 5/40",
+      "current_role": "旧探索性失败边界，不当L07主表"
     },
     {
       "experiment_id": "S05",
@@ -171,7 +209,10 @@
       "details": [
         "直接复用 L02；A2 未显示稳定方向/单调优势。动作命令不是米，最近接近点不是实际抓取点。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "组件一：公制标尺",
+      "current_status_note": "复用旧L02；未显示稳定方向/单调优势",
+      "current_role": "行为诊断；动作命令不直接当米"
     },
     {
       "experiment_id": "S06",
@@ -185,7 +226,10 @@
       "details": [
         "严格回放 50 scenes，正确输入 hash 与 E1 一致；改尺会改动作，但没有对称连续的 metric 调节证据。初版哈希不符 attempt 不纳入结论。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "组件一：公制标尺",
+      "current_status_note": "改尺会改动作；没有对称连续的metric调节证据",
+      "current_role": "历史机制证据，保留无效attempt"
     },
     {
       "experiment_id": "S07",
@@ -200,7 +244,10 @@
       "details": [
         "GT optical depth、原动作匹配、方向与半像素中心工程证据可复用；当前四套 1693 episodes 的数据准备已完成。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "数据与工程核验",
+      "current_status_note": "已有数据准备和工程记录",
+      "current_role": "组件二/多方法共用数据来源"
     },
     {
       "experiment_id": "S08",
@@ -214,7 +261,10 @@
       "details": [
         "5k full FT，warmup10k，10 scenes×4 shifts：RGB 14/40、Depth 16/40、CameraXYZ 27/40、ActionCoord 17/40。旧 pilot 不支持 ActionCoord，不能推断合理训练预算下谁更优。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "组件二：ActionCoord",
+      "current_status_note": "旧5k full-FT、warmup10k：14/40、16/40、27/40、17/40",
+      "current_role": "旧pilot不支持ActionCoord优势；预算/输入不同，不填当前表"
     },
     {
       "experiment_id": "S09",
@@ -228,7 +278,10 @@
       "details": [
         "5k full FT：CameraXYZ+Ruler 18/40，ActionCoord+Ruler 14/40；差 −10pp，scene CI [−22.5,+2.5]pp。早期保存阻断随后修复；最终 5k checkpoint/80 raw 对可复用为历史证据。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "主方法效果与组件组合",
+      "current_status_note": "5k旧pilot：18/40与14/40；已归档",
+      "current_role": "历史探索，不填当前S23"
     },
     {
       "experiment_id": "S10",
@@ -242,7 +295,10 @@
       "details": [
         "两组均 failed、2001 条 metrics，ENOSPC。目录虽写 lora，实际配置 Nothing() freeze filter、非 LoRA gemma variants，即 full FT；无30k最终结果。不得称已完成 LoRA。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "主方法效果与组件组合",
+      "current_status_note": "两臂失败、ENOSPC；各2001条metrics；目录叫lora但实际full-FT；无30k结果",
+      "current_role": "保留失败及真实训练方式，不能计作完成的LoRA实验"
     },
     {
       "experiment_id": "S11",
@@ -256,7 +312,10 @@
       "details": [
         "正确同帧 RGB-D/geometry，warmup500/5k。最新 R2 完成5000且reload_verified；R3仅4241条metrics，进程−11退出。旧“未跑”报告已过时；无完整配对策略结果，不混用两个预算。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "组件二：ActionCoord",
+      "current_status_note": "R2完成5k并验证reload；R3约4.2k崩溃；无完整配对结论",
+      "current_role": "几何同步修复后的历史证据，不能比较不等预算"
     },
     {
       "experiment_id": "S12",
@@ -270,7 +329,10 @@
       "details": [
         "46 demonstrations 的初始目标支持为一维；10 ID+10 interpolation+10 extrapolation 通过 scripted feasibility。属于几何可行性，非 policy SR。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "组件二：ActionCoord",
+      "current_status_note": "46示范支持近一维；30个ID/插值/外推场景通过可行性",
+      "current_role": "几何预检，不是policy成功率"
     },
     {
       "experiment_id": "S13",
@@ -284,7 +346,10 @@
       "details": [
         "50帧几何与接口核验，shared translation 修正可恢复；没有策略级效果结果。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "扩展归档：锚点校正可靠性",
+      "current_status_note": "50帧几何/接口核验",
+      "current_role": "oracle几何机制，不是学习型检测器或策略收益"
     },
     {
       "experiment_id": "S14",
@@ -298,7 +363,10 @@
       "details": [
         "800/800 接受，最大恢复误差0.493mm；限定共享平移误差。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "扩展归档：锚点校正可靠性",
+      "current_status_note": "800/800接受，最大恢复误差0.493mm",
+      "current_role": "仅共享平移条件下有效"
     },
     {
       "experiment_id": "S15",
@@ -312,7 +380,10 @@
       "details": [
         "1–2锚点0/300接受；仍有9个3/4锚点已接受结果超过固定2mm误差门槛。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "扩展归档：锚点校正可靠性",
+      "current_status_note": "仍有9个接受结果超过预先2mm门槛",
+      "current_role": "核心失败证据"
     },
     {
       "experiment_id": "S16",
@@ -326,7 +397,10 @@
       "details": [
         "Huber相对mean的偏差误差−2.944mm，episode cluster CI [−2.989,−2.902]mm；仅声明已测离群模型。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "扩展归档：锚点校正可靠性",
+      "current_status_note": "已测离群模型下Huber误差更小",
+      "current_role": "鲁棒拟合机制证据"
     },
     {
       "experiment_id": "S17",
@@ -340,7 +414,10 @@
       "details": [
         "100%接受，但远处残留误差42.162mm；局部平移拟合无法保证旋转错误的全场恢复。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "扩展归档：锚点校正可靠性",
+      "current_status_note": "100%接受但远处残留42.162mm",
+      "current_role": "平移模型能力边界"
     },
     {
       "experiment_id": "S18",
@@ -354,7 +431,10 @@
       "details": [
         "深度噪声/缺失逐条件coverage与acceptance已归档；一致性检测不是深度重建。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "扩展归档：锚点校正可靠性",
+      "current_status_note": "coverage/acceptance已归档",
+      "current_role": "一致性检测，不是深度重建"
     },
     {
       "experiment_id": "S19",
@@ -368,7 +448,10 @@
       "details": [
         "anchor-only bias 对原干净场景引入7.392mm RMS；高score不能证明全场正确。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "扩展归档：锚点校正可靠性",
+      "current_status_note": "原干净场景被引入7.392mm RMS",
+      "current_role": "高分不能认证全场正确"
     },
     {
       "experiment_id": "S20",
@@ -382,7 +465,10 @@
       "details": [
         "target-only误差7.603→7.854mm，score不变。G系列严格门槛总决策NO-GO，停止扩展此分支。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "扩展归档：锚点校正可靠性",
+      "current_status_note": "误差7.603→7.854mm、score不变；G总gate NO-GO",
+      "current_role": "扩展分支停止自动推进；不混入两个组件的主结果"
     },
     {
       "experiment_id": "S21",
@@ -397,7 +483,10 @@
       "details": [
         "最坏四槽 full-state 保存恢复通过；四方法接口动作10×7有限；三套新数据cue/统计/视觉审核通过。是L06工程验收，不是正式SR。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "数据与工程核验",
+      "current_status_note": "历史full-FT工程验收通过",
+      "current_role": "不能自动视为当前LoRA gate通过，更不是正式SR"
     },
     {
       "experiment_id": "S22",
@@ -406,13 +495,20 @@
       "legacy_ids": [
         "P0-A"
       ],
-      "status": "blocked_capacity_and_launch_gates",
+      "status": "paused_partial_100_updates",
       "purpose": "无Ruler的CameraXYZ vs ActionCoord",
       "details": [
+        "LoRA尝试的CameraXYZ与ActionCoord均保留100更新完整存档；暂停；尚无配对10k结果"
+      ],
+      "priority": "P0",
+      "research_group": "组件二：ActionCoord",
+      "current_status_note": "LoRA尝试的CameraXYZ与ActionCoord均保留100更新完整存档；暂停；尚无配对10k结果",
+      "current_role": "组件二的第一层表示对照",
+      "historical_status": "blocked_capacity_and_launch_gates",
+      "historical_details": [
         "两臂都比较精确10k快照、warmup1k，同一30k cosine曲线前10k；ActionCoord快照来自S23。额外独立训练CameraXYZ一个模型。",
         "P0，协议冻结；资源/逐臂smoke/评测合约门槛前不训练。"
-      ],
-      "priority": "P0"
+      ]
     },
     {
       "experiment_id": "S23",
@@ -421,13 +517,20 @@
       "legacy_ids": [
         "P0-B"
       ],
-      "status": "blocked_capacity_and_launch_gates",
+      "status": "paused_partial_no_factorial_results",
       "purpose": "RGB / Ruler / ActionCoord / Ruler+ActionCoord",
       "details": [
+        "当前run_matrix是LoRA且`executable=false`；ActionCoord有100更新存档，Ruler-only无新正式checkpoint；暂停"
+      ],
+      "priority": "P0",
+      "research_group": "主方法效果与组件组合",
+      "current_status_note": "当前run_matrix是LoRA且`executable=false`；ActionCoord有100更新存档，Ruler-only无新正式checkpoint；暂停",
+      "current_role": "两组件贡献与交互的核心证据缺口",
+      "historical_status": "blocked_capacity_and_launch_gates",
+      "historical_details": [
         "30k full FT；复用L06同suite/seed的Baseline与RulerVLA。只新增Ruler-only和ActionCoord-only两个模型。",
         "P0，协议冻结。"
-      ],
-      "priority": "P0"
+      ]
     },
     {
       "experiment_id": "S24",
@@ -442,7 +545,10 @@
         "10k同预算，复用S22两臂快照；条件成立后新增CameraEE、ActionXYZ。",
         "P1，条件执行，不立即排训练。"
       ],
-      "priority": "P1"
+      "priority": "P1",
+      "research_group": "组件二：ActionCoord",
+      "current_status_note": "条件执行；前置S22正向主要结果未满足",
+      "current_role": "分别归因basis与origin，暂不扩训"
     },
     {
       "experiment_id": "S25",
@@ -451,13 +557,17 @@
       "legacy_ids": [
         "MAIN_INFERENCE_INTERVENTION"
       ],
-      "status": "blocked_checkpoint",
+      "status": "waiting_matching_complete_checkpoint",
       "purpose": "zero map / remove ruler / swap x-y / ruler ×.5/×2",
       "details": [
         "同一完整RulerVLA checkpoint、相同scene和推理noise；无需重训。",
         "待L06完整RulerVLA checkpoint；不能拿旧B5充当主方法。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "主方法效果与组件组合",
+      "current_status_note": "待匹配的完整RulerVLA checkpoint",
+      "current_role": "机制辅助证据，不能代替S23",
+      "historical_status": "blocked_checkpoint"
     },
     {
       "experiment_id": "S26",
@@ -472,7 +582,10 @@
         "CPU，10任务50真实训练帧；四槽/共享编码/共同mask；主实验两端逐字节一致。",
         "本轮已完成：误差<1e−15m，抽样各表示裁剪率0；零train/inference/rollout。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "数据与工程核验",
+      "current_status_note": "10任务50帧；误差<1e−15m；抽样裁剪率0；已完成",
+      "current_role": "输入正确性证据，无train/inference/rollout"
     },
     {
       "experiment_id": "S27",
@@ -487,7 +600,82 @@
         "CPU，160原raw；跨run配置与state/RGB配对通过。",
         "本轮完成：Ruler在Camera下−22.5pp，CI[−40,−7.5]；在Action下−7.5pp，CI[−25,+7.5]；交互+15pp，CI[−5,+32.5]。旧不足预算结果，不能替代S23。"
       ],
-      "priority": null
+      "priority": null,
+      "research_group": "主方法效果与组件组合",
+      "current_status_note": "已完成配对历史分析；交互+15pp，CI[−5,+32.5]；一个seed/5k旧预算",
+      "current_role": "保留阴性/不确定证据，不替代新四格"
+    },
+    {
+      "experiment_id": "L08",
+      "display_name": "L08_四套标尺",
+      "classification": "large",
+      "legacy_ids": [
+        "A_series_four_suite_v1"
+      ],
+      "status": "paused_preflight",
+      "purpose": "四套件分别训练和评测A0/A1/A2/A3",
+      "details": [
+        "16个方法×套件组合；匹配时复用旧Spatial四组，其他三套预计新增12组；统一原A系列30k LoRA/batch4/seed42，不混用主比较四槽checkpoint。"
+      ],
+      "priority": "current",
+      "research_group": "组件一：公制标尺",
+      "current_status_note": "16组合配置，seed42；暂停；旧Spatial仅在核验通过后复用",
+      "current_role": "组件一验证的四套扩展，尚未执行完成",
+      "historical_status": "paused_preparation"
+    },
+    {
+      "experiment_id": "S28",
+      "display_name": "S28_位置泛化",
+      "classification": "small",
+      "legacy_ids": [
+        "A_series_location_maps_v1"
+      ],
+      "status": "preview_complete_plan_pending",
+      "purpose": "真实训练初始目标位置与配对测试成功/失败位置图",
+      "details": [
+        "已提取Spatial task2的46个训练示范初始黑碗位置；重画旧四臂各189条件。不是新的四套件或novel-location结果。"
+      ],
+      "priority": "current",
+      "research_group": "组件一：公制标尺",
+      "current_status_note": "旧单任务预览完成；新四套全40任务位置计划待冻结",
+      "current_role": "组件一/泛化的分析工具；图本身不代表新策略结果",
+      "historical_status": "implementation_preview_complete"
+    },
+    {
+      "experiment_id": "L09",
+      "display_name": "L09_公制提示",
+      "classification": "large",
+      "legacy_ids": ["metric_cue_v1"],
+      "status": "blocked_gpu_validation",
+      "purpose": "六通道 M0/M1/M2/M3 公制提示与实测历史位移受控训练和评测",
+      "details": [
+        "Spatial 四组、三训练种子，共十二次计划训练；协议与运行矩阵在 experiments/metric_cue_v1。",
+        "真实样本输入已核验；完整模型 GPU 检查与评测场景锁定尚未通过。"
+      ],
+      "priority": "current",
+      "research_group": "六通道公制提示",
+      "current_status_note": "2026-10-25 资源门槛阻止 GPU 检查，未开始正式训练",
+      "current_role": "检验方向、公制刻度和 Motion Echo 的逐项增量"
+    },
+    {
+      "experiment_id": "S29",
+      "display_name": "S29_新位置",
+      "classification": "small",
+      "legacy_ids": ["metric_cue_position_generalization_v1"],
+      "status": "blocked_scene_lock",
+      "purpose": "六通道公制提示四组在黑碗目标位置变化条件下的配对评测",
+      "details": [
+        "使用 L09 的相同 checkpoint；测试区域分为训练支持、内部留出与外部可行位置。",
+        "既有 S28 候选位置仍待可见性、抓取碰撞和放置稳定性核验。"
+      ],
+      "priority": "current",
+      "research_group": "六通道公制提示",
+      "current_status_note": "2026-10-25 场景清单未冻结，未执行策略 rollout",
+      "current_role": "位置泛化与尺度机制分析"
     }
-  ]
+  ],
+  "previous_audited_date": "2026-10-07",
+  "current_overview": "docs/EXPERIMENT_OVERVIEW.zh.md",
+  "status_scope": "Latest verified stored records at organization time; not live process telemetry. Older details retain their historical scope.",
+  "organization_scope": "Documentation, grouping and status reconciliation only. No protocol, checkpoint or queue change; no training launch."
 }
