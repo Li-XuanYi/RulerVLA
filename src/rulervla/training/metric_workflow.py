@@ -14,6 +14,7 @@ import jax.numpy as jnp
 import numpy as np
 import optax
 
+from openpi_client import image_tools
 from openpi.models import model as model_lib
 from openpi.shared import normalize
 from openpi.training import checkpoints, config as config_lib, optimizer, weight_loaders
@@ -325,13 +326,14 @@ def state_signatures(state):
 
 def source_provenance(root):
     """Resolve imported code and capture dirty state without altering other work."""
-    import openpi.models.model
-    import openpi_client.image_tools
     root = Path(root).resolve()
     tracked = set(subprocess.check_output(['git', 'ls-files'], cwd=root, text=True).splitlines())
     changed = set(subprocess.check_output(['git', 'diff', '--name-only', 'HEAD'], cwd=root, text=True).splitlines())
     loaded = {}
-    for name, module in list(sys.modules.items()):
+    runtime_modules = dict(sys.modules)
+    runtime_modules[model_lib.__name__] = model_lib
+    runtime_modules[image_tools.__name__] = image_tools
+    for name, module in runtime_modules.items():
         filename = getattr(module, '__file__', None)
         if filename and name.startswith(('rulervla.', 'openpi.', 'openpi_client.')) and filename.endswith('.py'):
             path = Path(filename).resolve()
