@@ -3,6 +3,7 @@ from collections import deque
 import hashlib
 import json
 from pathlib import Path
+import subprocess
 import sys
 
 import numpy as np
@@ -37,8 +38,9 @@ def main():
     missing = [gate for gate in protocol['launch_gates'] if not release['gate_status'].get(gate)]
     if not release['evaluation_released'] or missing:
         raise PermissionError('Metric Cue evaluation gates remain closed: ' + ', '.join(missing))
-    from rulervla.training.metric_protocol import validate_data_audit
+    from rulervla.training.metric_protocol import validate_data_audit, validate_scene_and_simulator
     validate_data_audit(ROOT, protocol, release)
+    validate_scene_and_simulator(ROOT, protocol, release)
     if (release['paired_scene_manifest'] is None or
             args.scene_plan.resolve() != (ROOT / release['paired_scene_manifest']).resolve() or
             file_sha(args.scene_plan) != release['paired_scene_manifest_sha256']):
@@ -49,16 +51,27 @@ def main():
     if args.out.name != args.run_id:
         raise ValueError('Evaluation output directory must use the run ID')
     scene_plan = json.loads(args.scene_plan.read_text())
+    if (scene_plan['schema'] != 'rulervla_metric_paired_scene_v1'
+            or scene_plan['experiment_id'] != protocol['experiment_id']
+            or scene_plan['task_order_index'] != 0):
+        raise ValueError('Paired scene manifest has an incompatible identity or task order')
     planned = [entry for entry in scene_plan['tasks'] if entry['suite'] == 'libero_spatial']
     if len(planned) != 10 or any(len(entry['scenes']) != 50 for entry in planned):
         raise ValueError('Spatial evaluation needs ten tasks and fifty fixed scenes per task')
     from rulervla.data.simulator_source import configure_libero_source
-    configure_libero_source()
+    source_root = configure_libero_source(
+        config_path=ROOT / 'configs/metric_cue/libero_source.json')
+    source_commit = subprocess.check_output(
+        ['git', '-C', str(source_root), 'rev-parse', 'HEAD'], text=True).strip()
+    if (source_root.resolve() != Path(scene_plan['source_root']).resolve()
+            or source_commit != scene_plan['source_commit']):
+        raise ValueError('LIBERO source differs from the paired scene manifest')
     from libero.libero import benchmark, get_libero_path
     from libero.libero.envs import OffScreenRenderEnv
     from openpi_client.websocket_client_policy import WebsocketClientPolicy
     from prepare_main_spatial_geometry import capture_frame
     from rulervla.data.state_adapter import state8_from_observation
+    import torch
     client = WebsocketClientPolicy(args.host, args.port)
     if client.get_server_metadata()['run_id'] != args.run_id:
         raise ValueError('Connected policy checkpoint belongs to another run')
@@ -70,16 +83,29 @@ def main():
         task = suite.get_task(task_index)
         if task.language != entry['instruction']:
             raise ValueError('Task instruction differs from the paired scene plan')
-        init_file = Path(entry['init_states_file'])
+        init_file = (Path(get_libero_path('init_states')) / task.problem_folder /
+                     task.init_states_file).resolve()
+        if init_file != Path(entry['init_states_file']).resolve():
+            raise ValueError('Initial state path differs from the paired scene plan')
         if file_sha(init_file) != entry['init_states_file_sha256']:
             raise ValueError('Initial state file changed')
-        states = np.load(init_file, allow_pickle=False)
-        bddl = Path(get_libero_path('bddl_files')) / task.problem_folder / task.bddl_file
+        states = torch.load(init_file, map_location='cpu', weights_only=False)
+        if (not isinstance(states, np.ndarray) or states.shape != (50, 92)
+                or states.dtype != np.float64 or not np.isfinite(states).all()):
+            raise ValueError('Initial state array differs from the paired scene plan')
+        bddl = (Path(get_libero_path('bddl_files')) / task.problem_folder / task.bddl_file).resolve()
+        if bddl != Path(entry['bddl_file']).resolve() or file_sha(bddl) != entry['bddl_file_sha256']:
+            raise ValueError('BDDL task differs from the paired scene plan')
+        if [scene['scene_index'] for scene in entry['scenes']] != list(range(50)):
+            raise ValueError('Paired scene indices must cover all fifty initial states')
         env = OffScreenRenderEnv(bddl_file_name=str(bddl), camera_heights=256,
                                  camera_widths=256, camera_depths=True,
                                  render_gpu_device_id=args.render_gpu_index)
         for scene in entry['scenes']:
             scene_index = scene['scene_index']
+            if (scene['environment_seed'] != scene_plan['environment_seed_base']
+                    + task_index * 50 + scene_index):
+                raise ValueError('Environment seed differs from the paired scene rule')
             initial_state = np.ascontiguousarray(states[scene_index])
             if hashlib.sha256(initial_state.tobytes()).hexdigest() != scene['initial_state_sha256']:
                 raise ValueError('Paired initial state changed')

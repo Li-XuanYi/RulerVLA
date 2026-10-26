@@ -18,7 +18,8 @@ from rulervla.training.metric_workflow import (MetricTrainer, create_training_st
 
 
 def run_config():
-    return dict(initial_checkpoint='unused',training=dict(batch_size=1,num_steps=2,seed=42,
+    return dict(initial_checkpoint='unused',resources=dict(gpu_indices=[0]),
+        training=dict(batch_size=1,num_steps=2,seed=42,
         learning_rate=1e-4,optimizer=dict(b1=.9,b2=.95,eps=1e-8,weight_decay=1e-10,clip_gradient_norm=1.)))
 
 
@@ -37,7 +38,8 @@ class TinyActionModel(nnx.Module):
 
 
 def test_actual_workflow_optimizer_checkpoint_and_preprocessing_restore(tmp_path,sample,config):
-    sample['wrist_intrinsic']=sample['intrinsic'].copy();sample['wrist_camera_to_world']=np.eye(4)
+    sample['wrist_intrinsic']=sample['intrinsic'].copy()
+    sample['wrist_camera_to_world']=np.eye(4)
     sample['actions']=np.full((10,7),.2,np.float32)
     stats={k:NormStats(mean=np.zeros(n),std=np.ones(n),q01=-np.ones(n),q99=np.ones(n))
            for k,n in [('state',8),('actions',7)]}
@@ -64,7 +66,8 @@ def test_actual_workflow_optimizer_checkpoint_and_preprocessing_restore(tmp_path
     assert recovered.fingerprint()==pipeline.fingerprint()
     # A normalization edit must not silently change a recovered inference policy.
     stats_file=directory/'assets/physical-intelligence/libero/norm_stats.json'
-    changed=json.loads(stats_file.read_text());changed['norm_stats']['actions']['q99'][0]=3
+    changed=json.loads(stats_file.read_text())
+    changed['norm_stats']['actions']['q99'][0]=3
     stats_file.write_text(json.dumps(changed))
     with pytest.raises(ValueError,match='assets|statistics'):
         pipeline_from_checkpoint(directory)

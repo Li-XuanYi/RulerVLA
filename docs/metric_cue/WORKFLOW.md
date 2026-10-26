@@ -66,7 +66,17 @@ PYTHONPATH=src /path/to/python scripts/metric_cue_infer.py \
 
 G2 推理从 checkpoint 自身恢复几何、Ruler、Prompt 参数、SentencePiece 模型字节和统计，并核对 contract 哈希；tokenizer 不依赖恢复时的网络下载内容。显式 `--g1-weights-bridge` 仅供既有 G1 六通道权重的工程检查，不恢复 G1 优化器。
 
-正式 rollout 使用 `scripts/metric_cue_serve.py` 提供策略，并由 `scripts/metric_cue_eval.py` 读取冻结的 Spatial 配对场景。客户端在每个环境控制步提交同步的双视角 RGB-D、相机 K/T 与 state8；服务端按 episode 重置历史，再返回十步动作块，客户端每五步重新查询。两端先检查 `release.json` 的训练、场景、模拟器和资源条件。当前模拟器源码路径对 SSH 用户不可读取，在线 rollout 尚未核验或启动。
+正式 rollout 使用 `scripts/metric_cue_serve.py` 提供策略，并由 `scripts/metric_cue_eval.py` 读取冻结的 Spatial 配对场景。客户端在每个环境控制步提交同步的双视角 RGB-D、相机 K/T 与 state8；服务端按 episode 重置历史，再返回十步动作块，客户端每五步重新查询。两端先检查 `release.json` 的训练、场景、模拟器和资源条件。在线 rollout 尚未核验或启动。
+
+模拟器源码使用 `configs/metric_cue/libero_source.json` 固定 LIBERO 提交 `8f1084e`，当前检出位于 `/home/lixuanyi/XuanyiLi/work/deps/libero-8f1084`。评测端使用独立 Python 3.11 环境，依赖见 `requirements/metric-cue-eval-linux.lock`；`LIBERO_CONFIG_PATH` 指向 `configs/metric_cue/libero_runtime/`，其中指定 BDDL、初始状态和资产目录。`scripts/metric_cue_scene_plan.py` 对十个官方 Spatial 任务的 500 个初始状态逐一检查形状与有限值，并固定初始状态、BDDL 和 LIBERO 提交的哈希。配对场景记录为 `experiments/metric_cue_v1/paired_scene_manifest.json`；生成后使用以下命令核对来源：
+
+```bash
+LIBERO_CONFIG_PATH=configs/metric_cue/libero_runtime PYTHONPATH=src \
+  outputs/metric_cue_pilot/eval_venv/bin/python scripts/metric_cue_scene_plan.py \
+  --out experiments/metric_cue_v1/paired_scene_manifest.json --verify
+```
+
+评测入口使用 `torch.load` 读取 LIBERO 官方 `.pruned_init` 文件，核对各场景与冻结记录。LIBERO benchmark 和 robosuite 的导入检查已通过。`scripts/metric_cue_simulator_gate.py` 已在 Spatial task index 2、scene index 0 完成真实离屏渲染、双视角 RGB-D 与相机参数采集，以及一个控制步；运行记录位于 `outputs/metric_cue_pilot/simulator_gate_task2_scene0_20261026/receipt.json`。正式入口核对该记录和配对场景记录的哈希。位置场景有效性与完整 rollout 仍待核验。
 
 ## G3 接口
 

@@ -1,0 +1,5 @@
+benchmark_root: /home/lixuanyi/XuanyiLi/work/deps/libero-8f1084/libero/libero
+bddl_files: /home/lixuanyi/XuanyiLi/work/deps/libero-8f1084/libero/libero/bddl_files
+init_states: /home/lixuanyi/XuanyiLi/work/deps/libero-8f1084/libero/libero/init_files
+datasets: /home/lixuanyi/XuanyiLi/work/worktrees/rulervla-metric-cue/outputs/metric_cue_pilot/libero_datasets
+assets: /home/lixuanyi/XuanyiLi/work/deps/libero-8f1084/libero/libero/assets

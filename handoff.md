@@ -105,3 +105,11 @@ RulerVLA 已有实验总览、协议、run matrix 和 36 项历史实验索引�
 - [Code] 资源检查对所选设备逐卡要求空闲 32768 MiB；模型载入之后和等价检查之后再次检查。JAX 编译缓存写在被 Git 忽略的 `outputs/metric_cue_pilot/jax_compilation_cache/`。单设备原有 45000 MiB 门槛保留。门槛属于启动保护，完整更新通过后须结合实际峰值显存核验。
 - [Experiment] 两个真实 CPU JAX 设备、完整基座模型参数及真实 32 条 Spatial 样本通过分片结构、三通道参数构造和梯度累积形状检查；Ruff 与 `git diff --check` 通过。GPU 0／2 的真实完整模型等价检查进入 XLA 编译，两卡中本进程各占约 7 GiB；其他作业随后占用了两卡，进程在执行参数更新之前终止。没有取得等价检查数值、完整 GPU 梯度更新、checkpoint 恢复或峰值显存。最近一次 preflight 对 GPU 0／2 返回 `blocked`，`jax_imported=false`、`gpu_job_started=false`。
 - [Experiment] `experiments/metric_cue_v1/release.json` 中 GPU 与训练发布条件继续关闭。两张设备均满足门槛且能持续供给时，执行真实完整模型 GPU smoke、参数更新、保存恢复及显存峰值检查；保持现有其他 GPU 任务和未提交文件原样。
+
+## 2026-10-26 LIBERO 场景与模拟器条件
+
+- [Code] 在独立依赖工作树 `/home/lixuanyi/XuanyiLi/work/deps/libero-8f1084` 检出 LIBERO 提交 `8f1084e3132a39270c3a13ebe37270a43ece2a01`。评测专用 Python 3.11 环境位于被忽略的 `outputs/metric_cue_pilot/eval_venv/`，依赖版本写入 `requirements/metric-cue-eval-linux.lock`；`pip check` 和 benchmark 导入通过。
+- [Experiment] `experiments/metric_cue_v1/paired_scene_manifest.json` 冻结十个 Spatial 任务、每任务五十个官方初始状态、BDDL、场景种子及来源哈希；重复来源核验通过，SHA-256 为 `8b3788f3402f4ef0f41d4ba26fe629e6455b3d07afedfff24229097fa8fe8fe9`。官方 `.pruned_init` 文件由 `torch.load` 读取。
+- [Experiment] 真实 OSMesa 模拟器在 Spatial task index 2、scene index 0 完成初始状态设置、双视角 RGB-D、相机参数和 state8 采集，并执行一个控制步。运行记录 `outputs/metric_cue_pilot/simulator_gate_task2_scene0_20261026/receipt.json` 的 SHA-256 为 `1cc6ba376368747b3afea973af119782390097df30213be2372fb7ad4dce5a52`。该记录证明此场景的运行接口，尚未取得完整 rollout 或策略成功率。
+- [Code] 正式训练和评测入口增加配对场景记录与模拟器运行记录的哈希和内容核验；`release.json` 中对应两个条件通过。完整模型 GPU 数值、参数更新、完整状态恢复、S29 场景有效性及资源条件仍未通过；正式训练与评测保持关闭。当前资源检查没有满足两张 GPU 各空闲 32768 MiB 且 CPU 可用 100 GiB 的组合。
+- [Experiment] 配对场景来源重复核验、模拟器记录哈希核验、评测入口关闭条件和依赖完整性检查通过。固定 CPU 后运行训练资源、状态恢复和输入工作流的 12 项回归全部通过；测试临时文件写入被忽略的 `outputs/metric_cue_pilot/pytest_temp/`。
