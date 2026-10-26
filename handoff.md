@@ -114,3 +114,8 @@ RulerVLA 已有实验总览、协议、run matrix 和 36 项历史实验索引�
 - [Code] 正式训练和评测入口增加配对场景记录与模拟器运行记录的哈希和内容核验；`release.json` 中对应两个条件通过。完整模型 GPU 数值、参数更新、完整状态恢复、S29 场景有效性及资源条件仍未通过；正式训练与评测保持关闭。当前资源检查没有满足两张 GPU 各空闲 32768 MiB 且 CPU 可用 100 GiB 的组合。
 - [Experiment] 配对场景来源重复核验、模拟器记录哈希核验、评测入口关闭条件和依赖完整性检查通过。固定 CPU 后运行训练资源、状态恢复和输入工作流的 12 项回归全部通过；测试临时文件写入被忽略的 `outputs/metric_cue_pilot/pytest_temp/`。
 - [Experiment] 读取主工作树 `outputs/a_series_four_suite_v1/S28_workspace_v1/` 的现有候选记录，`plan.json` 与 `candidate_initial_states.npz` 的 SHA-256 分别为 `a2477a02d481c4e57d0d25d7fc1ace673910f3ac58a2fdfc4a3022c5f7cd90b5` 和 `3f96a1573d041825bcafef6bbddffeec2210846c2ff1f1dcbcb9a60ec612a8d0`，训练位置文件的哈希与计划所记一致。99 个候选位置中 27 个通过既有几何筛选；遮挡、抓取过程碰撞、放置稳定性及最终分组尚未完成实际核验，S29 场景条件继续关闭。
+
+## 2026-10-26 标尺与 Motion Echo 视觉示例
+
+- [Experiment] 使用真实 LIBERO Spatial 黑碗样本 `outputs/metric_cue_pilot/real_sample_1261.npz`，SHA-256 为 `b588df1e3024159b81fecb6fbf8306dd622e00e51358bfc9bfca8b3c51880c56`；当前为 episode 1261 控制帧 20，实测历史为控制帧 15 至 20，EE 位移 `[0.0556159038, 0.0008702865, -0.0393905640]` 米。
+- [Code/Experiment] `scripts/metric_cue_visual_demo.py` 使用现有 `MetricViewAdapter` 分别生成 M2 标尺、空白标尺加真实 Echo、M3 标尺加 Echo。三种情况的双视角 RGB 逐值相同，Echo 在两个视角均已渲染。图像和来源记录位于被忽略的 `outputs/metric_cue_pilot/visual_demo_20261026/rendered/`，包含三张独立 PNG、对照图和 `manifest.json`。上排 RGB 叠加仅用于观察；下排显示实际三通道 Cue。Echo 单独示例是可视化组合，当前 L09 运行矩阵没有对应训练组。
