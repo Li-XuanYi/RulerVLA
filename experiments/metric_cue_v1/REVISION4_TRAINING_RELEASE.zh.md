@@ -1,0 +1,13 @@
+# Revision4：标准Spatial训练与S29评测分开准入
+
+[Code] 用户已在当前会话确认“修订协议，先训练L09”。revision4保留launch_gates用于训练，新增evaluation_launch_gates用于两个评测入口；S29 position_scene_validity_lock保持false，评测发布保持false，训练发布为true。
+
+[Code] protocol SHA-256为c924ef9cdf7ae2de11760371baf525d845edc4275020ec1eae6d68286e29e0e1。revision3的protocol、run matrix和release原字节归档于revisions/r3/frozen_inputs.tar.gz，归档SHA-256为4bcb3b1e4b2aef86e26affa1750105a4e0b14bd5b2024179e2f6c3fdf6ffbdd2。
+
+[Experiment] 直接读取归档并逐项比较，training、data、method、evaluation和position_generalization均与revision3相同；训练gates仅移出position_scene_validity_lock，评测gates保留完整九项。证明记录为outputs/metric_cue_pilot/L09_launch_r4/scope_preservation.json。
+
+[Experiment] 修改前6项训练/评测行为检查失败；最终真实配置、完整模型静态形状、内存、Ruler和Echo回归43项通过。新增真实CLI检查复现并修复receipt身份错误被误当资源不足无限等待的问题，输入错误现立即退出且不导入JAX。两个真实评测CLI仍返回position_scene_validity_lock未通过。日志在outputs/metric_cue_pilot/L09_launch_r4/，不使用mock或小模型替身。
+
+[Code] scripts/metric_cue_launch.py为一次正式运行等待资源：每轮重新检查冻结协议和真实数据，再选择满足双卡要求的GPU并执行同一个正式CLI。等待阶段不导入JAX、不加载权重；资源标准仍为每张GPU28 GiB、CPU160 GiB。全局run ID文件锁跨exec保留，避免重复启动。正式入口仍执行自己的即时预检，任何运行错误均明确退出。
+
+[Scope] 首次运行L09_spatial_M2_seed42从已验证pi05_base开始；batch8、microbatch1、累积8、EMA .999、full fine-tuning、CPU AdamW、双卡FSDP、30k、最终30000 checkpoint选择和全部对照保持不变。S29定义和验收须在评测前完成，训练不接触S29场景或策略反馈。

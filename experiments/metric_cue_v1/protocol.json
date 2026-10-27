@@ -1,7 +1,7 @@
 {
   "schema": "rulervla_metric_cue_v1",
-  "revision": 3,
-  "previous_revision_archive": "experiments/metric_cue_v1/revisions/r2/frozen_inputs.tar.gz",
+  "revision": 4,
+  "previous_revision_archive": "experiments/metric_cue_v1/revisions/r3/frozen_inputs.tar.gz",
   "method": {
     "ruler": "positive_world_xyz_0_to_15cm_equal_5cm_ticks_no_arrows",
     "direction_length_px": 28,
@@ -9,7 +9,7 @@
     "loss": "original_flow_matching"
   },
   "experiment_id": "L09",
-  "status": "blocked_gpu_validation",
+  "status": "training_released_evaluation_scene_lock_pending",
   "research_plan_sha256": "de5e268fd382b1541eb0eb7a3b2ed5bf3de0e3d6b427f92203536423298238e0",
   "research_question": "六通道动作坐标方向、公制刻度和实测五步历史位移对 LIBERO Spatial 任务成功率的贡献",
   "arms": {
@@ -112,6 +112,16 @@
     ]
   },
   "launch_gates": [
+    "real_arm_input_contract",
+    "full_dataset_integrity",
+    "full_model_gpu_zero_cue_equivalence",
+    "full_model_gpu_gradient_and_optimizer_update",
+    "full_state_checkpoint_restore",
+    "paired_scene_manifest_lock",
+    "simulator_runtime_verified",
+    "resource_preflight"
+  ],
+  "evaluation_launch_gates": [
     "real_arm_input_contract",
     "full_dataset_integrity",
     "full_model_gpu_zero_cue_equivalence",

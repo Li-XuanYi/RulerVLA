@@ -120,6 +120,7 @@ def preflight(value, *, gpu_query=query_gpus, file_probe=probe_file):
     elif checkpoint.get('sha256') != next((item['sha256'] for item in receipt.get('json', {}).get('files', [])
                                           if item['path'] == '_METADATA'), None):
         reasons.append('Initial checkpoint metadata does not match the verified base artifact')
+    input_reasons = list(reasons)
     gpus = gpu_query()
     resource = value['resources']
     selected = resource['gpu_indices']
@@ -140,6 +141,7 @@ def preflight(value, *, gpu_query=query_gpus, file_probe=probe_file):
         if available < resource.get('min_cpu_available_gib', 100):
             reasons.append('CPU memory below the optimizer-offload threshold')
     return dict(schema='rulervla_metric_preflight_v1', launch_allowed=not reasons, blockers=reasons,
+                input_blockers=input_reasons, resource_blockers=reasons[len(input_reasons):],
                 data=data, norm_stats=norm, norm_source={k:v for k,v in norm_source.items() if k!='json'},
                 checkpoint_metadata=checkpoint, checkpoint_receipt={k:v for k,v in receipt.items() if k!='json'},
                 gpu_snapshot=gpus, selected_gpu_indices=selected,

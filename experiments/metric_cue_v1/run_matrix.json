@@ -1,9 +1,9 @@
 {
   "schema": "rulervla_metric_cue_run_matrix_v1",
-  "protocol_revision": 3,
-  "protocol_sha256": "a5188add4e9839c17de991a8062fb780f50c8ca3a7f967cafcd91ad9cc2b80e4",
+  "protocol_revision": 4,
+  "protocol_sha256": "c924ef9cdf7ae2de11760371baf525d845edc4275020ec1eae6d68286e29e0e1",
   "experiment_id": "L09",
-  "status": "planned_blocked_position_scene_validity",
+  "status": "training_released_pending_live_resources",
   "runs": [
     {
       "run_id": "L09_spatial_M0_seed42",
@@ -45,9 +45,9 @@
       "run_id": "L09_spatial_M2_seed42",
       "arm": "M2",
       "seed": 42,
-      "status": "blocked",
+      "status": "waiting_resources",
       "receipt": "experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_start.json",
-      "current_blockers": ["position_scene_validity_lock"],
+      "current_blockers": ["resource_preflight_at_launch"],
       "engineering_smoke_receipt": "experiments/metric_cue_v1/receipts/L09_gpu_smoke_node147_20261027.json"
     },
     {

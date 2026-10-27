@@ -72,6 +72,13 @@ def require_arm_ruler(root, arm, run, protocol):
         raise ValueError('Requested ruler differs from the frozen formal arm')
 
 
+def require_evaluation_release(protocol, release):
+    missing = [gate for gate in protocol['evaluation_launch_gates']
+               if not release['gate_status'].get(gate)]
+    if not release['evaluation_released'] or missing:
+        raise PermissionError('Metric Cue evaluation gates remain closed: ' + ', '.join(missing))
+
+
 def load_formal_metric_run(root, arm, seed, run):
     root = Path(root).resolve()
     protocol_path = root / 'experiments/metric_cue_v1/protocol.json'

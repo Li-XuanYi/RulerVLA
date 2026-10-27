@@ -35,9 +35,8 @@ def main():
     release = json.loads((protocol_path.parent / 'release.json').read_text())
     if release['protocol_sha256'] != file_sha(protocol_path):
         raise ValueError('Evaluation release belongs to another protocol revision')
-    missing = [gate for gate in protocol['launch_gates'] if not release['gate_status'].get(gate)]
-    if not release['evaluation_released'] or missing:
-        raise PermissionError('Metric Cue evaluation gates remain closed: ' + ', '.join(missing))
+    from rulervla.training.metric_protocol import require_evaluation_release
+    require_evaluation_release(protocol, release)
     from rulervla.training.metric_protocol import validate_data_audit, validate_scene_and_simulator
     validate_data_audit(ROOT, protocol, release)
     validate_scene_and_simulator(ROOT, protocol, release)

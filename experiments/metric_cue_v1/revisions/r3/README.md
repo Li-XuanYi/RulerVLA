@@ -1,0 +1,3 @@
+# Revision3原字节归档
+
+frozen_inputs.tar.gz保存修订前protocol、run matrix及release。归档SHA-256为4bcb3b1e4b2aef86e26affa1750105a4e0b14bd5b2024179e2f6c3fdf6ffbdd2；其中protocol原始SHA-256为a5188add4e9839c17de991a8062fb780f50c8ca3a7f967cafcd91ad9cc2b80e4。revision4只调整训练与评测准入的适用范围，原实验配方及数据不变。

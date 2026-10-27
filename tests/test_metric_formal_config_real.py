@@ -44,14 +44,30 @@ def test_protocol_and_release_match_saved_sources():
     plan = ROOT / "docs/metric_cue/RESEARCH_PLAN.md"
     assert protocol["research_plan_sha256"] == hashlib.sha256(plan.read_bytes()).hexdigest()
     assert release["protocol_sha256"] == hashlib.sha256(protocol_bytes).hexdigest()
-    assert not release["training_released"] and not release["evaluation_released"]
+    assert release["training_released"] and not release["evaluation_released"]
 
 
 @pytest.mark.parametrize("arm", ["M0", "M1", "M2", "M3"])
-def test_formal_training_stops_at_closed_gates_after_config_loading(arm):
+def test_training_admits_audited_spatial_data_before_s29_evaluation(arm):
     run = load_run_config(ROOT / "configs/metric_workflow.yaml")
-    with pytest.raises(PermissionError, match="gates remain closed"):
-        load_formal_metric_run(ROOT, arm, 42, run)
+    actual, protocol = load_formal_metric_run(ROOT, arm, 42, run)
+    assert actual["formal_run_id"] == f"L09_spatial_{arm}_seed42"
+    assert actual["training"]["batch_size"] == 8
+    assert actual["training"]["num_steps"] == 30000
+    assert actual["training"]["ema_decay"] == .999
+    assert protocol["position_generalization"]["experiment_id"] == "S29"
+
+
+def test_evaluation_stays_closed_with_training_release():
+    from rulervla.training.metric_protocol import require_evaluation_release
+
+    protocol = json.loads((FAMILY / "protocol.json").read_text())
+    release = json.loads((FAMILY / "release.json").read_text())
+    assert not release["gate_status"]["position_scene_validity_lock"]
+    with pytest.raises(PermissionError, match="position_scene_validity_lock"):
+        require_evaluation_release(protocol, release)
+    with pytest.raises(PermissionError, match="position_scene_validity_lock"):
+        require_evaluation_release(protocol, dict(release, evaluation_released=True))
 
 
 def test_batch8_real_inputs_and_full_model_gradient_shapes():
@@ -95,3 +111,26 @@ def test_batch8_real_inputs_and_full_model_gradient_shapes():
         leaf.shape for leaf in jax.tree.leaves(expected)
     ]
     assert metrics["cue_grad_l2"].shape == () and metrics["gradients_finite"].shape == ()
+
+def test_launcher_fails_fast_for_real_checkpoint_receipt_identity_mismatch(tmp_path):
+    import subprocess
+    import sys
+    import yaml
+
+    run = yaml.safe_load((ROOT / "configs/metric_workflow.yaml").read_text())
+    run["checkpoint_receipt_sha256"] = run["norm_stats_sha256"]
+    config = tmp_path / "receipt_mismatch.yaml"
+    config.write_text(yaml.safe_dump(run))
+    out = tmp_path / "L09_spatial_M2_seed42"
+    wait = tmp_path / "launch"
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "scripts/metric_cue_launch.py"),
+         "--config", str(config), "--arm", "M2", "--seed", "42",
+         "--gpu-candidates", "0", "1", "--out", str(out),
+         "--wait-dir", str(wait), "--poll-seconds", "15"],
+        capture_output=True, text=True, timeout=12, cwd=ROOT)
+    assert result.returncode != 0
+    assert "Initial checkpoint source receipt hash mismatch" in result.stderr
+    status = json.loads((wait / "status.json").read_text())
+    assert status["state"] == "blocked_inputs"
+    assert not status["jax_imported"] and not out.exists()
