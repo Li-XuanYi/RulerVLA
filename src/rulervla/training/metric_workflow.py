@@ -13,10 +13,11 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import optax
+import orbax.checkpoint as ocp
 
 from openpi_client import image_tools
 from openpi.models import model as model_lib
-from openpi.shared import normalize
+from openpi.shared import array_typing as at, normalize
 from openpi.training import checkpoints, config as config_lib, optimizer, sharding, weight_loaders
 from openpi.training.utils import TrainState
 from rulervla.adapters.metric_pipeline import MetricPipeline, metric_model_config, tokenizer_from_asset
@@ -287,6 +288,17 @@ def save_training_checkpoint(manager, state, pipeline, config, run_manifest):
     return directory
 
 
+def checkpoint_restore_arguments(state):
+    with at.disable_typechecking():
+        train_state, inference_params = checkpoints._split_params(state)
+        items = {"train_state": train_state, "params": {"params": inference_params}}
+        kwargs = {
+            name: {"restore_args": ocp.checkpoint_utils.construct_restore_args(item)}
+            for name, item in items.items()
+        }
+    return items, kwargs
+
+
 def restore_training_checkpoint(manager, state, pipeline, config, *, step, expected_manifest=None):
     directory = Path(manager.directory)/str(step)
     metadata = json.loads((directory/'metric_workflow.json').read_text())
@@ -300,7 +312,14 @@ def restore_training_checkpoint(manager, state, pipeline, config, *, step, expec
                     'dependency_lock_sha256'):
             if metadata['run_manifest'].get(key) != expected_manifest.get(key):
                 raise ValueError('Checkpoint data/source identity differs: '+key)
-    restored = checkpoints.restore_state(manager, state, None, step=step)
+    with at.disable_typechecking():
+        items, restore_kwargs = checkpoint_restore_arguments(state)
+        values = manager.restore(step, items=items, restore_kwargs=restore_kwargs)
+        restored = checkpoints._merge_params(values["train_state"], values["params"])
+    device = jax.tree.leaves(state.params)[0].sharding.device_set
+    if len(device) != 1:
+        raise ValueError("Checkpoint restore requires one optimizer device")
+    require_training_state_device(restored, next(iter(device)))
     require_trainable_cue(restored.params, config.trainable_filter)
     require_cue_optimizer(restored.opt_state)
     return restored

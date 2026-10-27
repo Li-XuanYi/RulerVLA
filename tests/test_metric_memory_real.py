@@ -56,3 +56,20 @@ def test_shape_template_cannot_be_hashed_as_restored_values():
     state = nnx.state(nnx.eval_shape(config.model.create, jax.random.key(42)))
     with pytest.raises((TypeError, ValueError)):
         metric_workflow.state_signatures(state)
+
+def test_full_model_checkpoint_restore_arguments_include_cpu_sharding():
+    run = load_run_config(ROOT / "configs/metric_workflow_pilot.yaml")
+    config = metric_workflow.make_training_config(run)
+    cpu = jax.devices("cpu")[0]
+    template = metric_workflow.training_state_template(config, cpu)
+    items, kwargs = metric_workflow.checkpoint_restore_arguments(template)
+    assert set(items) == {"train_state", "params"}
+    for name, item in items.items():
+        targets = jax.tree.leaves(item)
+        arguments = jax.tree.leaves(kwargs[name]["restore_args"])
+        assert len(targets) == len(arguments) and targets
+        for target, argument in zip(targets, arguments, strict=True):
+            assert argument.restore_type is jax.Array
+            assert argument.sharding.device_set == {cpu}
+            assert argument.global_shape == target.shape
+            assert argument.dtype == target.dtype

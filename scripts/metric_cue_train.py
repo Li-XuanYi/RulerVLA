@@ -175,6 +175,7 @@ def main():
         require_current_capacity('before_checkpoint_save')
         stage('save_full_training_state')
         expected = state_signatures(state)
+        (args.out/'full_state_expected_sha256.json').write_text(json.dumps(expected, indent=2))
         completed_step = int(state.step)
         saved = save_training_checkpoint(manager, state, pipeline, config, provenance)
         template = abstract_training_state(state, cpu)

@@ -13,9 +13,17 @@ data:
   geometry_manifest_sha256: f09a5d2b021058d51f54e54fb54e1222f8d1202eff805c6ba96efee00cbb0e9e
 training:
   seed: 42
-  batch_size: 1
-  num_steps: 2
-  learning_rate: 1.0e-05
+  batch_size: 8
+  num_steps: 30000
+  micro_batch_size: 1
+  gradient_accumulation: 8
+  ema_decay: 0.999
+  scheduler:
+    name: warmup_cosine
+    warmup_updates: 1000
+    peak_lr: 0.00005
+    end_lr: 0.000005
+    decay_updates: 30000
   optimizer:
     b1: 0.9
     b2: 0.95
@@ -24,10 +32,11 @@ training:
     clip_gradient_norm: 1.0
 resources:
   gpu_indices:
-  - 7
+  - 2
+  - 5
   min_free_mib: 45000
-  min_free_mib_fsdp: 32768
-  min_cpu_available_gib: 100
+  min_free_mib_fsdp: 28672
+  min_cpu_available_gib: 128
   cpu_optimizer: true
 gpu_equivalence:
   vision_atol: 0.02

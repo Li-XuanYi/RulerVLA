@@ -35,8 +35,8 @@ resources:
   - 2
   - 5
   min_free_mib: 45000
-  min_free_mib_fsdp: 20480
-  min_cpu_available_gib: 72
+  min_free_mib_fsdp: 28672
+  min_cpu_available_gib: 128
   cpu_optimizer: true
 gpu_equivalence:
   vision_atol: 0.02
