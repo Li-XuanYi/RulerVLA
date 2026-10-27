@@ -12,9 +12,9 @@
 
 `protocol.json` 固定十二次训练、数据身份、共同配方、标准 Spatial 评测口径与进入实验的条件。`run_matrix.json` 保存全部计划运行。`release.json` 保存当前条件的核验状态。每次训练结果进入 `outputs/metric_cue_pilot/<run_id>/`；该目录中的 run manifest、模型 checkpoint 和实际执行记录需要在结果分析时核对。
 
-[Protocol r3] 当前共同配方采用有效 batch8、microbatch1、梯度累积8、30000次更新。工程与数据预算评估见 [batch8 评估](BATCH8_30K_ASSESSMENT.zh.md)。八条输入与完整模型静态梯度形状已经核验；GPU 实际更新、峰值显存、吞吐量和策略 SR 尚无验证结果。
+[Protocol r3] 当前共同配方为effective batch8、microbatch1、累积8、30000次更新。源码8a699dc已在vla_7_6000完成M2两次真实更新、GPU零Cue等价、CPU设备恢复及207个数组的SHA-256一致性核验；CPU峰值121.304 GiB，GPU采样峰值约21.2 GiB/卡。工程receipt见receipts/L09_gpu_smoke_node147_20261027.json，平台和资源说明见PLATFORM_BLACKWELL_R1.zh.md与RESOURCE_AND_SOURCE_FREEZE.zh.md。正式训练等待位置场景有效性，策略SR及稳定吞吐尚未验证。
 
-当前四组真实输入、连续专家动作、M3 历史状态以及完整基座模型的 CPU 载入已经核验。432 个训练 episode、52970 帧的 RGB-D 与几何文件逐一完成哈希和内容检查，记录位于 `outputs/metric_cue_pilot/full_data_audit_20261025/`。标准 Spatial 的十个任务、每任务五十个官方初始状态已按 LIBERO 提交 `8f1084e` 锁定在 `paired_scene_manifest.json`，包含 BDDL、初始状态文件和全部 500 个状态的哈希。指定黑碗任务的 scene index 0 已完成真实离屏渲染、双视角 RGB-D 与相机参数采集，以及一个控制步，记录位于 `outputs/metric_cue_pilot/simulator_gate_task2_scene0_20261026/receipt.json`。完整模型 GPU 更新、零提示数值等价、checkpoint 恢复、位置场景有效性和完整 rollout 尚无通过记录，训练与评测发布标志保持关闭。
+当前四组真实输入、连续专家动作、M3 历史状态以及完整基座模型的 CPU 载入已经核验。432 个训练 episode、52970 帧的 RGB-D 与几何文件逐一完成哈希和内容检查，记录位于 `outputs/metric_cue_pilot/full_data_audit_20261025/`。标准 Spatial 的十个任务、每任务五十个官方初始状态已按 LIBERO 提交 `8f1084e` 锁定在 `paired_scene_manifest.json`，包含 BDDL、初始状态文件和全部 500 个状态的哈希。指定黑碗任务的 scene index 0 已完成真实离屏渲染、双视角 RGB-D 与相机参数采集，以及一个控制步，记录位于 `outputs/metric_cue_pilot/simulator_gate_task2_scene0_20261026/receipt.json`。完整模型GPU更新、零Cue等价和checkpoint恢复已通过；位置场景有效性和完整rollout尚未通过，训练与评测发布标志保持关闭。
 
 训练输入使用 `scripts/metric_cue_full_data_audit.py` 核对完整数据；`tests/real_metric_arm_contract.py` 检查实际样本、正式批次、模型输入和在线会话。训练入口为 `scripts/metric_cue_train.py`。在线服务与模拟器客户端分别位于 `scripts/metric_cue_serve.py`、`scripts/metric_cue_eval.py`；两个入口在发布条件未通过时直接停止。模拟器使用独立 Python 3.11 环境和指定提交的 LIBERO 源码，依赖版本见 `requirements/metric-cue-eval-linux.lock`。LIBERO benchmark、robosuite 与单场景离屏运行已核验；完整 rollout 尚未运行。
 

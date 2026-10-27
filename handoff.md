@@ -1,12 +1,13 @@
 # Handoff
 
-## 2026-10-27 源码冻结与资源修复
+## 2026-10-27 MetricRuler 异节点 GPU 验证完成
 
-- [Code] CPU optimizer 对状态和梯度使用 JAX buffer donation，EMA 初始缓冲独立；完整 checkpoint 恢复先释放旧状态并使用抽象模板，resume不再加载基座及额外完整状态。运行中预算按空闲量加本进程占用计算，初始预检仍使用实际空闲量。
-- [Experiment] 当前真实π0.5静态形状核算：参数3,354,111,248个，FP32参数约12.5GiB；参数、AdamW及EMA常驻约50GiB，状态加完整梯度约62.5GiB。该值不包含全部临时缓冲，实测峰值尚待GPU运行。40项CPU回归通过，日志在outputs/metric_cue_pilot/resource_fix/verified.log。
-- [Code] 工程pilot对齐M2、seed42、batch8、microbatch1、累计8、EMA .999与正式warmup-cosine，执行两次更新和完整保存恢复；初始预算每卡20GiB、CPU72GiB。真实入口的旧batch32断言已改为读取revision3协议。
-- [Experiment] 用户提出使用其他节点；vla_6_6000的RTX PRO6000 Blackwell及CPU可作为候选，JAX/JAXlib0.5.3、Flax0.10.2、Orbax0.11.13匹配。使用独立运行目录，同一源码提交；权重与checkpoint放在NAS的/home/Dataset2/yqt/rulervla/metric_cue_runs，启动前重新检查资源，保留原有作业。
-- [Code] 本轮将提交实际导入的运行时及相关配置、测试和文档，继续强制source_provenance。正式release仍关闭，位置场景有效性及当前源码GPU更新/恢复须分别验收。
+- [Code] 运行时源码已提交并通过source_provenance，实际完整smoke提交为8a699dca1d3bee962b26e1ab0fe1bdb704b0a9c7。当前与旧工作流配置统一为batch8、microbatch1、累积8、EMA .999、warmup-cosine和双卡FSDP；CPU optimizer使用输入缓冲复用，恢复使用显式CPU sharding抽象模板，保存前写入期望签名。
+- [Experiment] vla_7_6000（ZjuServer147）GPU1/3完成M2 seed42的GPU零Cue等价、两次完整π0.5更新、非零且有限的Cue梯度、完整checkpoint保存及CPU恢复。207个状态数组SHA-256全部一致；CPU峰值121.304 GiB，GPU每秒采样峰值21662/21660 MiB。后续准入每卡28 GiB、CPU160 GiB。
+- [Code/Experiment] 独立运行树为/home/lixuanyi/XuanyiLi/metric_cue_runtime/RulerVLA，Python为同级environment/.venv/bin/python。Blackwell需要进程级LD_PRELOAD选择已锁定的NCCL2.28.9+cuda12.9，并将环境CUDA12.9.41 ptxas置于PATH前部。实际库版本、哈希及进程环境已记录；源共享环境保持原位。
+- [Experiment] receipt为experiments/metric_cue_v1/receipts/L09_gpu_smoke_node147_20261027.json；原始目录outputs/metric_cue_pilot/node147_M2_batch8_8a699dc，checkpoint为checkpoints/2。运行树outputs指向/home/Dataset2/yqt/rulervla/metric_cue_runs；基座20个文件逐一验证，数据审计、真实输入与模拟器receipt已同步并核验哈希。旧失败日志与checkpoint保留。
+- [Experiment] 主开发树41项CPU回归通过，日志outputs/metric_cue_pilot/resource_fix/restore_final.log；独立运行树已有14项CPU检查。GPU两步耗时135.47/80.35秒，仅有一个编译后的更新观察，稳定吞吐尚未建立。
+- [Code] release更新GPU等价、更新、恢复和资源gates为通过，training_released/evaluation_released继续为false；正式30k训练仍等待position_scene_validity_lock，当前没有训练或采样监视进程。冻结protocol revision3及其SHA-256保持原字节。
 
 ## 2026-10-27 冒烟失败原因核查
 

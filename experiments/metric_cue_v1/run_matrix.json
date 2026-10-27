@@ -3,7 +3,7 @@
   "protocol_revision": 3,
   "protocol_sha256": "a5188add4e9839c17de991a8062fb780f50c8ca3a7f967cafcd91ad9cc2b80e4",
   "experiment_id": "L09",
-  "status": "planned_blocked_gpu_validation",
+  "status": "planned_blocked_position_scene_validity",
   "runs": [
     {
       "run_id": "L09_spatial_M0_seed42",
@@ -46,7 +46,9 @@
       "arm": "M2",
       "seed": 42,
       "status": "blocked",
-      "receipt": "experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_start.json"
+      "receipt": "experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_start.json",
+      "current_blockers": ["position_scene_validity_lock"],
+      "engineering_smoke_receipt": "experiments/metric_cue_v1/receipts/L09_gpu_smoke_node147_20261027.json"
     },
     {
       "run_id": "L09_spatial_M2_seed43",
