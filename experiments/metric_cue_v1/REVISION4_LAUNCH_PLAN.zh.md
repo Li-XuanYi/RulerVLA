@@ -20,8 +20,8 @@
 
 ## 执行步骤
 
-- [ ] 修改tests/test_metric_formal_config_real.py，使用真实数据审计及GPUreceipt证明训练准入；验证评测在S29未通过时拒绝启动。先运行并记录预期失败。
-- [ ] 归档revision3 protocol/run matrix/release，更新revision4及对应SHA；更新metric_protocol.py的评测检查并接入metric_cue_eval.py、metric_cue_serve.py。
-- [ ] 运行真实配置、完整模型静态形状、内存与渲染回归；运行两个真实评测CLI确认在CUDA导入前拒绝请求。
-- [ ] 提交和部署冻结源码。运行单次正式启动器，实时检查资源，保存身份和原始日志；实际训练出现更新后才报告已启动。
-- [ ] 更新run matrix、registry和主仓库/开发树handoff，记录实际进程、更新数和剩余评测条件。
+- [x] 修改tests/test_metric_formal_config_real.py，使用真实数据审计及GPUreceipt证明训练准入；验证评测在S29未通过时拒绝启动。先运行并记录预期失败。
+- [x] 归档revision3 protocol/run matrix/release，更新revision4及对应SHA；更新metric_protocol.py的评测检查并接入metric_cue_eval.py、metric_cue_serve.py。
+- [x] 运行真实配置、完整模型静态形状、内存与渲染回归；运行两个真实评测CLI确认在CUDA导入前拒绝请求。
+- [x] 提交和部署冻结源码。运行单次正式启动器，实时检查资源，保存身份和原始日志；实际训练出现更新后才报告已启动。
+- [x] 更新run matrix、registry和主仓库/开发树handoff，记录实际进程、更新数和剩余评测条件。

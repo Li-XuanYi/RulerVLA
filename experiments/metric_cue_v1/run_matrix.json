@@ -3,7 +3,7 @@
   "protocol_revision": 4,
   "protocol_sha256": "c924ef9cdf7ae2de11760371baf525d845edc4275020ec1eae6d68286e29e0e1",
   "experiment_id": "L09",
-  "status": "training_released_pending_live_resources",
+  "status": "running_M2_seed42",
   "runs": [
     {
       "run_id": "L09_spatial_M0_seed42",
@@ -45,9 +45,14 @@
       "run_id": "L09_spatial_M2_seed42",
       "arm": "M2",
       "seed": 42,
-      "status": "waiting_resources",
-      "receipt": "experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_start.json",
-      "current_blockers": ["resource_preflight_at_launch"],
+      "status": "running",
+      "receipt": "experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_launch_r4.json",
+      "previous_start_receipt": "experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_start.json",
+      "current_blockers": [],
+      "host": "vla_7_6000",
+      "gpu_indices": [0, 4],
+      "pid": 216052,
+      "observed_optimizer_updates": 6,
       "engineering_smoke_receipt": "experiments/metric_cue_v1/receipts/L09_gpu_smoke_node147_20261027.json"
     },
     {

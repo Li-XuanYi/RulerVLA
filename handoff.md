@@ -1,5 +1,14 @@
 # Handoff
 
+## 2026-10-27 L09 revision4 正式训练已启动
+
+- [Code] 用户明确确认修订协议先训练L09，S29位置场景有效性保留为评测条件。当前protocol revision4 SHA-256为c924ef9cdf7ae2de11760371baf525d845edc4275020ec1eae6d68286e29e0e1；revision3原字节归档于experiments/metric_cue_v1/revisions/r3/frozen_inputs.tar.gz。模型、数据、训练配方、checkpoint选择及评测定义经归档比对均未改变。
+- [Experiment] L09_spatial_M2_seed42已在vla_7_6000 GPU0/4正式运行，PID216052，冻结运行代码e50e61c0fe9475f70a1b74ab62523325a1061983；已核实至少6次优化器更新，目标30000。第6次loss0.10732248、Cue梯度L2 0.02945974、梯度有限，该次更新23.64秒。此为启动观察，不表示训练完成或稳定吞吐。
+- [Code] 配方为full fine-tuning、batch8、microbatch1、累计8、EMA .999、原warmup-cosine、CPU AdamW、双卡FSDP。源自已验证pi05_base，工程smoke更新不计入正式预算；计划10000/20000/30000保存完整checkpoint。
+- [Experiment] 运行树/home/lixuanyi/XuanyiLi/metric_cue_runtime/RulerVLA，输出及原始metrics位于outputs/metric_cue_pilot/L09_spatial_M2_seed42；启动日志为同级L09_spatial_M2_seed42.launch.log，启动器准入记录为L09_spatial_M2_seed42_launch_r4。outputs仍指向共享NAS。对应receipt为experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_launch_r4.json，绑定run manifest SHA-256 d5633b61e4aa6d0fb7552c8000d27876820743e79a921bbbd127a8584a717ab8。
+- [Experiment] 最终43项真实回归通过，两个真实评测CLI均被position_scene_validity_lock拒绝；日志在outputs/metric_cue_pilot/L09_launch_r4/。启动器对真实输入/receipt身份错误立即退出，只有容量不足才等待；flock跨exec保留。JAX日志存在部分donated buffers不可复用警告，训练已持续更新，原始警告保留。
+- [Code] training_released=true，evaluation_released=false，position_scene_validity_lock=false。不改变活动运行树的源码和Git HEAD；后续文档记录提交保留在主开发树，恢复正式训练须使用e50e61c冻结运行时及同一manifest身份。
+
 ## 2026-10-27 MetricRuler 异节点 GPU 验证完成
 
 - [Code] 运行时源码已提交并通过source_provenance，实际完整smoke提交为8a699dca1d3bee962b26e1ab0fe1bdb704b0a9c7。当前与旧工作流配置统一为batch8、microbatch1、累积8、EMA .999、warmup-cosine和双卡FSDP；CPU optimizer使用输入缓冲复用，恢复使用显式CPU sharding抽象模板，保存前写入期望签名。

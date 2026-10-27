@@ -1,0 +1,50 @@
+{
+  "schema": "rulervla_metric_formal_launch_receipt_v1",
+  "experiment_id": "L09",
+  "run_id": "L09_spatial_M2_seed42",
+  "protocol_revision": 4,
+  "protocol_sha256": "c924ef9cdf7ae2de11760371baf525d845edc4275020ec1eae6d68286e29e0e1",
+  "state": "running",
+  "formal_training_started": true,
+  "source_commit": "e50e61c0fe9475f70a1b74ab62523325a1061983",
+  "host": "vla_7_6000",
+  "hostname": "ZjuServer147",
+  "pid": 216052,
+  "gpu_indices": [
+    0,
+    4
+  ],
+  "arm": "M2",
+  "seed": 42,
+  "batch_size": 8,
+  "micro_batch_size": 1,
+  "gradient_accumulation": 8,
+  "target_optimizer_updates": 30000,
+  "finetuning": "full",
+  "ema_decay": 0.999,
+  "observed_optimizer_updates": 6,
+  "observed_metrics": {
+    "update": 6,
+    "loss": 0.10732247680425644,
+    "grad_norm": 1.3508689403533936,
+    "cue_grad_l2": 0.029459737241268158,
+    "gradients_finite": true,
+    "seconds": 23.644703370984644
+  },
+  "observed_cpu_peak_rss_gib": 96.69362258911133,
+  "run_directory": "outputs/metric_cue_pilot/L09_spatial_M2_seed42",
+  "launch_log": "outputs/metric_cue_pilot/L09_spatial_M2_seed42.launch.log",
+  "launcher_receipts": "outputs/metric_cue_pilot/L09_spatial_M2_seed42_launch_r4",
+  "run_manifest_sha256": "d5633b61e4aa6d0fb7552c8000d27876820743e79a921bbbd127a8584a717ab8",
+  "planned_checkpoint_updates": [
+    10000,
+    20000,
+    30000
+  ],
+  "evaluation_released": false,
+  "position_scene_validity_lock": false,
+  "engineering_notes": [
+    "JAX reports that some donated buffers were not usable; successful updates and original logs are preserved."
+  ],
+  "observation_scope": "This is a verified startup/progress snapshot, not a completion receipt."
+}
