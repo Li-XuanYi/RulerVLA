@@ -1,5 +1,5 @@
 schema: rulervla_metric_workflow_v1
-cue_config: configs/rulervla_metric_cue.yaml
+cue_config: configs/metric_ruler.yaml
 norm_stats_dir: configs/metric_cue/spatial_norm
 norm_stats_sha256: b5e3345ee3d2a4698348ea8f8988031f2d003fdcd36c4716a7f7abc2d0834820
 initial_checkpoint: outputs/metric_cue_pilot/checkpoint_cache/pi05_base/params

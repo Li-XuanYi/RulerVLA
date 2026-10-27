@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT / 'src'))
 
 def main():
     parser = argparse.ArgumentParser(description='核验 L09 全部真实 Spatial 训练 episode')
-    parser.add_argument('--config', type=Path, default=ROOT / 'configs/rulervla_metric_workflow.yaml')
+    parser.add_argument('--config', type=Path, default=ROOT / 'configs/metric_workflow.yaml')
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
     from rulervla.training.main_data import SpatialDataset

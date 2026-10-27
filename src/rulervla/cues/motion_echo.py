@@ -1,11 +1,13 @@
-"""Past measured EE displacement projected into the current camera view."""
 from dataclasses import dataclass
 
+import cv2
 import numpy as np
-from PIL import Image, ImageDraw
 
-from rulervla.cues.adaptive_metric_ruler import clip_segment_to_viewport
+from rulervla.geometry.camera import project_visible_segment
 from rulervla.data.schema import Camera, finite
+
+
+ECHO_RENDER_CONTRACT = "antialiased_channel_max"
 
 
 @dataclass(frozen=True)
@@ -23,7 +25,8 @@ class MotionEchoConfig:
         if (not np.isfinite(self.min_displacement_m) or self.min_displacement_m < 0
                 or not np.isfinite(self.near_clip_m) or self.near_clip_m <= 0):
             raise ValueError("Invalid echo physical thresholds")
-        if self.arrow_width < 1 or self.arrow_head_px < 1:
+        if any(not isinstance(value, int) or isinstance(value, bool) or value < 1
+               for value in (self.arrow_width, self.arrow_head_px)):
             raise ValueError("Invalid echo stroke")
 
 
@@ -123,39 +126,50 @@ def render_motion_echo(history: MotionHistory, camera: Camera, config: MotionEch
     if not config.enabled:
         return blank, {"rendered": False, "reason": "disabled"}
     if not history.valid:
-        return blank, {"rendered": False, "reason": history.reason or "invalid_history"}
+        return blank, {"rendered": False, "history_valid": False,
+                       "reason": history.reason or "invalid_history"}
     displacement = history.displacement_m
     if np.linalg.norm(displacement) < config.min_displacement_m:
-        return blank, {"rendered": False, "stationary": True, "reason": "valid_stationary"}
-    points = np.stack((history.past_m, history.current_m))
-    uv, depth = camera.project(points)
-    info = {"rendered": False, "stationary": False, "past_uv": uv[0].tolist(),
-            "current_uv": uv[1].tolist(), "displacement_m": displacement.tolist()}
-    if not np.isfinite(uv).all() or np.any(depth < config.near_clip_m):
-        info["reason"] = "behind_near_plane"
+        return blank, dict(rendered=False, history_valid=True, stationary=True, reason="valid_stationary",
+                           displacement_m=displacement.tolist(), displacement_norm_m=float(np.linalg.norm(displacement)))
+    uv, depth = camera.project(np.stack((history.past_m, history.current_m)))
+    visible = ((depth >= config.near_clip_m) & np.isfinite(uv).all(axis=1)
+               & (uv >= [0, 0]).all(axis=1) & (uv <= [width-1, height-1]).all(axis=1))
+    segment = project_visible_segment(history.past_m, history.current_m, camera, config.near_clip_m)
+    info = dict(rendered=False, history_valid=True, stationary=False, head_rendered=False,
+        past_uv=uv[0].tolist() if np.isfinite(uv[0]).all() else None,
+        current_uv=uv[1].tolist() if np.isfinite(uv[1]).all() else None,
+        optical_depth_m=depth.tolist(), displacement_m=displacement.tolist(),
+        displacement_norm_m=float(np.linalg.norm(displacement)), current_visible=bool(visible[1]),
+        past_visible=bool(visible[0]), near_clipped=bool(np.any(depth < config.near_clip_m)),
+        viewport_clipped=False, endpoints_uv=None, visible_length_px=0., head_length_px=0.)
+    if segment is None:
+        info["reason"] = "behind_near_plane" if np.max(depth) < config.near_clip_m else "outside_view"
         return blank, info
-    clipped = clip_segment_to_viewport(*uv, camera.resolution)
-    if clipped is None:
-        info["reason"] = "outside_view"
-        return blank, info
-    start, end = clipped
+    start, end = segment.start_uv, segment.end_uv
+    info.update(viewport_clipped=segment.viewport_clipped, endpoints_uv=[start.tolist(), end.tolist()])
     direction = end - start
     norm = float(np.linalg.norm(direction))
+    info["visible_length_px"] = norm
     if norm < 1:
         info["reason"] = "subpixel_projection"
         return blank, info
     direction /= norm
-    normal = np.array([-direction[1], direction[0]])
-    back = end - direction * min(config.arrow_head_px, norm)
-    mask = Image.new("L", (width, height), 0)
-    draw = ImageDraw.Draw(mask)
-    draw.line([tuple(start), tuple(end)], fill=255, width=config.arrow_width)
-    draw.polygon([tuple(end), tuple(back + normal * config.arrow_head_px/2),
-                  tuple(back - normal * config.arrow_head_px/2)], fill=255)
-    yellow = np.asarray(mask, dtype=np.float32) / 255.
+    mask = np.zeros((height, width), np.uint8)
+    pixels = np.rint(np.stack((start, end)) * 256).astype(np.int32)
+    cv2.line(mask, tuple(pixels[0]), tuple(pixels[1]), 255, config.arrow_width, cv2.LINE_AA, 8)
+    # 头部始终锚定真实当前端点；裁剪交点只用于绘制可见线段。
+    if visible[1]:
+        length = min(config.arrow_head_px, norm * .4)
+        normal = np.array([-direction[1], direction[0]])
+        back = uv[1] - direction * length
+        triangle = np.stack((uv[1], back + normal*length/2, back - normal*length/2))
+        cv2.fillConvexPoly(mask, np.rint(triangle*256).astype(np.int32), 255, cv2.LINE_AA, 8)
+        info.update(head_rendered=True, head_length_px=length)
+    yellow = mask.astype(np.float32) / 255.
     blank[..., 0] = yellow
     blank[..., 1] = yellow
-    info["rendered"] = True
+    info.update(rendered=True, reason="visible")
     return blank, info
 
 
@@ -167,7 +181,4 @@ def compose_cues(ruler, echo, *, enabled):
             or not np.isfinite(echo).all() or ruler.min() < 0 or ruler.max() > 1
             or echo.min() < 0 or echo.max() > 1):
         raise ValueError("Composer needs matching finite float32 HWC3 cues in [0,1]")
-    output = ruler.copy()
-    if enabled:
-        output[echo.max(axis=-1) > 0] = echo[echo.max(axis=-1) > 0]
-    return output
+    return np.maximum(ruler, echo) if enabled else ruler.copy()

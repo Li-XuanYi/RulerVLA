@@ -4,17 +4,13 @@ metric_ruler:
   mode: blank
   origin: ee_tcp
   frame: action_world_xyz
-  axis_extent_m:
-    x: [-0.30, 0.30]
-    y: [-0.30, 0.30]
-    z: [-0.30, 0.30]
+  extent_m: 0.15
   tick_spacing_m: 0.05
-  major_tick_every: 2
-  positive_style: solid_filled
-  negative_style: dashed_hollow
   near_clip_m: 0.001
-  line_width: 2
-  tick_radius: 2
+  line_width_px: 2
+  tick_half_length_px: 3
+  min_tick_spacing_px: 6
+  origin_radius_px: 2
   direction_length_px: 28
 motion_echo:
   enabled: false

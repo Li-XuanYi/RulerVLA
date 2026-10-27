@@ -13,8 +13,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--sample', type=Path, required=True)
     parser.add_argument('--checkpoint', type=Path)
-    parser.add_argument('--g1-weights-bridge', action='store_true')
-    parser.add_argument('--config', type=Path, default=ROOT/'configs/rulervla_metric_workflow.yaml')
+    parser.add_argument('--config', type=Path, default=ROOT/'configs/metric_workflow.yaml')
     parser.add_argument('--mode', choices=('prepare', 'predict'), default='prepare')
     parser.add_argument('--backend', choices=('cpu', 'gpu'), default='cpu')
     parser.add_argument('--out', type=Path, required=True)
@@ -39,7 +38,7 @@ def main():
     with np.load(args.sample, allow_pickle=False) as archive:
         sample = {key: archive[key] for key in archive.files}
     sample['task'] = str(sample['task'])
-    if args.checkpoint and not args.g1_weights_bridge:
+    if args.checkpoint:
         pipeline, _ = pipeline_from_checkpoint(args.checkpoint)
     else:
         pipeline = MetricPipeline.from_files(run['cue_config'],run['norm_stats_dir'])
@@ -60,7 +59,7 @@ def main():
         result.update(state='predicted',actions_shape=list(prediction['actions'].shape),
                       actions_dtype=str(prediction['actions'].dtype),
                       actions_min=float(prediction['actions'].min()),actions_max=float(prediction['actions'].max()),
-                      checkpoint=str(args.checkpoint), g1_weights_bridge=args.g1_weights_bridge)
+                      checkpoint=str(args.checkpoint))
     (args.out/'status.json').write_text(json.dumps(result, indent=2))
     print(json.dumps({key:value for key,value in result.items() if key!='source'}), flush=True)
 

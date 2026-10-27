@@ -1,8 +1,18 @@
 # L09 公制提示四组实验
 
-研究依据是 2026-10-24 的 `reaserch.md`。本实验仅覆盖六通道 Metric Ruler、Motion Echo 和原 π0.5 Flow Matching 动作目标。M0 使用空白提示，M1 使用固定 28 像素的 XYZ 方向线段，M2 使用以当前 EE 为原点、沿 world XYZ 正负方向延伸 30 cm 的公制刻度，M3 在 M2 上加入同一 episode 过去五个环境控制步的实测 EE 位移。
+## 当前工程入口
+
+[Code] 当前标尺为正 XYZ、0～15 cm、5 cm 等价横刻度和 EE 原点。统一配置为 `configs/metric_ruler.yaml`、`configs/metric_workflow.yaml`，代码为 `cues/metric_ruler.py` 与 `geometry/camera.py`，审计入口为 `scripts/audit_metric_ruler.py`。合同与清理证据见 `docs/metric_cue/RULER.md`、`reports/metric_ruler_cleanup/report.zh.md`。当前训练、推理共用此流程。
+
+## 当前冻结协议 revision 3
+
+[Code] 四组配置对齐当前正轴标尺；revision1 的协议、运行矩阵、发布状态和五份配置原字节保存在 revisions/r1/frozen_inputs.tar.gz；revision2 的协议、运行矩阵和发布状态保存在 revisions/r2/frozen_inputs.tar.gz。修订说明见 CONFIG_ALIGNMENT_R2.zh.md 与 REVISION3_BATCH8.zh.md。正式训练仍须通过当前协议的全部 gates。
+
+研究依据是当前 `docs/metric_cue/RESEARCH_PLAN.md`，其 SHA-256 写入 protocol.json。本实验覆盖六通道 Metric Ruler、Motion Echo 和原 π0.5 Flow Matching 动作目标。M0 使用空白提示，M1 使用固定 28 像素的正 XYZ 方向线段，M2 使用 EE 原点、world XYZ 正轴 0～15 cm、每 5 cm 等价横刻度且无标尺箭头，M3 在 M2 上加入同一 episode 过去五个环境控制步的实测 EE 位移。
 
 `protocol.json` 固定十二次训练、数据身份、共同配方、标准 Spatial 评测口径与进入实验的条件。`run_matrix.json` 保存全部计划运行。`release.json` 保存当前条件的核验状态。每次训练结果进入 `outputs/metric_cue_pilot/<run_id>/`；该目录中的 run manifest、模型 checkpoint 和实际执行记录需要在结果分析时核对。
+
+[Protocol r3] 当前共同配方采用有效 batch8、microbatch1、梯度累积8、30000次更新。工程与数据预算评估见 [batch8 评估](BATCH8_30K_ASSESSMENT.zh.md)。八条输入与完整模型静态梯度形状已经核验；GPU 实际更新、峰值显存、吞吐量和策略 SR 尚无验证结果。
 
 当前四组真实输入、连续专家动作、M3 历史状态以及完整基座模型的 CPU 载入已经核验。432 个训练 episode、52970 帧的 RGB-D 与几何文件逐一完成哈希和内容检查，记录位于 `outputs/metric_cue_pilot/full_data_audit_20261025/`。标准 Spatial 的十个任务、每任务五十个官方初始状态已按 LIBERO 提交 `8f1084e` 锁定在 `paired_scene_manifest.json`，包含 BDDL、初始状态文件和全部 500 个状态的哈希。指定黑碗任务的 scene index 0 已完成真实离屏渲染、双视角 RGB-D 与相机参数采集，以及一个控制步，记录位于 `outputs/metric_cue_pilot/simulator_gate_task2_scene0_20261026/receipt.json`。完整模型 GPU 更新、零提示数值等价、checkpoint 恢复、位置场景有效性和完整 rollout 尚无通过记录，训练与评测发布标志保持关闭。
 
@@ -11,3 +21,11 @@
 黑碗目标位置泛化归入 S29。协议指定的 Spatial task index 2 对应“从桌面中心拿起黑碗并放到盘子上”。既有 S28 候选网格仍待完成可见性、无碰撞抓取姿态和放置稳定性检查。S29 的训练支持区域、内部留出区域和外部可行区域必须在执行前固定。三种主要比较是 M1−M0、M2−M1、M3−M2。任务成功率是主要结局；每个训练种子与任务均保留全部 planned rollout 的成功和工程异常记录。
 
 M2−M1 同时改变标尺图案和单位说明，能够估计完整公制提示的增量。`reaserch.md` 要求的固定像素标尺控制尚需基于训练数据确定两路相机的固定像素刻度，并形成独立训练与评测记录；目前不能把四组任务表现单独解释为模型学会了真实物理刻度。
+
+## ±15 cm 渲染版本
+
+[Code/Experiment] 新增独立身份 `metric_ruler_15cm_v2`，固定 EE/world XYZ、±15 cm 和每 5 cm 等价刻度，使用 OpenCV 抗锯齿与确定性省略规则。真实 120 帧渲染及训练/推理输入核验见 `reports/metric_ruler_15cm_v2/report.zh.md`，合同见 `docs/metric_cue/RULER_15CM_V2.md`。旧 ±30 cm 配置、协议和 checkpoint 身份保持原定义；指定新工作流后选择旧正式 arm 会被明确拒绝。新版本正式训练尚需匹配的版本化协议和 gates，本次没有启动训练或 rollout，也没有修改当前 release 条件。
+
+## 正轴 0～15 cm 渲染记录（归档）
+
+[Code/Experiment] 该记录使用 `metric_ruler_positive15cm_v3`，只绘制正 XYZ 轴和 +5/+10/+15 cm 等价刻度。该阶段合同为 `docs/metric_cue/RULER_POSITIVE15CM_V3.md`；真实 120 帧及输入核验证据见 `reports/metric_ruler_positive15cm_v3/report.zh.md`。历史协议与运行矩阵继续保留原定义。

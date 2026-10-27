@@ -1,3 +1,5 @@
+# CodeGraph 本地索引
+/.codegraph/
 __pycache__/
 *.py[cod]
 .pytest_cache/

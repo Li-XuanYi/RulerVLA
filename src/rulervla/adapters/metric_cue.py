@@ -4,8 +4,9 @@ import numpy as np
 
 from rulervla.adapters.libero import LiberoAdapter
 from rulervla.adapters.main_comparison import MAIN_IMAGE_KEYS
-from rulervla.adapters.openpi import resize_float_map, resize_rgb
-from rulervla.cues.metric_ruler import MetricCueConfig, render_metric_cue
+from rulervla.adapters.openpi import resize_rgb
+from rulervla.cues.metric_ruler import MetricRulerConfig, render_ruler_cue
+from rulervla.geometry.camera import resize_camera
 from rulervla.cues.metric_prompt import build_scale_prompt
 from rulervla.cues.motion_echo import MotionEchoConfig, MotionHistory, compose_cues, render_motion_echo
 from rulervla.data.schema import validate_sample
@@ -13,7 +14,7 @@ from rulervla.geometry.action_coord import raster
 
 
 class MetricViewAdapter:
-    def __init__(self, geometry_contract, ruler: MetricCueConfig,
+    def __init__(self, geometry_contract, ruler: MetricRulerConfig,
                  echo: MotionEchoConfig = MotionEchoConfig()):
         self.geometry = geometry_contract
         self.libero = LiberoAdapter(geometry_contract)
@@ -37,18 +38,23 @@ class MetricViewAdapter:
         ):
             canonical = raster(sample[rgb_key], self.geometry["stored_rgb_to_canonical"])
             camera = self.libero.camera(sample, view)
-            ruler_cue, projection = render_metric_cue(sample["ee_world_m"], camera, self.ruler)
+            camera = resize_camera(camera, tuple(self.geometry["policy_resolution"]))
+            ruler_cue, projection = render_ruler_cue(sample["ee_world_m"], camera, self.ruler)
             if history is None:
                 history = MotionHistory(False, None, None, None, None, None, "no_history")
             echo_cue, echo_info = render_motion_echo(history, camera, self.echo)
             cue = compose_cues(ruler_cue, echo_cue, enabled=self.echo.enabled)
             prepared[image_key] = resize_rgb(raster(canonical, to_policy))
-            prepared[cue_key] = resize_float_map(raster(cue, to_policy))
+            oriented = raster(cue, to_policy)
+            prepared[cue_key] = oriented.copy()
             diagnostics[view] = {**projection.diagnostics, "echo": echo_info}
+            diagnostics[view]["render_resolution"] = list(camera.resolution)
+            diagnostics[view]["coordinate_frame"] = "canonical_at_policy_resolution"
+            diagnostics[view]["canonical_to_policy"] = to_policy
         prepared["observation/state"] = np.asarray(sample["state8"], np.float32).copy()
         prepared["prompt"] = build_scale_prompt(sample["task"], self.ruler,
             echo_history_steps=self.echo.history_steps if self.echo.enabled else None,
-            echo_valid=history.valid if self.echo.enabled else None)
+            echo_views={view: info["echo"] for view, info in diagnostics.items()} if self.echo.enabled else None)
         if "actions" in sample:
             prepared["actions"] = np.asarray(sample["actions"], np.float32).copy()
         prepared["diagnostics"] = diagnostics

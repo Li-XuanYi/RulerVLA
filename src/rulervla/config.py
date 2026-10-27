@@ -10,7 +10,7 @@ import yaml
 from rulervla.geometry.action_coord import validate_contract
 from rulervla.geometry.correction import CorrectionConfig
 from rulervla.geometry.reliability import ReliabilityConfig
-from rulervla.cues.metric_ruler import MetricCueConfig
+from rulervla.cues.metric_ruler import MetricRulerConfig
 from rulervla.cues.motion_echo import MotionEchoConfig
 
 
@@ -84,16 +84,13 @@ def profile(config, name):
 
 
 def load_metric_cue_config(path):
-    """Read one new-method ruler definition without altering archived configs."""
-    path = Path(path).resolve()
-    value = yaml.safe_load(path.read_text())
-    geometry = json.loads((path.parent / value["geometry_contract"]).read_text())
-    validate_contract(geometry)
-    return geometry, MetricCueConfig.from_mapping(value["metric_ruler"])
+    geometry, ruler, _ = load_metric_method_config(path)
+    return geometry, ruler
 
 
 def load_metric_method_config(path):
     path = Path(path).resolve()
     value = yaml.safe_load(path.read_text())
-    geometry, ruler = load_metric_cue_config(path)
-    return geometry, ruler, MotionEchoConfig(**value.get("motion_echo", {}))
+    geometry = json.loads((path.parent / value["geometry_contract"]).read_text())
+    validate_contract(geometry)
+    return geometry, MetricRulerConfig.from_mapping(value["metric_ruler"]), MotionEchoConfig(**value.get("motion_echo", {}))

@@ -1,8 +1,16 @@
 {
   "schema": "rulervla_metric_cue_v1",
+  "revision": 3,
+  "previous_revision_archive": "experiments/metric_cue_v1/revisions/r2/frozen_inputs.tar.gz",
+  "method": {
+    "ruler": "positive_world_xyz_0_to_15cm_equal_5cm_ticks_no_arrows",
+    "direction_length_px": 28,
+    "motion_echo": "measured_5_control_steps_antialiased_channel_max",
+    "loss": "original_flow_matching"
+  },
   "experiment_id": "L09",
   "status": "blocked_gpu_validation",
-  "research_plan_sha256": "9239b62fe26f9702731dfaecbf16c82f3915fedfbbf34f6193d91f3be1051a9b",
+  "research_plan_sha256": "de5e268fd382b1541eb0eb7a3b2ed5bf3de0e3d6b427f92203536423298238e0",
   "research_question": "六通道动作坐标方向、公制刻度和实测五步历史位移对 LIBERO Spatial 任务成功率的贡献",
   "arms": {
     "M0": "configs/rulervla_metric_cue_m0.yaml",
@@ -11,11 +19,15 @@
     "M3": "configs/rulervla_metric_cue_m3.yaml"
   },
   "training": {
-    "seeds": [42, 43, 44],
+    "seeds": [
+      42,
+      43,
+      44
+    ],
     "num_steps": 30000,
-    "batch_size": 32,
+    "batch_size": 8,
     "micro_batch_size": 1,
-    "gradient_accumulation": 32,
+    "gradient_accumulation": 8,
     "gradient_sharding": {
       "strategy": "fsdp",
       "devices": 2,
@@ -28,18 +40,22 @@
     "scheduler": {
       "name": "warmup_cosine",
       "warmup_updates": 1000,
-      "peak_lr": 0.00005,
-      "end_lr": 0.000005,
+      "peak_lr": 5e-05,
+      "end_lr": 5e-06,
       "decay_updates": 30000
     },
     "optimizer": {
       "b1": 0.9,
       "b2": 0.95,
-      "eps": 1e-8,
+      "eps": 1e-08,
       "weight_decay": 1e-10,
       "clip_gradient_norm": 1.0
     },
-    "checkpoint_updates": [10000, 20000, 30000],
+    "checkpoint_updates": [
+      10000,
+      20000,
+      30000
+    ],
     "checkpoint_selection": "30000 updates for every arm and seed"
   },
   "data": {
@@ -62,16 +78,38 @@
     "maximum_control_steps": 220,
     "success_denominator": "all planned rollouts, including execution failures",
     "primary_metric": "complete_task_success_rate",
-    "primary_comparisons": ["M1-M0", "M2-M1", "M3-M2"],
-    "reporting": ["task_counts", "seed_counts", "macro_sr", "micro_sr", "paired_difference", "clustered_confidence_interval", "engineering_failures"]
+    "primary_comparisons": [
+      "M1-M0",
+      "M2-M1",
+      "M3-M2"
+    ],
+    "reporting": [
+      "task_counts",
+      "seed_counts",
+      "macro_sr",
+      "micro_sr",
+      "paired_difference",
+      "clustered_confidence_interval",
+      "engineering_failures"
+    ]
   },
   "position_generalization": {
     "experiment_id": "S29",
     "task": "black_bowl_libero_spatial_task_index_2",
     "scene_lock": "pending_geometry_visibility_collision_and_placement_checks",
-    "groups": ["training_support", "inside_holdout", "outside_feasible"],
+    "groups": [
+      "training_support",
+      "inside_holdout",
+      "outside_feasible"
+    ],
     "planned_independent_variable": "target_object_xy_position",
-    "keep_fixed": ["task_instruction", "robot_initial_state", "other_object_states", "camera_calibration", "policy_checkpoint"]
+    "keep_fixed": [
+      "task_instruction",
+      "robot_initial_state",
+      "other_object_states",
+      "camera_calibration",
+      "policy_checkpoint"
+    ]
   },
   "launch_gates": [
     "real_arm_input_contract",

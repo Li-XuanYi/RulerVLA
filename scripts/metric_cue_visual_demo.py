@@ -1,4 +1,5 @@
 import argparse
+from dataclasses import replace
 import hashlib
 import json
 from pathlib import Path
@@ -25,11 +26,10 @@ def preview_overlay(rgb, cue):
         raise ValueError('Expected finite float32 spatial cue at 224x224')
     if cue.min() < 0 or cue.max() > 1:
         raise ValueError('Spatial cue must be in [0, 1]')
-    result = rgb.copy()
-    mask = cue.max(axis=-1) > 0
-    blended = np.rint(0.35 * rgb.astype(np.float32) + 0.65 * cue * 255).astype(np.uint8)
-    result[mask] = blended[mask]
-    return Image.fromarray(result)
+    strength = cue.max(axis=-1, keepdims=True)
+    color = np.divide(cue, strength, out=np.zeros_like(cue), where=strength > 0)
+    alpha = .65 * strength
+    return Image.fromarray(np.rint(rgb * (1-alpha) + color * 255 * alpha).astype(np.uint8))
 
 
 def render_panel(title, prepared):
@@ -61,6 +61,7 @@ def main():
     parser = argparse.ArgumentParser(description='真实 LIBERO 双视角标尺与 Echo 视觉示例')
     parser.add_argument('--sample', required=True, type=Path)
     parser.add_argument('--out', required=True, type=Path)
+    parser.add_argument('--previous', type=Path)
     args = parser.parse_args()
     sample_path = args.sample.resolve()
     with np.load(sample_path, allow_pickle=False) as source:
@@ -68,13 +69,12 @@ def main():
     sample['task'] = str(sample['task'])
     sample.pop('actions', None)
 
-    configurations = {}
-    for name, relative in (
-        ('blank', 'configs/rulervla_metric_cue_m0.yaml'),
-        ('ruler', 'configs/rulervla_metric_cue.yaml'),
-        ('combined', 'configs/rulervla_metric_cue_m3.yaml'),
-    ):
-        configurations[name] = load_metric_method_config(ROOT / relative)
+    geometry, ruler, echo = load_metric_method_config(ROOT / 'configs/metric_ruler.yaml')
+    configurations = {
+        'blank': (geometry, replace(ruler, enabled=False, mode='blank'), echo),
+        'ruler': (geometry, ruler, echo),
+        'combined': (geometry, ruler, replace(echo, enabled=True)),
+    }
     geometry = configurations['ruler'][0]
     if any(value[0] != geometry for value in configurations.values()):
         raise ValueError('Demo modes have different camera geometry contracts')
@@ -125,6 +125,10 @@ def main():
     for name, title, _, _, _ in variants:
         panel = render_panel(title, prepared_by_mode[name])
         panel.save(args.out / f'{name}.png')
+        for view, rgb_key, cue_key in VIEWS:
+            cue = prepared_by_mode[name][cue_key]
+            Image.fromarray(np.rint(cue*255).astype(np.uint8)).save(args.out / f'{name}_{view}_cue.png')
+            preview_overlay(prepared_by_mode[name][rgb_key], cue).save(args.out / f'{name}_{view}_overlay.png')
         panels.append(panel)
     gap = 24
     contact = Image.new('RGB', (panels[0].width * 3 + gap * 4,
@@ -132,6 +136,16 @@ def main():
     for index, panel in enumerate(panels):
         contact.paste(panel, (gap + index * (panel.width + gap), gap))
     contact.save(args.out / 'comparison.png')
+    if args.previous is not None:
+        comparison = Image.new('RGB', (panels[0].width*2, (panels[0].height+32)*2), 'white')
+        draw = ImageDraw.Draw(comparison)
+        for row, (name, new_panel) in enumerate((('echo', panels[1]), ('ruler_echo', panels[2]))):
+            for column, (label, panel) in enumerate((('Previous', Image.open(args.previous / f'{name}.png')),
+                                                    ('Current', new_panel))):
+                left, top = column*panels[0].width, row*(panels[0].height+32)
+                draw.text((left+16, top+8), label, fill='black')
+                comparison.paste(panel, (left, top+32))
+        comparison.save(args.out / 'render_comparison.png')
     manifest = {
         'schema': 'rulervla_metric_visual_demo_v1',
         'sample': str(sample_path),
@@ -140,7 +154,8 @@ def main():
         'frame_index': current_step,
         'past_frame_index': history.past_step,
         'measured_displacement_m': history.displacement_m.tolist(),
-        'visualization': 'cue pixels use 65% cue color and 35% RGB; cue-only row is the exact prepared cue',
+        'visualization': 'overlay alpha is 0.65 times cue intensity; cue-only row is the exact prepared cue',
+        'previous_render': str(args.previous.resolve()) if args.previous is not None else None,
         'modes': metadata,
     }
     (args.out / 'manifest.json').write_text(json.dumps(manifest, indent=2, allow_nan=False) + '\n')

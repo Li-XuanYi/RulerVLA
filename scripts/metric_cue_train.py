@@ -1,7 +1,9 @@
 import argparse
+import gc
 import json
 import os
 from pathlib import Path
+import resource
 import sys
 import time
 
@@ -11,7 +13,7 @@ sys.path.insert(0, str(ROOT/'src'))
 
 def main():
     parser = argparse.ArgumentParser(description='六通道 Metric Cue 资源核验、完整模型检查与训练')
-    parser.add_argument('--config', type=Path, default=ROOT/'configs/rulervla_metric_workflow.yaml')
+    parser.add_argument('--config', type=Path, default=ROOT/'configs/metric_workflow.yaml')
     parser.add_argument('--mode', choices=('preflight', 'smoke', 'train'), default='preflight')
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--steps', type=int)
@@ -20,7 +22,7 @@ def main():
     parser.add_argument('--resume', action='store_true')
     parser.add_argument('--gpu-indices', type=int, nargs='+')
     args = parser.parse_args()
-    from rulervla.training.metric_resources import load_run_config, preflight, query_gpus
+    from rulervla.training.metric_resources import load_run_config, preflight, runtime_capacity
     run = load_run_config(args.config)
     if args.gpu_indices is not None:
         if len(set(args.gpu_indices)) != len(args.gpu_indices) or any(index < 0 for index in args.gpu_indices):
@@ -33,7 +35,9 @@ def main():
         from rulervla.training.metric_protocol import load_formal_metric_run
         run, protocol = load_formal_metric_run(ROOT, args.arm, args.seed, run)
     elif args.arm is not None:
+        from rulervla.training.metric_protocol import require_arm_ruler
         protocol = json.loads((ROOT/'experiments/metric_cue_v1/protocol.json').read_text())
+        require_arm_ruler(ROOT, args.arm, run, protocol)
         run['cue_config'] = str(ROOT/protocol['arms'][args.arm])
     if args.resume and args.mode != 'train':
         raise ValueError('Only formal training can resume a full checkpoint')
@@ -69,9 +73,10 @@ def main():
     from openpi.training import checkpoints, sharding
     from rulervla.adapters.metric_pipeline import MetricPipeline
     from rulervla.training.main_data import SpatialDataset, update_indices
-    from rulervla.training.metric_workflow import (MetricTrainer, create_training_state, gpu_equivalence,
+    from rulervla.training.metric_workflow import (MetricTrainer, abstract_training_state,
+        create_training_state, gpu_equivalence,
         load_initial_model, make_training_config, prepare_batch, restore_training_checkpoint,
-        save_training_checkpoint, source_provenance, state_signatures)
+        save_training_checkpoint, source_provenance, state_signatures, training_state_template)
     pipeline = MetricPipeline.from_files(run['cue_config'], run['norm_stats_dir'])
     dataset = SpatialDataset(run['data']['rgbd_root'], run['data']['geometry_root'],
                              max_cache_bytes=2 << 30, path_mappings=run['path_mappings'])
@@ -94,32 +99,31 @@ def main():
         status = dict(state='running', gpu_job_started=True, formal_training_started=args.mode == 'train',
                       mode=args.mode, optimizer_updates=0, metrics=[] if args.mode == 'smoke' else None)
     def stage(name, **values):
-        status.update(stage=name, **values)
+        status.update(stage=name, peak_cpu_rss_gib=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 2**20,
+                      **values)
         (args.out/'status.json').write_text(json.dumps(status, indent=2, allow_nan=False))
         print(json.dumps({'stage':name, **values}), flush=True)
-    def require_current_gpu_capacity(phase):
-        current_gpus = query_gpus()
-        selected = run['resources']['gpu_indices']
-        required_free = admission['selected_gpu_min_free_mib']
-        if isinstance(current_gpus, dict):
-            blockers = ['GPU query unavailable during ' + phase]
-        else:
-            available = {item['index']: item['free_mib'] for item in current_gpus}
-            blockers = [f'GPU {index} requires {required_free} MiB free during {phase}'
-                        for index in selected if available.get(index, 0) < required_free]
-        if blockers:
-            stage('resource_gate_closed', state='blocked', blockers=blockers,
-                  gpu_snapshot=current_gpus)
-            raise RuntimeError('; '.join(blockers))
+    def require_current_capacity(phase):
+        measured = runtime_capacity(run)
+        status.setdefault('resource_checks', []).append(dict(phase=phase, **measured))
+        if measured['blockers']:
+            stage('resource_gate_closed', state='blocked', blockers=measured['blockers'],
+                  resources=measured)
+            raise RuntimeError('; '.join(measured['blockers']))
     if len(jax.devices('gpu')) != len(run['resources']['gpu_indices']):
         raise ValueError('JAX did not expose every selected GPU')
     gpu, cpu = jax.devices('gpu')[0], jax.devices('cpu')[0]
     mesh = (sharding.make_mesh(len(run['resources']['gpu_indices']))
             if len(run['resources']['gpu_indices']) > 1 else None)
-    stage('load_real_base_and_six_channel_optimizer')
+    require_current_capacity('before_state_loading')
+    stage('restore_state_template' if args.resume else 'load_real_base_and_six_channel_optimizer')
     with jax.default_device(cpu):
-        state = create_training_state(config, load_initial_model(config), optimizer_device=cpu)
-    require_current_gpu_capacity('model loading')
+        if args.resume:
+            state = training_state_template(config, cpu)
+        else:
+            state = create_training_state(config, load_initial_model(config), optimizer_device=cpu)
+    gc.collect()
+    require_current_capacity('model loading')
     manager, resuming = checkpoints.initialize_checkpoint_dir(
         args.out/'checkpoints', keep_period=10000 if args.mode == 'train' else 1,
         overwrite=False, resume=args.resume)
@@ -127,8 +131,7 @@ def main():
         if not resuming:
             raise FileNotFoundError('No complete full-state checkpoint to resume')
         latest = max(manager.all_steps())
-        template = jax.tree.map(lambda value: jax.numpy.zeros_like(value), state)
-        state = restore_training_checkpoint(manager, template, pipeline, config, step=latest,
+        state = restore_training_checkpoint(manager, state, pipeline, config, step=latest,
                                             expected_manifest=provenance)
         if int(state.step) != latest:
             raise ValueError('Restored optimizer step differs from checkpoint directory')
@@ -140,7 +143,7 @@ def main():
         measured = gpu_equivalence(config, state.params, first_batch, gpu,
                                    run['gpu_equivalence'], mesh=mesh)
         (args.out/'gpu_equivalence.json').write_text(json.dumps(measured, indent=2))
-        require_current_gpu_capacity('GPU equivalence')
+        require_current_capacity('GPU equivalence')
     trainer = MetricTrainer(config, state.model_def, gradient_device=gpu,
                             optimizer_device=cpu, gradient_mesh=mesh)
     saved = None
@@ -150,7 +153,9 @@ def main():
         started = time.monotonic()
         micro_batch_size = (protocol['training']['micro_batch_size'] if args.mode == 'train'
                             else 1 if mesh is not None else None)
+        require_current_capacity(f'before_update_{update + 1}')
         state, metrics = trainer.step(state, batch, micro_batch_size=micro_batch_size)
+        require_current_capacity(f'after_update_{int(state.step)}')
         if args.mode == 'smoke' and metrics['cue_grad_l2'] <= 0:
             raise ValueError('Real action loss did not produce nonzero Cue kernel gradients')
         record = dict(update=int(state.step), seconds=time.monotonic()-started,
@@ -163,18 +168,24 @@ def main():
             status['last_metrics'] = record
         stage('training_updates', optimizer_updates=int(state.step))
         if args.mode == 'train' and int(state.step) in protocol['training']['checkpoint_updates']:
+            require_current_capacity('before_checkpoint_save')
             stage('save_full_training_state')
             saved = save_training_checkpoint(manager, state, pipeline, config, provenance)
     if args.mode == 'smoke':
+        require_current_capacity('before_checkpoint_save')
         stage('save_full_training_state')
         expected = state_signatures(state)
+        completed_step = int(state.step)
         saved = save_training_checkpoint(manager, state, pipeline, config, provenance)
+        template = abstract_training_state(state, cpu)
+        del state
+        gc.collect()
         stage('restore_full_training_state')
-        template = jax.tree.map(lambda value: jax.numpy.zeros_like(value), state)
-        restored = restore_training_checkpoint(manager, template, pipeline, config, step=int(state.step),
-                                                expected_manifest=provenance)
-        if state_signatures(restored) != expected:
+        state = restore_training_checkpoint(manager, template, pipeline, config, step=completed_step,
+                                            expected_manifest=provenance)
+        if state_signatures(state) != expected:
             raise ValueError('Full six-channel parameter/optimizer state changed during recovery')
+        require_current_capacity('after_checkpoint_restore')
         (args.out/'full_state_sha256.json').write_text(json.dumps(expected, indent=2))
     manager.close()
     stage('complete', state='complete', full_state_restore_bitwise=args.mode == 'smoke',

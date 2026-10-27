@@ -62,6 +62,16 @@ def validate_scene_and_simulator(root, protocol, release):
         raise ValueError('Simulator runtime observation interface differs')
 
 
+def require_arm_ruler(root, arm, run, protocol):
+    from dataclasses import replace
+    from rulervla.config import load_metric_cue_config
+
+    _, requested = load_metric_cue_config(run['cue_config'])
+    _, frozen = load_metric_cue_config(Path(root) / protocol['arms'][arm])
+    if replace(requested, enabled=frozen.enabled, mode=frozen.mode) != frozen:
+        raise ValueError('Requested ruler differs from the frozen formal arm')
+
+
 def load_formal_metric_run(root, arm, seed, run):
     root = Path(root).resolve()
     protocol_path = root / 'experiments/metric_cue_v1/protocol.json'
@@ -75,6 +85,7 @@ def load_formal_metric_run(root, arm, seed, run):
         raise ValueError('Metric Cue release belongs to another protocol revision')
     if arm not in protocol['arms'] or seed not in protocol['training']['seeds']:
         raise ValueError('Unknown formal arm or training seed')
+    require_arm_ruler(root, arm, run, protocol)
     missing = [gate for gate in protocol['launch_gates'] if not release['gate_status'].get(gate)]
     if not release['training_released'] or missing:
         raise PermissionError('Formal Metric Cue training gates remain closed: ' + ', '.join(missing))

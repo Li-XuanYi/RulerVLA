@@ -1,0 +1,16 @@
+geometry_contract: v03_geometry.json
+metric_ruler:
+  enabled: true
+  mode: metric
+  origin: ee_tcp
+  frame: action_world_xyz
+  extent_m: 0.15
+  tick_spacing_m: 0.05
+  near_clip_m: 0.001
+  line_width_px: 2
+  tick_half_length_px: 3
+  min_tick_spacing_px: 6
+  origin_radius_px: 2
+motion_echo:
+  enabled: false
+  history_steps: 5

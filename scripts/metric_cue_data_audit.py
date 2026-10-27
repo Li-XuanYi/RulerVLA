@@ -12,7 +12,7 @@ sys.path.insert(0,str(ROOT/'src'))
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--config',type=Path,default=ROOT/'configs/rulervla_metric_workflow.yaml')
+    parser.add_argument('--config',type=Path,default=ROOT/'configs/metric_workflow.yaml')
     parser.add_argument('--cache-root',type=Path)
     parser.add_argument('--indices',type=int,nargs='+',default=[20,108,109,110])
     parser.add_argument('--reference-g1-frame',type=Path)

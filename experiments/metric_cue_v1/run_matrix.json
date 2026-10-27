@@ -1,19 +1,82 @@
 {
   "schema": "rulervla_metric_cue_run_matrix_v1",
+  "protocol_revision": 3,
+  "protocol_sha256": "a5188add4e9839c17de991a8062fb780f50c8ca3a7f967cafcd91ad9cc2b80e4",
   "experiment_id": "L09",
   "status": "planned_blocked_gpu_validation",
   "runs": [
-    {"run_id": "L09_spatial_M0_seed42", "arm": "M0", "seed": 42, "status": "planned"},
-    {"run_id": "L09_spatial_M0_seed43", "arm": "M0", "seed": 43, "status": "planned"},
-    {"run_id": "L09_spatial_M0_seed44", "arm": "M0", "seed": 44, "status": "planned"},
-    {"run_id": "L09_spatial_M1_seed42", "arm": "M1", "seed": 42, "status": "planned"},
-    {"run_id": "L09_spatial_M1_seed43", "arm": "M1", "seed": 43, "status": "planned"},
-    {"run_id": "L09_spatial_M1_seed44", "arm": "M1", "seed": 44, "status": "planned"},
-    {"run_id": "L09_spatial_M2_seed42", "arm": "M2", "seed": 42, "status": "planned"},
-    {"run_id": "L09_spatial_M2_seed43", "arm": "M2", "seed": 43, "status": "planned"},
-    {"run_id": "L09_spatial_M2_seed44", "arm": "M2", "seed": 44, "status": "planned"},
-    {"run_id": "L09_spatial_M3_seed42", "arm": "M3", "seed": 42, "status": "planned"},
-    {"run_id": "L09_spatial_M3_seed43", "arm": "M3", "seed": 43, "status": "planned"},
-    {"run_id": "L09_spatial_M3_seed44", "arm": "M3", "seed": 44, "status": "planned"}
+    {
+      "run_id": "L09_spatial_M0_seed42",
+      "arm": "M0",
+      "seed": 42,
+      "status": "planned"
+    },
+    {
+      "run_id": "L09_spatial_M0_seed43",
+      "arm": "M0",
+      "seed": 43,
+      "status": "planned"
+    },
+    {
+      "run_id": "L09_spatial_M0_seed44",
+      "arm": "M0",
+      "seed": 44,
+      "status": "planned"
+    },
+    {
+      "run_id": "L09_spatial_M1_seed42",
+      "arm": "M1",
+      "seed": 42,
+      "status": "planned"
+    },
+    {
+      "run_id": "L09_spatial_M1_seed43",
+      "arm": "M1",
+      "seed": 43,
+      "status": "planned"
+    },
+    {
+      "run_id": "L09_spatial_M1_seed44",
+      "arm": "M1",
+      "seed": 44,
+      "status": "planned"
+    },
+    {
+      "run_id": "L09_spatial_M2_seed42",
+      "arm": "M2",
+      "seed": 42,
+      "status": "blocked",
+      "receipt": "experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_start.json"
+    },
+    {
+      "run_id": "L09_spatial_M2_seed43",
+      "arm": "M2",
+      "seed": 43,
+      "status": "planned"
+    },
+    {
+      "run_id": "L09_spatial_M2_seed44",
+      "arm": "M2",
+      "seed": 44,
+      "status": "planned"
+    },
+    {
+      "run_id": "L09_spatial_M3_seed42",
+      "arm": "M3",
+      "seed": 42,
+      "status": "planned"
+    },
+    {
+      "run_id": "L09_spatial_M3_seed43",
+      "arm": "M3",
+      "seed": 43,
+      "status": "planned"
+    },
+    {
+      "run_id": "L09_spatial_M3_seed44",
+      "arm": "M3",
+      "seed": 44,
+      "status": "planned"
+    }
   ]
 }

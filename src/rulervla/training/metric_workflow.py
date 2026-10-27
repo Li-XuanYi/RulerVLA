@@ -20,8 +20,8 @@ from openpi.shared import normalize
 from openpi.training import checkpoints, config as config_lib, optimizer, sharding, weight_loaders
 from openpi.training.utils import TrainState
 from rulervla.adapters.metric_pipeline import MetricPipeline, metric_model_config, tokenizer_from_asset
-from rulervla.cues.metric_ruler import MetricCueConfig
-from rulervla.cues.motion_echo import MetricInferenceHistory, MotionEchoConfig
+from rulervla.cues.metric_ruler import MetricRulerConfig
+from rulervla.cues.motion_echo import ECHO_RENDER_CONTRACT, MetricInferenceHistory, MotionEchoConfig
 from rulervla.training.accumulation import accumulated_gradients, apply_gradients
 
 STEM = 'PaliGemma/img/embedding/kernel'
@@ -113,7 +113,7 @@ def load_initial_model(config):
     return config.model.load(params, remove_extra_params=False)
 
 
-def create_training_state(config, policy, *, optimizer_device=None):
+def _make_training_state(config, policy, *, optimizer_device=None):
     graph, params = nnx.split(policy)
     if optimizer_device is not None:
         params = jax.device_put(params, optimizer_device)
@@ -122,11 +122,31 @@ def create_training_state(config, policy, *, optimizer_device=None):
     opt_state = jax.jit(tx.init, device=optimizer_device)(selected)
     require_cue_optimizer(opt_state)
     step = jax.device_put(jnp.asarray(0, jnp.int32), optimizer_device)
+    # EMA与参数使用独立缓冲，允许后续CPU更新复用输入状态。
+    ema_params = (jax.tree.map(lambda value: value.copy(), params)
+                  if config.ema_decay is not None else None)
     state = TrainState(step=step, params=params, model_def=graph, tx=tx,
-                       opt_state=opt_state, ema_decay=config.ema_decay,
-                       ema_params=params if config.ema_decay is not None else None)
+                       opt_state=opt_state, ema_decay=config.ema_decay, ema_params=ema_params)
+    return state
+
+
+def create_training_state(config, policy, *, optimizer_device=None):
+    state = _make_training_state(config, policy, optimizer_device=optimizer_device)
     require_training_state_device(state, optimizer_device)
     return state
+
+
+def abstract_training_state(state, device):
+    placement = jax.sharding.SingleDeviceSharding(device)
+    return jax.tree.map(lambda value: jax.ShapeDtypeStruct(
+        value.shape, value.dtype, sharding=placement), state)
+
+
+def training_state_template(config, device):
+    with jax.default_device(device):
+        shaped = jax.eval_shape(lambda: _make_training_state(
+            config, config.model.create(jax.random.key(config.seed)), optimizer_device=device))
+    return abstract_training_state(shaped, device)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -184,7 +204,7 @@ class MetricTrainer:
         self._accumulated_backward_fn = accumulated_backward
         self._accumulated_backward = jax.jit(accumulated_backward)
         self._update = jax.jit(lambda state, gradient: apply_gradients(config, state, gradient),
-                               device=optimizer_device)
+                               device=optimizer_device, donate_argnums=(0, 1))
 
     def configure_sharding(self, params):
         if self.gradient_mesh is None:
@@ -294,10 +314,14 @@ def pipeline_from_checkpoint(directory):
     contract = metadata['pipeline']
     if contract['model'] != dataclasses.asdict(metric_model_config()):
         raise ValueError('Checkpoint model differs from the validated pi05 six-channel contract')
+    ruler = MetricRulerConfig.from_mapping(contract['metric_ruler'])
+    if (contract['motion_echo']['enabled']
+            and contract.get('motion_echo_rendering') != ECHO_RENDER_CONTRACT):
+        raise ValueError('Checkpoint Echo rendering differs from the current input contract')
     # Norm statistics are saved by OpenPI beside inference params; never use the caller's mutable stats.
     stats = normalize.load(directory/'assets/physical-intelligence/libero')
     tokenizer = tokenizer_from_asset(directory/'assets/paligemma_tokenizer.model', contract['tokenizer']['max_len'])
-    pipeline = MetricPipeline(contract['geometry'], MetricCueConfig(**contract['metric_ruler']), stats,
+    pipeline = MetricPipeline(contract['geometry'], ruler, stats,
                               echo=MotionEchoConfig(**contract['motion_echo']), tokenizer=tokenizer)
     if pipeline.fingerprint() != metadata['pipeline_sha256']:
         raise ValueError('Checkpoint input assets or normalization statistics changed')
@@ -358,11 +382,8 @@ def load_metric_policy(directory, *, explicit_pipeline=None, sampling_steps=10, 
         pipeline, _ = pipeline_from_checkpoint(directory)
         if explicit_pipeline is not None and explicit_pipeline.fingerprint() != pipeline.fingerprint():
             raise ValueError('Caller preprocessing differs from checkpoint preprocessing')
-    elif explicit_pipeline is not None:
-        # Engineering-only bridge for the G1 six-channel artifact, not a full-state resume.
-        pipeline = explicit_pipeline
     else:
-        raise ValueError('A G2 checkpoint with saved preprocessing is required')
+        raise ValueError('A checkpoint with saved preprocessing is required')
     params = model_lib.restore_params(directory/'params', restore_type=np.ndarray)
     policy = pipeline.model_config.load(params, remove_extra_params=False)
     return MetricPolicy(policy, pipeline, sampling_steps=sampling_steps, seed=seed)

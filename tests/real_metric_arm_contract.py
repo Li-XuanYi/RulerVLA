@@ -9,7 +9,6 @@ import numpy as np
 from openpi.shared import normalize
 from rulervla.adapters.metric_pipeline import MetricPipeline
 from rulervla.config import load_metric_method_config
-from rulervla.cues.metric_prompt import build_scale_prompt
 from rulervla.cues.motion_echo import EpisodeHistoryBuffer, MetricInferenceHistory
 from rulervla.training.main_data import SpatialDataset, action_chunk_indices
 from rulervla.training.metric_resources import load_run_config
@@ -25,7 +24,7 @@ def main():
     parser.add_argument("--check-sharding-shape", action="store_true")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
-    run = load_run_config(root / "configs/rulervla_metric_workflow.yaml")
+    run = load_run_config(root / "configs/metric_workflow.yaml")
     cache_root = args.cache_root.resolve()
     rgbd_root = cache_root / Path(run["data"]["rgbd_root"]).relative_to("/")
     geometry_root = cache_root / Path(run["data"]["geometry_root"]).relative_to("/")
@@ -44,20 +43,17 @@ def main():
         raise AssertionError("历史位移与真实本体状态不一致")
 
     arms = {
-        "M0": load_metric_method_config(root / "configs/rulervla_metric_cue_m0.yaml")[1:],
-        "M1": load_metric_method_config(root / "configs/rulervla_metric_cue_m1.yaml")[1:],
+        "M0": (dataclasses.replace(ruler, enabled=False, mode="blank"), echo),
+        "M1": (dataclasses.replace(ruler, mode="direction"), echo),
         "M2": (ruler, echo),
-        "M3": load_metric_method_config(root / "configs/rulervla_metric_cue_m3.yaml")[1:],
+        "M3": (ruler, dataclasses.replace(echo, enabled=True)),
     }
     results = {}
     for name, (arm_ruler, arm_echo) in arms.items():
         pipeline = MetricPipeline(geometry, arm_ruler, statistics, echo=arm_echo)
         for instruction in {row["task"] for row in dataset.rows}:
-            prompt = build_scale_prompt(
-                instruction, arm_ruler,
-                echo_history_steps=arm_echo.history_steps if arm_echo.enabled else None,
-                echo_valid=True if arm_echo.enabled else None,
-            )
+            prompt = pipeline.adapter.prepare(dict(sample, task=instruction),
+                history=history if arm_echo.enabled else None)["prompt"]
             pipeline.tokenizer.tokenize(prompt)
         current_history = history if arm_echo.enabled else None
         trained = pipeline.prepare_train(sample, history=current_history)
@@ -92,14 +88,18 @@ def main():
     formal = dict(run, training=dict(protocol["training"], seed=42),
                   resources=dict(run["resources"], gpu_indices=[4, 5]))
     formal_config = make_training_config(formal)
-    if (formal_config.batch_size != 32 or formal_config.ema_decay != 0.999
+    batch_size = protocol["training"]["batch_size"]
+    accumulation = protocol["training"]["gradient_accumulation"]
+    micro_batch_size = protocol["training"]["micro_batch_size"]
+    if (formal_config.batch_size != batch_size or formal_config.ema_decay != 0.999
             or formal_config.fsdp_devices != 2
             or formal_config.num_train_steps != 30000
-            or formal_config.lr_schedule.warmup_steps != 1000):
+            or formal_config.lr_schedule.warmup_steps != 1000
+            or batch_size != accumulation * micro_batch_size):
         raise AssertionError("正式训练配方与协议不一致")
-    formal_batch = prepare_batch(dataset, list(range(32)), m3_pipeline)
-    if formal_batch.actions.shape != (32, 10, 32):
-        raise AssertionError("正式训练批次没有使用 32 条真实动作序列")
+    formal_batch = prepare_batch(dataset, list(range(batch_size)), m3_pipeline)
+    if formal_batch.actions.shape != (batch_size, 10, 32):
+        raise AssertionError("正式训练批次没有使用协议规定的真实动作序列")
     buffer = EpisodeHistoryBuffer(history_steps=echo.history_steps)
     buffer.reset(1261)
     for step in range(15, 21):
@@ -148,9 +148,10 @@ def main():
             import flax.nnx as nnx
             graph, params = nnx.split(model)
             trainer = MetricTrainer(formal_config, graph)
-            observations = jax.tree.map(lambda value: value.reshape((32, 1) + value.shape[1:]),
-                                        formal_batch.observation)
-            actions = formal_batch.actions.reshape((32, 1, 10, 32))
+            observations = jax.tree.map(
+                lambda value: value.reshape((accumulation, micro_batch_size) + value.shape[1:]),
+                formal_batch.observation)
+            actions = formal_batch.actions.reshape((accumulation, micro_batch_size, 10, 32))
             _, metric_shapes = jax.eval_shape(trainer._accumulated_backward, params,
                                               observations, actions, np.int32(0))
             if metric_shapes["cue_grad_l2"].shape != ():
@@ -177,9 +178,10 @@ def main():
                 raise AssertionError("三通道对照状态改变了六通道训练参数")
             rgb_graph = nnx.split(nnx.eval_shape(rgb_config.create, jax.random.key(42)))[0]
             nnx.merge(rgb_graph, rgb_state)
-            observations = jax.tree.map(lambda value: value.reshape((32, 1) + value.shape[1:]),
-                                        formal_batch.observation)
-            actions = formal_batch.actions.reshape((32, 1, 10, 32))
+            observations = jax.tree.map(
+                lambda value: value.reshape((accumulation, micro_batch_size) + value.shape[1:]),
+                formal_batch.observation)
+            actions = formal_batch.actions.reshape((accumulation, micro_batch_size, 10, 32))
             with sharding.set_mesh(mesh):
                 _, metric_shapes = jax.eval_shape(trainer._accumulated_backward, params,
                                                   observations, actions, np.int32(0))

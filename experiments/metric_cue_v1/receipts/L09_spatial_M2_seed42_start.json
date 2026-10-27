@@ -1,0 +1,59 @@
+{
+  "schema": "rulervla_metric_training_start_receipt_v1",
+  "date_local": "2026-10-27",
+  "experiment_id": "L09",
+  "run_id": "L09_spatial_M2_seed42",
+  "protocol_revision": 3,
+  "protocol_sha256": "a5188add4e9839c17de991a8062fb780f50c8ca3a7f967cafcd91ad9cc2b80e4",
+  "host": "vla_7_A6000",
+  "hostname": "amax",
+  "workspace": "/home/lixuanyi/XuanyiLi/work/worktrees/rulervla-metric-cue",
+  "state": "blocked",
+  "arm": "M2",
+  "seed": 42,
+  "planned_training": {
+    "batch_size": 8,
+    "micro_batch_size": 1,
+    "gradient_accumulation": 8,
+    "num_updates": 30000,
+    "finetuning": "full",
+    "motion_echo": false
+  },
+  "attempted_command": [
+    "scripts/metric_cue_train.py",
+    "--mode",
+    "train",
+    "--arm",
+    "M2",
+    "--seed",
+    "42",
+    "--gpu-indices",
+    "3",
+    "5",
+    "--out",
+    "outputs/metric_cue_pilot/L09_spatial_M2_seed42"
+  ],
+  "attempt_exit_code": 1,
+  "formal_training_started": false,
+  "gpu_job_started": false,
+  "optimizer_updates": 0,
+  "checkpoint": null,
+  "closed_gates": [
+    "full_model_gpu_zero_cue_equivalence",
+    "full_model_gpu_gradient_and_optimizer_update",
+    "full_state_checkpoint_restore",
+    "position_scene_validity_lock",
+    "resource_preflight"
+  ],
+  "resource_snapshot": {
+    "gpu3_free_mib": 12259,
+    "gpu5_free_mib": 23549,
+    "required_free_mib_per_gpu": 32768,
+    "cpu_available_gib": 66.93238067626953,
+    "required_cpu_available_gib": 100
+  },
+  "preflight": "outputs/metric_cue_pilot/launch_M2_seed42_r3_20261027/preflight/preflight.json",
+  "preflight_sha256": "bbb2fa8af85b6a5e612860c157dde277787a0b57518d2d44348957601ae76e74",
+  "start_log": "outputs/metric_cue_pilot/launch_M2_seed42_r3_20261027/train_start.log",
+  "start_log_sha256": "2fab6b7447a7d5c7d055c003dbb49ce11d6007f5989969c90124479bc6b76657"
+}

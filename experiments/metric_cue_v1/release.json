@@ -1,6 +1,7 @@
 {
   "schema": "rulervla_metric_cue_release_v1",
-  "protocol_sha256": "63498060346a1bad1c460aadacc256215c98f48915cda2c2bb6bcb183e142632",
+  "protocol_revision": 3,
+  "protocol_sha256": "a5188add4e9839c17de991a8062fb780f50c8ca3a7f967cafcd91ad9cc2b80e4",
   "training_released": false,
   "evaluation_released": false,
   "gate_status": {
@@ -16,6 +17,8 @@
   },
   "data_audit_status": "outputs/metric_cue_pilot/full_data_audit_20261025/status.json",
   "data_audit_receipts_sha256": "73dbf88aa9abb7b412f8cbe5468e88dc928708466f87cbd510b2acfe693a1849",
+  "real_arm_input_receipt": "outputs/metric_cue_pilot/config_alignment_r2/real_arm_input.json",
+  "real_arm_input_receipt_sha256": "913fa3d69420e53cbe195769d4a7885a409d04a473c5020f8e1f50763fd0de6c",
   "gpu_smoke_receipt": null,
   "paired_scene_manifest": "experiments/metric_cue_v1/paired_scene_manifest.json",
   "paired_scene_manifest_sha256": "8b3788f3402f4ef0f41d4ba26fe629e6455b3d07afedfff24229097fa8fe8fe9",

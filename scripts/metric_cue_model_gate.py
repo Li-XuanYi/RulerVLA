@@ -307,7 +307,7 @@ def main():
     parser.add_argument('--checkpoint',type=Path,required=True)
     parser.add_argument('--sample',type=Path,required=True)
     parser.add_argument('--norm-stats',type=Path,required=True)
-    parser.add_argument('--config',type=Path,default=ROOT/'configs/rulervla_metric_cue.yaml')
+    parser.add_argument('--config',type=Path,default=ROOT/'configs/metric_ruler.yaml')
     parser.add_argument('--out',type=Path,required=True)
     parser.add_argument('--learning-rate',type=float,default=1e-4)
     parser.add_argument('--sampling-steps',type=int,default=10)

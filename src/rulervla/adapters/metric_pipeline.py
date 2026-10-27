@@ -13,7 +13,7 @@ from openpi.shared import normalize
 from rulervla.adapters.metric_cue import MetricViewAdapter, SixChannelInputs
 from rulervla.config import load_metric_method_config
 from rulervla.cues.metric_prompt import StrictPromptTokenizer
-from rulervla.cues.motion_echo import MotionEchoConfig
+from rulervla.cues.motion_echo import ECHO_RENDER_CONTRACT, MotionEchoConfig
 
 
 def tokenizer_from_asset(path, max_len):
@@ -57,11 +57,14 @@ class MetricPipeline:
         return cls(geometry, ruler, normalize.load(norm_stats_dir), echo=echo)
 
     def contract(self):
-        return dict(version=self.version, geometry=self.geometry, metric_ruler=asdict(self.ruler),
+        contract = dict(version=self.version, geometry=self.geometry, metric_ruler=asdict(self.ruler),
                     motion_echo=asdict(self.echo), model=asdict(self.model_config),
                     tokenizer=dict(source='gs://big_vision/paligemma_tokenizer.model',
                                    sha256=self.tokenizer_sha256, max_len=self.model_config.max_token_len),
                     quantile_norm=True, norm_stats=json.loads(normalize.serialize_json(self.norm_stats)))
+        if self.echo.enabled:
+            contract['motion_echo_rendering'] = ECHO_RENDER_CONTRACT
+        return contract
 
     def fingerprint(self):
         value=json.dumps(self.contract(), sort_keys=True, separators=(',', ':'), allow_nan=False)

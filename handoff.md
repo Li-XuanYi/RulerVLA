@@ -1,5 +1,61 @@
 # Handoff
 
+## 2026-10-27 源码冻结与资源修复
+
+- [Code] CPU optimizer 对状态和梯度使用 JAX buffer donation，EMA 初始缓冲独立；完整 checkpoint 恢复先释放旧状态并使用抽象模板，resume不再加载基座及额外完整状态。运行中预算按空闲量加本进程占用计算，初始预检仍使用实际空闲量。
+- [Experiment] 当前真实π0.5静态形状核算：参数3,354,111,248个，FP32参数约12.5GiB；参数、AdamW及EMA常驻约50GiB，状态加完整梯度约62.5GiB。该值不包含全部临时缓冲，实测峰值尚待GPU运行。40项CPU回归通过，日志在outputs/metric_cue_pilot/resource_fix/verified.log。
+- [Code] 工程pilot对齐M2、seed42、batch8、microbatch1、累计8、EMA .999与正式warmup-cosine，执行两次更新和完整保存恢复；初始预算每卡20GiB、CPU72GiB。真实入口的旧batch32断言已改为读取revision3协议。
+- [Experiment] 用户提出使用其他节点；vla_6_6000的RTX PRO6000 Blackwell及CPU可作为候选，JAX/JAXlib0.5.3、Flax0.10.2、Orbax0.11.13匹配。使用独立运行目录，同一源码提交；权重与checkpoint放在NAS的/home/Dataset2/yqt/rulervla/metric_cue_runs，启动前重新检查资源，保留原有作业。
+- [Code] 本轮将提交实际导入的运行时及相关配置、测试和文档，继续强制source_provenance。正式release仍关闭，位置场景有效性及当前源码GPU更新/恢复须分别验收。
+
+## 2026-10-27 冒烟失败原因核查
+
+- [Experiment] 最新batch8_split_attempt_20261027/preflight_M0停在资源准入：GPU2/5空闲8221/23549 MiB，要求每卡32768 MiB；CPU可用69.8140 GiB，要求100 GiB；未导入JAX或启动GPU。
+- [Experiment] 本轮CPU执行source_provenance(Path.cwd())，复现 Runtime source is not committed: src/rulervla/geometry/camera.py。资源满足后仍有当前运行时代码身份阻塞；本轮未提交、改写源码或放宽检查。
+- [Experiment] 历史ef3c277版本的gpu_fsdp_0_2_reuse_rgb_20261026已有gpu_equivalence.json，且源码哈希与manifest相符；两项allclose通过后才写入JSON。该原始证据覆盖旧handoff中“未取得等价检查数值”的概述，但不能用于当前revision3发布。
+- [Unknown] 历史smoke没有首条成功更新记录，最终stderr/退出码未找到；旧running字段为遗留状态，当前无训练进程。现有证据不能确定历史中断是GPU/CPU OOM、NCCL异常还是外部终止。
+- 详细证据与范围见开发树 experiments/metric_cue_v1/SMOKE_FAILURE_ANALYSIS.zh.md。本轮仅核查与CPU源码身份诊断，未启动GPU smoke、训练或rollout，全部门槛保持原状态。
+
+
+## 2026-10-27 M2 seed42 正式启动检查
+
+- [Experiment] 用户要求开始预训练；目标为当前protocol revision3的L09_spatial_M2_seed42：有效batch8、microbatch1、累计8、30k更新，full fine-tuning，关闭Echo。实际运行preflight及正式train入口，启动返回blocked，尚未发生参数更新或创建训练checkpoint。
+- [Experiment] 本次GPU3/5空闲12259/23549 MiB，要求每卡32768 MiB；CPU可用66.93 GiB，要求100 GiB。两个manifest、统计量和基座metadata/receipt身份通过。preflight未导入JAX或启动GPU。
+- [Code/Experiment] 正式入口因五项未通过条件抛出PermissionError：GPU零Cue等价、GPU梯度/优化器更新、完整状态恢复、位置场景有效性、资源准入。release的训练/评测开关保持关闭，没有降低门槛、停止其他作业或启动后台训练队列。
+- 记录位于开发树 experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_start.json；原始日志位于 outputs/metric_cue_pilot/launch_M2_seed42_r3_20261027/。运行矩阵将该run标为blocked；其他run保持原状态。
+
+
+## 2026-10-27 revision3：协议采用 batch8
+
+- [Code] protocol.json 已升至 revision3：effective batch8、microbatch1、gradient accumulation8、30000 updates。run_matrix.json 与 release.json 使用相同 protocol revision 和 SHA-256；十二个 run ID、学习率、优化器、数据和评测条件保留。revision2 的协议、运行矩阵和 release 状态归档于 experiments/metric_cue_v1/revisions/r2/frozen_inputs.tar.gz。协议 SHA-256：a5188add4e9839c17de991a8062fb780f50c8ca3a7f967cafcd91ad9cc2b80e4。
+- [Status] 训练与评测仍未发布；本次没有启动训练。GPU更新、资源条件、完整状态恢复和SR仍未验证。
+
+## 2026-10-27 batch8 评估与旧配置修复
+
+- [Code] 修改仅位于 MetricRuler 开发树。L09四组Cue和旧工作流入口对齐正XYZ、0～15 cm、5 cm等价横刻度及当前字段；协议更新为revision2，研究计划、协议、运行矩阵与release身份同步。旧协议与五份配置原字节保存在 experiments/metric_cue_v1/revisions/r1/frozen_inputs.tar.gz，SHA-256为4b85026ac19c6c2ab63a1327a538336b893288ef9d6f5fd96a2c6de01ad64413。
+- [Experiment] 新增真实配置回归先复现10项旧字段/哈希失败，修复后11项通过；连同真实标尺与Echo回归共37 passed、209条当前JAX/Flax弃用警告。实际四组输入入口通过，receipt为 outputs/metric_cue_pilot/config_alignment_r2/real_arm_input.json。四组CLI preflight都能读取配置，随后因GPU2/5每卡32768 MiB及CPU100 GiB门槛而停止；四组preflight均未导入JAX或启动GPU。计算图与回归仅使用CPU，本轮没有正式训练。
+- [Inference] 有效batch8按microbatch1、累计8解释；八条真实连续动作及完整π0.5梯度累积静态形状通过。30k更新抽取240000个起始帧窗口，等效4.5309轮；batch32为960000个、18.1235轮。参数/梯度/CPU AdamW/EMA占用基本保持，不能用batch降低解除当前资源限制；吞吐量、峰值显存、数值稳定性与SR仍未知。
+- [Code] 该记录后由revision3更新：当前共同配方采用effective batch8、microbatch1、累计8、30k。详细依据见 experiments/metric_cue_v1/BATCH8_30K_ASSESSMENT.zh.md 与 REVISION3_BATCH8.zh.md。旧产物、checkpoint及失败结果保持原位，训练与评测发布标志继续关闭。Ruff、差异检查通过，CodeGraph已同步。
+
+
+## 2026-10-27 CodeGraph 远程索引
+
+- 用户已授权在远程主仓库和 MetricRuler 开发树建立索引。CodeGraph 0.9.4 已隔离安装到 /home/lixuanyi/.local/opt/codegraph/0.9.4，远程命令入口为 /home/lixuanyi/.local/bin/codegraph，自带运行时；没有修改系统 Node 或本地 MCP 配置。
+- 主仓库 /home/lixuanyi/XuanyiLi/code/RulerVLA 与开发树 /home/lixuanyi/XuanyiLi/work/worktrees/rulervla-metric-cue 分别完成 init -i。status 记录主仓库1997个节点、3881条边，开发树4138个节点、8146条边；两者 pendingChanges 均为零。
+- 开发树首轮 errors.log 的4个 ENOENT 均对应原有 Git 删除项：src/rulervla/training/metric_grounding.py、tests/test_metric_cue.py、tests/test_metric_grounding_labels.py、tests/test_metric_prompt.py。文件保持删除状态；当前 MetricRulerConfig 与主仓库 project_metric_ruler 的实际符号查询均返回源码位置。
+- 两个工作区的 .gitignore 均新增 /.codegraph/。安装缓存和日志在主仓库 outputs/codegraph_setup/20261027/；开发树初始化日志在其 outputs/codegraph_setup/20261027/。中间文件均位于被忽略的 outputs 内，没有使用 /tmp。
+- 后续通过 SSH 使用 /home/lixuanyi/.local/bin/codegraph，并切换到目标工作区执行 context/query/sync/status；本地会话中的 CodeGraph MCP 仍指向本地目录，不能自动读取远程索引。本轮没有启动训练、GPU 作业、rollout 或历史队列。
+
+
+## 2026-10-27 MetricRuler 训练可行性核对
+
+- [Code] 当前开发树 HEAD 为 c65323387dae06ae6c14036310643948649ca522，另有未提交修改。当前入口 configs/metric_ruler.yaml、configs/metric_workflow.yaml 使用 EE/TCP 原点、固定 world/action 正 XYZ、0～15 cm、每 5 cm 等价横刻度、无标尺箭头；双视角 RGB 加独立 Cue，经六通道 SigLIP 输入，Echo 默认关闭，目标为原 Flow Matching 动作损失。
+- [Code/Inference] 可从官方 pi05_base 继续训练，使 π0.5 学习使用当前 Cue；MetricRuler 是确定性几何渲染模块。现有正式配方为 full fine-tuning，当前工作流的 batch1/2 updates 是工程检查配置。L09 仍引用旧 ±30 cm 字段，实际执行 preflight --arm M2 在读取冻结配置时因 axis_extent_m 等旧字段被拒绝；正式训练需先对齐版本化协议及 gates。
+- [Experiment] 本日重新运行无 JAX/GPU 初始化的 preflight，数据两个 manifest、统计量及基座来源身份检查通过。GPU2/5 空闲分别为15759/23549 MiB，低于每卡32768 MiB；CPU可用63.35 GiB，低于100 GiB。launch_allowed=false。原始记录位于开发树 outputs/metric_cue_pilot/pretraining_feasibility_20261027/preflight/。
+- [Experiment] release.json 当前 training_released=false、evaluation_released=false；完整模型 GPU 零Cue等价、梯度及优化器更新、完整训练状态恢复、位置场景有效性与资源条件仍未通过。120帧几何和输入报告为已存证据，本轮未重新执行该审计；尚无当前标尺的正式训练或 rollout SR。
+- 本轮读取当前源码、配置、历史证据并完成资源及冻结配置检查；未修改代码、协议、发布条件或 registry，未启动训练、GPU smoke、policy inference 或 rollout。主仓库及开发树交接同步记录本次核查。
+
+
 > 更新日期：2026-10-20 · 工作流首次部署交接
 
 ## 一句话现状
@@ -119,3 +175,41 @@ RulerVLA 已有实验总览、协议、run matrix 和 36 项历史实验索引�
 
 - [Experiment] 使用真实 LIBERO Spatial 黑碗样本 `outputs/metric_cue_pilot/real_sample_1261.npz`，SHA-256 为 `b588df1e3024159b81fecb6fbf8306dd622e00e51358bfc9bfca8b3c51880c56`；当前为 episode 1261 控制帧 20，实测历史为控制帧 15 至 20，EE 位移 `[0.0556159038, 0.0008702865, -0.0393905640]` 米。
 - [Code/Experiment] `scripts/metric_cue_visual_demo.py` 使用现有 `MetricViewAdapter` 分别生成 M2 标尺、空白标尺加真实 Echo、M3 标尺加 Echo。三种情况的双视角 RGB 逐值相同，Echo 在两个视角均已渲染。图像和来源记录位于被忽略的 `outputs/metric_cue_pilot/visual_demo_20261026/rendered/`，包含三张独立 PNG、对照图和 `manifest.json`。上排 RGB 叠加仅用于观察；下排显示实际三通道 Cue。Echo 单独示例是可视化组合，当前 L09 运行矩阵没有对应训练组。
+
+## 2026-10-26 ±15 cm Metric Ruler 渲染版本
+
+- [Code] 工作树仍为 `/home/lixuanyi/XuanyiLi/work/worktrees/rulervla-metric-cue`。新增 `metric_ruler_15cm_v2` 及 `configs/rulervla_metric_cue_15cm_v2.yaml`、`configs/rulervla_metric_workflow_15cm_v2.yaml`。EE 为原点，world XYZ，每轴 ±15 cm、每 5 cm 等价横刻度；独立通道，正实线/负虚线及正箭头。OpenCV 亚像素 AA 直接在 224×224 标定上绘制，RGB 路径和原模型/FM 目标保持原状。
+- [Code] 旧 ±30 cm 配置继续使用原渲染和原合同，历史 Cue 两视角哈希及 pipeline fingerprint 均与已有记录一致。新配置 fingerprint 为 `036530fc989926dd2ae0190077aa6a6738ef9e40d0e804fde19f0efff48e30e7`。新身份会拒绝无版本 G1 权重桥接，以及旧正式 arm 对新配置的静默替换。
+- [Experiment] 120 个真实帧、240 个视角、4320 个刻度：最大物理误差 `1.1102230246251565e-16 m`，独立投影误差 `1.3642420526593924e-12 px`。4 个真实连续动作样本在训练/推理及 SigLIP 前逐值一致；六通道 float32、Cue [0,1]、朝向、mask 和真实 tokenizer 核验通过。边界测试使用真实标定独立检查 near 交点、viewport 端点及可见轴线像素。
+- [Experiment] 本次新增真实数据测试 12 passed，相关回归 49 passed；全仓 192 passed、16 failed、96 warnings，16 个失败在修改前独立源码快照中逐项复现。详细名称、限制及数值表见 `reports/metric_ruler_15cm_v2/report.zh.md`，命令见同目录 `commands.md`；原始日志和最终图片位于 `outputs/metric_cue_pilot/ruler15_v2_validation/delivery_verified/` 及其上级。Ruff、git diff --check 和只读代码审查通过。
+- [Inference] 当前 L09 protocol/run matrix 仍为旧 ±30 cm，release 条件未改变。新工作流已经过渲染和输入核验；正式训练需先冻结匹配的新协议并通过 gates。本次没有启动正式训练、GPU smoke、policy predict 或 rollout。Wrist 的视野/近面裁剪、光轴接近及投影轴夹角退化均保留真实位置并记录；不据此声明模型尺度能力或 SR。
+
+## 2026-10-26 正 XYZ 轴标尺 v3
+
+- [Code] 按最新要求，当前版本只显示从 EE 原点沿正 XYZ 轴的 0～15 cm 标尺，刻度为 +5/+10/+15 cm。新增独立身份 `metric_ruler_positive15cm_v3`，配置为 `configs/rulervla_metric_cue_positive15cm_v3.yaml` 和 `configs/rulervla_metric_workflow_positive15cm_v3.yaml`；v2 与历史配置、checkpoint 及记录保留原定义。
+- [Code] 本地 `reaserch.md` 的公式、范围、刻度、Prompt、M1/M2/M3 描述已同步为当前正轴定义；远端副本为 `docs/metric_cue/RESEARCH_PLAN.md`。合同见 `docs/metric_cue/RULER_POSITIVE15CM_V3.md`。
+- [Experiment] 120 个真实帧、240 视角、2160 正刻度通过核验；最大物理误差 `1.1102230246251565e-16 m`，独立投影误差 `1.3073986337985843e-12 px`。双视角没有负向轴线像素，四个真实样本的训练/推理及 SigLIP 前输入逐值一致。新 fingerprint 为 `de1ac6d2bb7a64bc64a8ab642da45b0cb657584c36d683e5693f14bc4c152dbb`。
+- [Experiment] 新增真实测试 4 项通过，相关回归 35 passed；全仓 196 passed、16 个既有失败、96 warnings，失败名称与上一轮相同。Ruff、diff 检查与只读审查通过。详细记录在 `reports/metric_ruler_positive15cm_v3/report.zh.md`，图片和原始日志在 `outputs/metric_cue_pilot/positive15_v3_validation/`。
+- [Inference] 本次没有启动训练或 rollout，旧正式协议和 gates 未修改。Wrist 正 Z 的刻度在当前示例中因实际视野与近平面不可见，保留真实裁剪及省略记录。
+
+## 2026-10-26 无箭头标尺与代码整理
+
+- [Code] 当前 Cue 仅保留正 XYZ 实线、+5/+10/+15 cm 等价横刻度及 EE 原点。参数类统一为 `MetricRulerConfig`，当前投影/渲染为 `project_ruler_cue`、`render_ruler_cue`；共用相机几何位于 `geometry/camera.py`。删除多套 Cue 分派、标尺箭头参数/函数、旧类名及未使用的读尺辅助实现。
+- [Code] 所有当前 CLI 默认采用 `configs/metric_ruler.yaml`、`configs/metric_workflow.yaml`，审计入口为 `scripts/audit_metric_ruler.py`；版本后缀配置和重复测试合并清理。仍被 RGB/Adaptive 对照使用的实现与冻结协议引用配置保留。修改前源码完整归档于 `outputs/metric_cue_pilot/ruler_cleanup/before/source.tar.gz`。
+- [Experiment] 120 个真实帧、240 视角、2160 个刻度检查通过，物理误差最大 `1.1102230246251565e-16 m`，独立投影误差最大 `1.3073986337985843e-12 px`。4 个真实连续动作样本的 Train/Inference 与 SigLIP 前输入一致；新输入 fingerprint 为 `4a0c879cec9dff924465417a64a8623c1676b4a3f357563e03a2aa73e52e3775`。
+- [Experiment] 当前11项真实标尺测试、checkpoint保存恢复和RGB/Adaptive对照通过；最终全仓180 passed、16个既有失败、96 warnings，失败名单与此前相同。Ruff、diff检查和独立审查通过。原始日志、预览与输入在 `outputs/metric_cue_pilot/ruler_cleanup/final_render/` 及其上级；说明见 `reports/metric_ruler_cleanup/report.zh.md`，当前合同见 `docs/metric_cue/RULER.md`。
+- [Code] 本地 `reaserch.md` 与远端 `docs/metric_cue/RESEARCH_PLAN.md` 同步改为当前名称和无箭头标尺。当前配置拒绝旧输入字段，旧 checkpoint 使用匹配的冻结源码；训练/rollout gates 未改变，本轮未启动正式训练或 rollout。
+
+## 2026-10-26 Motion Echo 实现检查
+
+- [Code] Echo 默认关闭；启用后使用同一 episode 内当前与五个环境控制步前的实测 EE 位置，在每个当前相机视角分别投影并绘制黄色净位移箭头。训练通过 `SpatialDataset.get_history` 读取历史，推理通过 `MetricInferenceHistory` 逐控制步维护历史；历史不足或位移小于 3 mm 时 Cue 留空。
+- [Code] 当前实现存在四项待处理问题：Pillow 在最终分辨率直接绘图，未使用抗锯齿；任一端点位于近平面之后时丢弃整个线段，且视野裁剪后仍在裁剪端点画箭头；Echo 像素整组三通道覆盖 Ruler，可清除重叠位置的 Z 通道；Prompt 只依据历史有效性，未依据实际渲染或静止状态。本次仅检查实现，没有修改 Echo 源码或配置。
+- [Experiment] 本次运行 `tests/test_motion_echo.py`，5 passed，日志为 `outputs/metric_cue_pilot/echo_review/tests.log`。另核对上一轮两个真实样本的 M0–M3 输入检查记录 `outputs/metric_cue_pilot/ruler_cleanup/real_arms_verified.log`；现有证据没有覆盖上述全部 Echo 可读性与裁剪问题，也不代表 policy 或 rollout 成功率。
+
+## 2026-10-26 Motion Echo 渲染改进
+
+- [Code] `render_motion_echo` 采用共用三维近平面／视野裁剪与 OpenCV 亚像素抗锯齿，保留实测五步 EE 净位移；头部仅锚定可见的真实当前端点，大小最多为可见长度 40%。`compose_cues` 逐通道取最大值，Z 逐值保持；Prompt 改由两个视角的实际渲染诊断生成，移除 `echo_valid`。无效投影诊断使用 JSON null。研究计划与 `docs/metric_cue/MOTION_ECHO.md` 已同步。
+- [Code] Echo 默认关闭，关闭 fingerprint 仍为 `4a0c879cec9dff924465417a64a8623c1676b4a3f357563e03a2aa73e52e3775`；启用时保存 `motion_echo_rendering: antialiased_channel_max`，fingerprint 为 `775d450f78263bd1e0d44a1dd1edb9393afc08f7dea7ed9908d44f2c7e4c8413`，旧 Echo 身份在资产读取前被拒绝。六通道模型与 Flow Matching 目标不变。
+- [Experiment] 120 个真实帧、240 视角：Agentview/Wrist 可见 Echo 为 107/109，历史不足各 10，不足 1 px 各 3/1；Wrist 有 45 个视野裁剪。独立投影误差最大 `1.1368683772161603e-12 px`，累计 12,376 个蓝通道重叠像素逐值保留。8 个真实样本 Train/Inference/SigLIP 前输入完全一致、RGB 不变、mask TTFF；启用预处理资产保存恢复通过。
+- [Experiment] 新增 15 项回归在旧源码失败、新源码通过；Echo 与相关接口 35 项全通过。最终全仓 194 passed、16 个既有失败、96 warnings；与前轮 XML 按名称逐项比对失败集合相同。真实 M0–M3 入口、Ruff、diff 检查及独立只读审查通过。报告为 `reports/motion_echo/report.zh.md`；原始日志、配置和张量在 `outputs/metric_cue_pilot/echo_render/verified/` 及上级，最终对比图为 `outputs/metric_cue_pilot/echo_render/delivery/render_comparison.png`。修改前源码完整归档在同运行目录的 `before/source.tar.gz`。
+- [Inference] 本轮没有训练或 rollout；共享 Cue 通道可能混色，不能分别恢复两个组件；边界压力用实测轨迹与受控标定参数变体单独验证。结果不构成模型尺度能力或 SR 结论，冻结协议和 gates 未修改。

@@ -649,12 +649,12 @@
       "status": "blocked_gpu_validation",
       "purpose": "六通道 M0/M1/M2/M3 公制提示与实测历史位移受控训练和评测",
       "details": [
-        "Spatial 四组、三训练种子，共十二次计划训练；协议与运行矩阵在 experiments/metric_cue_v1。",
-        "真实样本输入已核验；完整模型 GPU 检查与评测场景锁定尚未通过。"
+        "Spatial 四组、三训练种子，共十二次计划训练；experiments/metric_cue_v1/protocol.json revision3 对齐正 XYZ、0～15 cm、5 cm 等价横刻度和有效 batch8。revision1、revision2 输入分别归档在 revisions/r1、revisions/r2。",
+        "当前共同配方 effective batch8、microbatch1、梯度累积8、30k updates；真实输入和完整模型静态梯度形状已核验。GPU 实际更新、完整状态恢复、位置场景与资源门槛继续关闭。"
       ],
       "priority": "current",
       "research_group": "六通道公制提示",
-      "current_status_note": "2026-10-25 资源门槛阻止 GPU 检查，未开始正式训练",
+      "current_status_note": "2026-10-27 revision3采用effective batch8；M2 seed42正式启动检查被五项launch gates拒绝，参数更新为0，启动receipt已保存",
       "current_role": "检验方向、公制刻度和 Motion Echo 的逐项增量"
     },
     {

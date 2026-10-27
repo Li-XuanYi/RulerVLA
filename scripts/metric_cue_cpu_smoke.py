@@ -10,7 +10,7 @@ import numpy as np
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--sample', type=Path, required=True)
-    parser.add_argument('--config', type=Path, default=Path(__file__).resolve().parents[1] / 'configs/rulervla_metric_cue.yaml')
+    parser.add_argument('--config', type=Path, default=Path(__file__).resolve().parents[1] / 'configs/metric_ruler.yaml')
     parser.add_argument('--report', type=Path)
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]

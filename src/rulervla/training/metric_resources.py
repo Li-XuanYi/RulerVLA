@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 import sys
 
+import psutil
 import yaml
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -43,12 +44,47 @@ def probe_file(path, *, parse_json=False):
 
 def query_gpus():
     try:
-        result = subprocess.run(['nvidia-smi', '--query-gpu=index,memory.free,memory.total,utilization.gpu',
+        result = subprocess.run(['nvidia-smi', '--query-gpu=index,uuid,memory.free,memory.total,utilization.gpu',
                                  '--format=csv,noheader,nounits'], capture_output=True, text=True, timeout=8, check=True)
-        return [dict(index=int(row[0]), free_mib=int(row[1]), total_mib=int(row[2]), utilization=int(row[3]))
+        return [dict(index=int(row[0]), uuid=row[1].strip(), free_mib=int(row[2]),
+                     total_mib=int(row[3]), utilization=int(row[4]))
                 for row in csv.reader(io.StringIO(result.stdout))]
     except (OSError, subprocess.SubprocessError, ValueError) as error:
         return {'error': str(error)}
+
+
+def runtime_capacity(value):
+    gpus = query_gpus()
+    if isinstance(gpus, dict):
+        raise RuntimeError('GPU resource query failed: ' + gpus['error'])
+    process = psutil.Process()
+    result = subprocess.run(
+        ['nvidia-smi', '--query-compute-apps=pid,gpu_uuid,used_memory',
+         '--format=csv,noheader,nounits'], capture_output=True, text=True, timeout=8, check=True)
+    own = {}
+    for row in csv.reader(io.StringIO(result.stdout)):
+        if int(row[0]) == process.pid:
+            uuid = row[1].strip()
+            own[uuid] = own.get(uuid, 0) + int(row[2])
+    for gpu in gpus:
+        gpu['own_mib'] = own.get(gpu['uuid'], 0)
+        gpu['budget_available_mib'] = gpu['free_mib'] + gpu['own_mib']
+    resources = value['resources']
+    minimum = (resources['min_free_mib'] if len(resources['gpu_indices']) == 1
+               else resources['min_free_mib_fsdp'])
+    indexed = {gpu['index']: gpu for gpu in gpus}
+    blockers = []
+    for index in resources['gpu_indices']:
+        if index not in indexed:
+            raise RuntimeError(f'Selected GPU {index} disappeared')
+        if indexed[index]['budget_available_mib'] < minimum:
+            blockers.append(f'GPU {index} available budget is below {minimum} MiB')
+    available = psutil.virtual_memory().available / 2**30
+    rss = process.memory_info().rss / 2**30
+    if available + rss < resources['min_cpu_available_gib']:
+        blockers.append('CPU available budget is below the optimizer threshold')
+    return dict(pid=process.pid, gpu_snapshot=gpus, cpu_available_gib=available,
+                cpu_rss_gib=rss, cpu_budget_available_gib=available + rss, blockers=blockers)
 
 
 def preflight(value, *, gpu_query=query_gpus, file_probe=probe_file):
