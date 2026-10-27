@@ -6,7 +6,9 @@
 
 [Experiment] 原环境NCCL2.26.2+cuda12.2在真实图像all_gather首次运行时先进行长时间PTX编译，随后抛出CUDA_ERROR_ILLEGAL_ADDRESS。原始输出为outputs/metric_cue_pilot/node147_deploy/transport_warm.log；GDB观察到驱动PTX编译线程，见transport_shm_gdb.log。等待提示本身不足以认定死锁。GPU更新尚未通过。
 
-[Code] 当前独立验证NCCL2.28.9，版本和wheel SHA-256锁定于requirements/metric-cue-blackwell-nccl.lock。该目录通过进程级LD_LIBRARY_PATH选择，旧NCCL及基础环境保持原位。须核验实际加载的共享库、真实图像逐值通信及完整模型训练；仅下载或配置新库不代表已修复。ptxas使用环境中的CUDA12.9.41，显式放在PATH前部，避免系统旧编译器不支持sm_120。
+[Code] 独立NCCL2.28.9的版本和wheel SHA-256锁定于requirements/metric-cue-blackwell-nccl.lock。运行时通过进程级LD_PRELOAD明确加载nccl2289/nvidia/nccl/lib/libnccl.so.2；基础环境和旧库保持原位。日志核验实际库版本，平台receipt记录共享库哈希。ptxas使用环境中的CUDA12.9.41，显式放在PATH前部。
+
+[Experiment] vla_7_6000 GPU1/3的真实图像all_gather已通过逐值比较：输入[2,224,224,6]，输出[2,2,224,224,6]，1.288秒，实际NCCL2.28.9+cuda12.9；原始记录在outputs/metric_cue_pilot/node147_transport_preload2289_89b7b5c/，日志为node147_deploy/transport_preload2289.log。该结果核验传输正确性，完整模型梯度、CPU optimizer峰值及恢复仍需单独通过。
 
 [Protocol] 当前模型、batch8、microbatch1、累积8、FP32 AdamW/EMA、学习率、数据和评测协议保持revision3定义。环境修订的实测结果须与run manifest、平台库哈希和checkpoint共同保存；完整训练及评测release继续关闭。
 

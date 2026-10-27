@@ -43,8 +43,8 @@ def main():
     manifest = source_provenance(ROOT)
     manifest.update(sample_identities=batch.identities, environment={
         name: os.environ.get(name) for name in (
-            "PATH", "LD_LIBRARY_PATH", "CUDA_VISIBLE_DEVICES", "JAX_PLATFORMS",
-            "NCCL_DEBUG", "NCCL_P2P_DISABLE", "NCCL_CUMEM_HOST_ENABLE")})
+            "PATH", "LD_LIBRARY_PATH", "LD_PRELOAD", "CUDA_VISIBLE_DEVICES", "JAX_PLATFORMS",
+            "CUDA_CACHE_MAXSIZE", "NCCL_DEBUG", "NCCL_P2P_DISABLE", "NCCL_CUMEM_HOST_ENABLE")})
     (args.out / "manifest.json").write_text(json.dumps(manifest, indent=2))
     started = time.monotonic()
     print("real_image_all_gather_started", flush=True)
