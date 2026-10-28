@@ -1,0 +1,30 @@
+{
+  "schema": "rulervla_metric_runtime_stop_receipt_v1",
+  "experiment_id": "L09",
+  "run_id": "L09_spatial_M2_seed42",
+  "verified_date": "2026-10-28",
+  "host": "vla_7_6000",
+  "hostname": "ZjuServer147",
+  "source_commit": "e50e61c0fe9475f70a1b74ab62523325a1061983",
+  "pid": 216052,
+  "gpu_indices": [0, 4],
+  "state": "stopped_by_runtime_resource_gate",
+  "stage": "before_update_14",
+  "completed_optimizer_updates": 13,
+  "complete_checkpoints": 0,
+  "last_metrics": {
+    "update": 13,
+    "loss": 0.11788222193717957,
+    "grad_norm": 0.8337269425392151,
+    "cue_grad_l2": 0.03273098170757294,
+    "gradients_finite": true
+  },
+  "gpu_budget_available_mib": [16126, 16621],
+  "required_gpu_budget_mib": 28672,
+  "cpu_budget_available_gib": 291.9731864929199,
+  "run_directory": "outputs/metric_cue_pilot/L09_spatial_M2_seed42",
+  "launch_log": "outputs/metric_cue_pilot/L09_spatial_M2_seed42.launch.log",
+  "previous_launch_receipt": "experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_launch_r4.json",
+  "restart_from": "verified_pi05_base",
+  "preserved_in_place": true
+}

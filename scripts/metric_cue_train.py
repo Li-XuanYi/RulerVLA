@@ -115,7 +115,8 @@ def main():
     gpu, cpu = jax.devices('gpu')[0], jax.devices('cpu')[0]
     mesh = (sharding.make_mesh(len(run['resources']['gpu_indices']))
             if len(run['resources']['gpu_indices']) > 1 else None)
-    require_current_capacity('before_state_loading')
+    # 用户要求：保留启动前准入；启动后不因资源查询或阈值主动终止训练。
+    # require_current_capacity('before_state_loading')
     stage('restore_state_template' if args.resume else 'load_real_base_and_six_channel_optimizer')
     with jax.default_device(cpu):
         if args.resume:
@@ -123,7 +124,7 @@ def main():
         else:
             state = create_training_state(config, load_initial_model(config), optimizer_device=cpu)
     gc.collect()
-    require_current_capacity('model loading')
+    # require_current_capacity('model loading')
     manager, resuming = checkpoints.initialize_checkpoint_dir(
         args.out/'checkpoints', keep_period=10000 if args.mode == 'train' else 1,
         overwrite=False, resume=args.resume)
@@ -143,7 +144,7 @@ def main():
         measured = gpu_equivalence(config, state.params, first_batch, gpu,
                                    run['gpu_equivalence'], mesh=mesh)
         (args.out/'gpu_equivalence.json').write_text(json.dumps(measured, indent=2))
-        require_current_capacity('GPU equivalence')
+        # require_current_capacity('GPU equivalence')
     trainer = MetricTrainer(config, state.model_def, gradient_device=gpu,
                             optimizer_device=cpu, gradient_mesh=mesh)
     saved = None
@@ -153,9 +154,9 @@ def main():
         started = time.monotonic()
         micro_batch_size = (protocol['training']['micro_batch_size'] if args.mode == 'train'
                             else 1 if mesh is not None else None)
-        require_current_capacity(f'before_update_{update + 1}')
+        # require_current_capacity(f'before_update_{update + 1}')
         state, metrics = trainer.step(state, batch, micro_batch_size=micro_batch_size)
-        require_current_capacity(f'after_update_{int(state.step)}')
+        # require_current_capacity(f'after_update_{int(state.step)}')
         if args.mode == 'smoke' and metrics['cue_grad_l2'] <= 0:
             raise ValueError('Real action loss did not produce nonzero Cue kernel gradients')
         record = dict(update=int(state.step), seconds=time.monotonic()-started,
@@ -168,11 +169,11 @@ def main():
             status['last_metrics'] = record
         stage('training_updates', optimizer_updates=int(state.step))
         if args.mode == 'train' and int(state.step) in protocol['training']['checkpoint_updates']:
-            require_current_capacity('before_checkpoint_save')
+            # require_current_capacity('before_checkpoint_save')
             stage('save_full_training_state')
             saved = save_training_checkpoint(manager, state, pipeline, config, provenance)
     if args.mode == 'smoke':
-        require_current_capacity('before_checkpoint_save')
+        # require_current_capacity('before_checkpoint_save')
         stage('save_full_training_state')
         expected = state_signatures(state)
         (args.out/'full_state_expected_sha256.json').write_text(json.dumps(expected, indent=2))
@@ -186,7 +187,7 @@ def main():
                                             expected_manifest=provenance)
         if state_signatures(state) != expected:
             raise ValueError('Full six-channel parameter/optimizer state changed during recovery')
-        require_current_capacity('after_checkpoint_restore')
+        # require_current_capacity('after_checkpoint_restore')
         (args.out/'full_state_sha256.json').write_text(json.dumps(expected, indent=2))
     manager.close()
     stage('complete', state='complete', full_state_restore_bitwise=args.mode == 'smoke',
