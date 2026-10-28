@@ -650,11 +650,11 @@
       "purpose": "六通道 M0/M1/M2/M3 公制提示与实测历史位移受控训练和评测",
       "details": [
         "Spatial四组、三训练种子，共十二次计划训练；当前revision4沿用正XYZ、0～15 cm、5 cm等价横刻度和有效batch8，分开训练与评测准入。revision1至revision3原输入已分别归档。",
-        "当前共同配方effective batch8、microbatch1、梯度累积8、30k updates；vla_7_6000已运行M2 seed42正式训练，GPU0/4、PID216052。既有完整smoke的207个数组保存恢复通过；资源准入每卡28 GiB、CPU160 GiB。S29位置场景有效性作为评测门槛保持关闭。"
+        "当前共同配方effective batch8、microbatch1、梯度累积8、30k updates；vla_7_6000已重新运行M2 seed42正式训练，GPU4/3、PID2296578，源码9519baf。用户要求注释启动后的资源检查，启动前每卡28 GiB、CPU160 GiB准入保留。旧13次未保存更新及原始失败输出保留；重启从已验证pi05_base开始。S29位置场景有效性作为评测门槛保持关闭。"
       ],
       "priority": "current",
       "research_group": "六通道公制提示",
-      "current_status_note": "2026-10-27 用户确认revision4分开训练/评测准入；M2 seed42正式训练运行于vla_7_6000 GPU0/4，PID216052，已核实至少6次更新，目标30k。S29位置场景及策略评测保持关闭。",
+      "current_status_note": "2026-10-28 按用户要求通过WSL连接，注释启动后资源检查并重新启动；M2 seed42运行于vla_7_6000 GPU4/3，PID2296578，已核实至少1次真实更新，目标30k。重启receipt见experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_restart_no_runtime_gate.json。S29及策略评测保持关闭。",
       "current_role": "检验方向、公制刻度和 Motion Echo 的逐项增量"
     },
     {

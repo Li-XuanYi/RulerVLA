@@ -1,5 +1,15 @@
 # Handoff
 
+## 2026-10-28 L09 关闭启动后资源检查并重启
+
+- [Code] 用户要求使用WSL连接远程，注释启动训练后的显存检查，启动后不可因资源检查主动停止训练。已通过WSL Ubuntu OpenSSH完成修改和部署，scripts/metric_cue_train.py的八处require_current_capacity调用全部注释，CPU/GPU运行中资源阈值均不再主动终止训练；启动前数据/来源/gates及每卡28 GiB、CPU160 GiB准入保留。后续操作不得添加运行中资源终止监视器或以资源阈值主动停止该训练。
+- [Experiment] 原PID216052实际完成13次更新，在before_update_14因GPU0/4可用预算16126/16621 MiB低于28672 MiB主动退出；没有完整checkpoint。原目录、日志、manifest、失败状态保留，原13次未保存更新不计入新预算；记录见开发树experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_runtime_gate_stop.json。
+- [Experiment] 新训练L09_spatial_M2_seed42在vla_7_6000 GPU4/3运行，PID2296578，已核实至少1次真实更新；首条loss0.10175843、Cue梯度L2 0.04631297、梯度有限。配方继续为batch8、microbatch1、累计8、full fine-tuning、EMA .999、CPU AdamW、双卡FSDP、30000次更新，源自已验证pi05_base。
+- [Code] 冻结运行树/home/lixuanyi/XuanyiLi/metric_cue_runtime/RulerVLA当前源码为9519bafe8af1b76ebd1bb93d6b21ac0d9ba18d8a，manifest SHA-256为8a6476832f9fda75a8b025d0ab93ac695bdbb8579f135c1507e486f38611d43a，git_status为空。协议revision4 SHA-256保持c924ef9cdf7ae2de11760371baf525d845edc4275020ec1eae6d68286e29e0e1，S29及策略评测继续关闭。活动运行树的源码和Git HEAD保持冻结。
+- [Experiment] 新输出outputs/metric_cue_pilot/L09_restart_no_runtime_gate/L09_spatial_M2_seed42，日志同父目录launch.log，启动前准入记录同父目录launch/；共享outputs仍指向NAS。启动时GPU4/3空闲93920/90680 MiB、CPU可用484.235 GiB，首轮准入无blockers，flock跨exec保留。新启动receipt为开发树experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_restart_no_runtime_gate.json，run matrix和registry已指向本次运行。
+- [Experiment] 43项现有真实回归通过，233条已有依赖警告；Ruff、Python语法、bash -n及差异检查通过。CodeGraph确认require_current_capacity无调用者；原始验证目录outputs/metric_cue_pilot/L09_restart_no_runtime_gate_verification/。JAX部分donated buffers不可复用警告保留在日志。
+- [Code] 维护说明位于开发树experiments/metric_cue_v1/RUNTIME_RESOURCE_POLICY.zh.md；开发树为vla_7_A6000:/home/lixuanyi/XuanyiLi/work/worktrees/rulervla-metric-cue。receipt和本交接为观察快照，后续进度须读取实际status.json及metrics.jsonl；当前尚无训练完成或SR结论。
+
 ## 2026-10-27 L09 revision4 正式训练已启动
 
 - [Code] 用户明确确认修订协议先训练L09，S29位置场景有效性保留为评测条件。当前protocol revision4 SHA-256为c924ef9cdf7ae2de11760371baf525d845edc4275020ec1eae6d68286e29e0e1；revision3原字节归档于experiments/metric_cue_v1/revisions/r3/frozen_inputs.tar.gz。模型、数据、训练配方、checkpoint选择及评测定义经归档比对均未改变。

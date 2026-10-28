@@ -4,6 +4,8 @@
 
 [Code] 当前标尺为正 XYZ、0～15 cm、5 cm 等价横刻度和 EE 原点。统一配置为 `configs/metric_ruler.yaml`、`configs/metric_workflow.yaml`，代码为 `cues/metric_ruler.py` 与 `geometry/camera.py`，审计入口为 `scripts/audit_metric_ruler.py`。合同与清理证据见 `docs/metric_cue/RULER.md`、`reports/metric_ruler_cleanup/report.zh.md`。当前训练、推理共用此流程。
 
+[Code/Experiment] 2026-10-28按用户要求注释启动后的八处资源检查，保留启动前准入；原训练在第14次更新前被显存预算阈值终止，已完成13次且没有完整checkpoint。重启从已验证pi05_base重新开始，输出目录为`outputs/metric_cue_pilot/L09_restart_no_runtime_gate/L09_spatial_M2_seed42`。修订与原始失败证据见[RUNTIME_RESOURCE_POLICY.zh.md](RUNTIME_RESOURCE_POLICY.zh.md)。当前运行身份与进度以run_matrix.json引用的最新receipt为准。
+
 ## 当前冻结协议 revision 4
 
 [Code] 四组配置对齐当前正轴标尺；revision1 的协议、运行矩阵、发布状态和五份配置原字节保存在 revisions/r1/frozen_inputs.tar.gz；revision2 的协议、运行矩阵和发布状态保存在 revisions/r2/frozen_inputs.tar.gz。修订说明见 CONFIG_ALIGNMENT_R2.zh.md 与 REVISION3_BATCH8.zh.md。正式训练仍须通过当前协议的全部 gates。
