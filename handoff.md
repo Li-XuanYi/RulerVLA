@@ -1,7 +1,15 @@
 # Handoff
 
+## 2026-10-29 L09共同CPU准入降至48GiB
+
+- [Code] 用户明确要求降低CPU内存门槛。四组共同起始预算64降至48GiB，正式门槛改为max(48,ceil(四组完整真实smoke最高CPU峰值*1.25))；双卡各28672MiB、LoRA、micro1/累计8、batch8、30k、数据及评测保持一致。48GiB覆盖此前观测33.9GiB峰值加25%后的约42.4GiB，但完整资源校准尚未完成，不能视为GPU已验证。
+- [Code] 冻结运行时6bfd12cad6a3e1622c8e55fa34dd0165d87db4d7；protocol revision6 SHA9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b，release/run matrix同步。原CPU64六份输入归档revisions/r5_cpu64/frozen_inputs.tar.gz，SHAca5ebefe6da43ed4c67b2dd327409538a8d9a083c5a08180fe7f496792771f2a；原LoRA数学配方计划保留，资源修订见REVISION6_CPU48_PLAN.zh.md。
+- [Experiment] 已核实旧117578处于waiting_resources、JAXfalse/GPUfalse且命令/工作目录吻合后取消等待器；其控制117574随后退出，没有停止已启动训练。新smoke_cpu48_r6控制192956、M2 PID193194，最近attempt1、waiting_resources、JAXfalse/GPUfalse，CPU可用20031196KiB（约19.1GiB）低于48GiB，候选GPU6/4；顺序M2/M0/M1/M3，仍需新四组完整验收并绑定新协议SHA。
+- [Experiment] CPU48合同检查3 passed、0.78秒，RED保留1failed/2passed的64!=48；归档与当前输入语义比对确认训练数学、数据、方法、评测和12个run保持一致，SHA一致，ruff/diff/JSON检查通过，只读复核无Critical/Important。实际正式CLI仍在创建输出前PermissionError拒绝，training_released/evaluation_released均false，正式30k尚未启动；receipt为receipts/L09_lora_cpu48_restart_20261029.json，l09-lora将按protocol6/48GiB继续，启动后资源终止调用仍注释。
+
 ## 2026-10-29 L09 LoRA CPU参数传输验证排队
 
+- [Experiment] 2026-10-29 14:46 UTC后续复核：V7 M2第7次等待，117578进程及命令、工作目录与冻结81ecdbb一致；仍未导入JAX或启动GPU，CPU可用22069616KiB（约21.0GiB）低于64GiB，正式输出status尚不存在，训练/评测发布仍关闭。本轮仅更新观察记录，不修改运行树或重复启动；状态无实质变化，继续安静等待资源。
 - [Experiment] V6 M2也完成两次真实更新、CP2保存及恢复，之后load_delta_inference_model阶段连续出现pinned host注册错误，launch.log记录14586 Killed，控制14119及14586均不存在。原始status的running为陈旧状态，终止来源未知；V5/V6均不满足完整GPU验收。数据、两份CP2和所有失败日志保留，未主动停止任何训练。
 - [Code/Inference] 冻结提交81ecdbb3c162a5c16f07e70e124a34a6d3c9c690已部署。独立checkpoint模型返回NumPy参数，而已成功的训练与零Cue检查使用CPU jax.Array；现在先将独立推理参数放到CPU并逐叶核验，释放NumPy模型引用，再执行同样FSDP传输，并用delta_gpu_prediction阶段区分加载与预测。该差异是待验证原因，尚不能报告GPU故障已修复；先释放训练状态及完整恢复/推理/第三步要求继续保留。
 - [Experiment] 最新五项相关CPU回归5 passed、78.95秒，日志outputs/metric_cue_pilot/L09_lora_r5_implementation/inference_cpu_placement.log；ruff与git diff --check通过，只读代码复核无Critical/Important。147节点仍NVML Unknown Error；145的NVML查询恢复，但六卡空闲13616至20222MiB，均不满足共同28672MiB准入。

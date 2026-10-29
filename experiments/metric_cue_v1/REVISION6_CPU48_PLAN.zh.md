@@ -18,11 +18,11 @@
 
 ## 执行与验证
 
-- [ ] 归档revision5 CPU64的原始protocol/release/run matrix/config/计划，记录SHA。
-- [ ] 先将真实配置合同测试改为48及拒绝47，确认旧配置产生失败。
-- [ ] 更新共同LoRA配置、protocol revision6、release与run matrix的版本和SHA，保留原输出/run ID。
-- [ ] 审计器按冻结协议下限计算正式CPU门槛；原25%余量及其他验收不变。
-- [ ] 执行真实CPU合同检查、ruff/diff/JSON校验，并确认正式训练gates继续关闭。
-- [ ] 仅在旧等待器仍未导入JAX、未启动GPU且进程身份吻合时取消等待器，保留取消记录；不能停止已启动训练。
-- [ ] 提交并在无本次活动进程时前向部署干净运行树，以唯一新目录启动48GiB四组等待队列。
-- [ ] 更新handoff、registry、receipt及后续automation；如资源不足，报告真实等待状态，不降低其余gates。
+- [x] 归档revision5 CPU64的原始protocol/release/run matrix/config/计划，记录SHA。
+- [x] 先将真实配置合同测试改为48及拒绝47，确认旧配置产生失败。
+- [x] 更新共同LoRA配置、protocol revision6、release与run matrix的版本和SHA，保留原输出/run ID。
+- [x] 审计器按冻结协议下限计算正式CPU门槛；原25%余量及其他验收不变。
+- [x] 执行真实CPU合同检查、ruff/diff/JSON校验，并确认正式训练gates继续关闭。
+- [x] 仅在旧等待器仍未导入JAX、未启动GPU且进程身份吻合时取消等待器，保留取消记录；不能停止已启动训练。
+- [x] 提交并在无本次活动进程时前向部署干净运行树，以唯一新目录启动48GiB四组等待队列。
+- [x] 更新handoff、registry、receipt及后续automation；如资源不足，报告真实等待状态，不降低其余gates。

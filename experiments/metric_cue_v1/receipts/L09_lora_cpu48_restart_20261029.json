@@ -1,0 +1,22 @@
+{
+  "schema": "rulervla_metric_lora_cpu_admission_amendment_v1",
+  "experiment_id": "L09",
+  "authorization": "用户明确要求降低CPU内存门槛；本轮选择四组统一64GiB降至48GiB",
+  "protocol_revision": 6,
+  "previous_protocol_sha256": "8c7cf7f372673d53143935a3f433134d9399189d21a4b47a0e6b0c3c50758071",
+  "protocol_sha256": "9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b",
+  "previous_inputs_archive": {"path": "experiments/metric_cue_v1/revisions/r5_cpu64/frozen_inputs.tar.gz", "sha256": "ca5ebefe6da43ed4c67b2dd327409538a8d9a083c5a08180fe7f496792771f2a"},
+  "runtime_commit": "6bfd12cad6a3e1622c8e55fa34dd0165d87db4d7",
+  "runtime_root": "/home/lixuanyi/XuanyiLi/work/rulervla-metric-lora-r5-runtime",
+  "initial_cpu_min_available_gib": 48,
+  "formal_cpu_rule": "max(48, ceil(1.25 * maximum_cpu_peak_gib_across_all_four_complete_arm_smokes))",
+  "recipe": {"finetuning": "lora", "batch_size": 8, "micro_batch_size": 1, "gradient_accumulation": 8, "num_steps": 30000, "gpu_devices": 2, "gpu_min_free_mib_per_device": 28672, "post_start_resource_termination": false},
+  "previous_waiter": {"run": "smoke_pool_v7/M2", "pid": 117578, "controller_pid": 117574, "state_before_cancel": "waiting_resources", "jax_imported_before_cancel": false, "gpu_job_started_before_cancel": false, "command_and_cwd_verified": true, "cancelled_for_user_cpu48_request": true, "both_processes_absent_after_cancel": true, "active_training_stopped": false},
+  "latest_observation": {"raw_root": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6", "order": ["M2", "M0", "M1", "M3"], "controller_pid": 192956, "pid": 193194, "arm": "M2", "state": "waiting_resources", "attempt": 1, "selected_gpu_indices": [6, 4], "jax_imported": false, "gpu_job_started": false, "formal_training_started": false, "observed_mem_available_kib": 20031196, "blocker": "CPU memory below the optimizer-offload threshold"},
+  "resource_evidence": {"previous_observed_v6_vm_hwm_kib": 35548836, "terminal_v6_peak_unknown": true, "48gib_is_initial_engineering_budget": true, "all_four_complete_gpu_profiles_validated": false},
+  "validation": {"cpu_contract_red": "1 failed, 2 passed;64!=48", "cpu_contract_green": "3 passed in0.78s", "frozen_input_semantics_and_sha_passed": true, "formal_closed_gate_cli": "PermissionError before output creation", "ruff_passed": true, "git_diff_check_passed": true, "review_critical": 0, "review_important": 0},
+  "training_released": false,
+  "evaluation_released": false,
+  "automation": {"id": "l09-lora", "status": "ACTIVE", "frequency": "hourly"},
+  "raw_evidence_checkpoints_and_failure_results_preserved": true
+}

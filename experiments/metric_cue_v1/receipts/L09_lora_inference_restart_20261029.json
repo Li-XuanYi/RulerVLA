@@ -1,6 +1,7 @@
 {
   "schema": "rulervla_metric_lora_restart_v4",
   "observation_utc_date": "2026-10-29",
+  "last_verified_at_utc": "2026-10-29 14:46:09 UTC",
   "experiment_id": "L09",
   "runtime_commit": "81ecdbb3c162a5c16f07e70e124a34a6d3c9c690",
   "runtime_root": "/home/lixuanyi/XuanyiLi/work/rulervla-metric-lora-r5-runtime",
@@ -10,7 +11,7 @@
   "training_released": false,
   "evaluation_released": false,
   "recipe": {"finetuning": "lora", "batch_size": 8, "micro_batch_size": 1, "gradient_accumulation": 8, "num_steps": 30000, "trainable_parameters": 53509280},
-  "latest_observation": {"controller_pid": 117574, "pid": 117578, "arm": "M2", "mode": "smoke", "state": "waiting_resources", "attempt": 1, "selected_gpu_indices": [6, 7], "optimizer_updates": null, "jax_imported": false, "gpu_job_started": false, "blocker": "CPU memory below the optimizer-offload threshold", "cpu_min_available_gib": 64, "observed_mem_available_kib": 23648284, "raw_root": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_pool_v7"},
+  "latest_observation": {"controller_pid": 117574, "pid": 117578, "arm": "M2", "mode": "smoke", "state": "waiting_resources", "attempt": 7, "selected_gpu_indices": [6, 7], "optimizer_updates": null, "jax_imported": false, "gpu_job_started": false, "actual_process_verified": true, "runtime_cwd_verified": true, "formal_status_exists": false, "blocker": "CPU memory below the optimizer-offload threshold", "cpu_min_available_gib": 64, "observed_mem_available_kib": 22069616, "raw_root": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_pool_v7"},
   "previous_partial_failure": {"run": "smoke_pool_v5/M2", "pid": 1094999, "optimizer_updates": 2, "losses": [0.1017892062664032, 0.1376851201057434], "gradients_finite": true, "checkpoint_2_saved": true, "complete_state_restore_signatures_identical": true, "last_stage_cpu_peak_gib": 28.339351654052734, "last_stage": "load_delta_inference_model", "raw_status_stale_running": true, "process_absent": true, "shell_reported_killed": true, "pinned_host_memory_allocation_errors": true, "termination_source": "unknown; kernel log access denied", "proactively_stopped": false, "full_smoke_passed": false},
   "previous_partial_failure_v6": {"run": "smoke_pool_v6/M2", "pid": 14586, "optimizer_updates": 2, "checkpoint_2_saved": true, "complete_state_restore_completed": true, "last_stage": "load_delta_inference_model", "shell_reported_killed": true, "process_absent": true, "raw_status_stale_running": true, "pinned_host_memory_allocation_errors": true, "termination_source": "unknown", "proactively_stopped": false, "full_smoke_passed": false},
   "changes": ["释放完整训练状态后再执行独立完整推理模型重建与GPU推理", "独立推理参数先明确放到CPU jax.Array并逐叶核验，再以训练相同路径传入FSDP；增加delta_gpu_prediction阶段区分加载和GPU预测", "释放推理模型后从同一CP2重新恢复参数/AdamW/EMA/step，并再次校验全部状态签名后继续第三步", "所有组配方、完整验收和启动后不主动按资源阈值终止保持一致；实际GPU故障修复效果尚未验证"],

@@ -649,12 +649,12 @@
       "status": "lora_gpu_validation_in_progress",
       "purpose": "六通道 M0/M1/M2/M3 公制提示与实测历史位移受控训练和评测",
       "details": [
-        "当前revision5统一M0/M1/M2/M3及进入同一比较的其他对照采用LoRA，三个种子42/43/44共十二次计划训练；PaliGemma rank/alpha16/16、Action Expert32/32，四组共享可训练白名单、初始化、有效batch8及30k预算。revision1至revision4原输入已分别归档。",
-        "LoRA白名单、零B初始化、可训练AdamW/EMA、delta保存恢复与共同入口已实现，可训练53,509,280参数。真实完整batch8 CPU检查10项及最新相关CPU回归5项通过。V5/V6均完成两次更新和CP2保存恢复，随后推理阶段被终止；冻结81ecdbb先释放训练状态，并将独立推理参数明确置于CPU后执行FSDP传输，GPU修复效果待验证。V7等待共同CPU64GiB准入，正式训练及评测发布关闭，失败及历史full-FT记录全部保留。"
+        "当前revision6按用户指令将共同CPU起始门槛64降至48GiB，正式按max(48,ceil(四组完整smoke最高峰值*1.25))校准；沿用revision5的统一LoRA配方和12个run ID。四组及其他主表对照共享rank/alpha、可训练白名单、初始化、有效batch8、30k与原数据评测。原CPU64输入已归档revisions/r5_cpu64。",
+        "可训练53,509,280参数，既有完整batch8 CPU检查10项及相关回归5项通过；本次CPU48合同测试3项通过，正式gates仍关闭。V5/V6两次更新及CP2保留，推理故障修复效果待完整GPU验证。冻结6bfd12c，新的smoke_cpu48_r6四组队列等待48GiB资源；全部失败和历史full-FT记录保留。"
       ],
       "priority": "current",
       "research_group": "六通道公制提示",
-      "current_status_note": "2026-10-29 冻结81ecdbb，smoke_pool_v7控制PID117574、M2 PID117578，最近state=waiting_resources、jax_imported=false、gpu_job_started=false，因CPU可用约22.6GiB低于64GiB等待。V6在推理阶段被终止，原始status陈旧，不能当作运行正常。四组统一LoRA/batch8/micro1累计8/30k；完整验收后发布正式M2 seed42，S29评测保持关闭，automation l09-lora继续本次重启。见receipts/L09_lora_inference_restart_20261029.json及handoff.md。",
+      "current_status_note": "2026-10-29 用户要求降低CPU门槛，已修订protocol6并部署6bfd12c。旧117578在未导入JAX、未启动GPU的等待状态取消，新smoke_cpu48_r6控制192956、M2 PID193194，最近waiting_resources、JAXfalse/GPUfalse，CPU约19.1GiB低于新48GiB门槛，候选GPU6/4。正式30k尚未开始，S29评测关闭，l09-lora按新协议继续。见receipts/L09_lora_cpu48_restart_20261029.json和REVISION6_CPU48_PLAN.zh.md。",
       "current_role": "检验方向、公制刻度和 Motion Echo 的逐项增量"
     },
     {
