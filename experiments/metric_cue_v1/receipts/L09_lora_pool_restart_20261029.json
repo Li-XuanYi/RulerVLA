@@ -1,0 +1,91 @@
+{
+  "schema": "rulervla_metric_lora_restart_v2",
+  "recorded_at_utc": "2026-10-29 13:18:24 UTC",
+  "experiment_id": "L09",
+  "state": "gpu_validation_queued",
+  "formal_training_started": false,
+  "training_released": false,
+  "evaluation_released": false,
+  "runtime_commit": "14b81870e48cdcb12d2c5e97aae28468ede0e5c8",
+  "runtime_root": "/home/lixuanyi/XuanyiLi/work/rulervla-metric-lora-r5-runtime",
+  "protocol_sha256": "8c7cf7f372673d53143935a3f433134d9399189d21a4b47a0e6b0c3c50758071",
+  "latest_observation": {
+    "state": "waiting_resources",
+    "pid": 1094999,
+    "controller_pid": 1094997,
+    "attempt": 3,
+    "jax_imported": false,
+    "gpu_job_started": false,
+    "selected_gpu_indices": [
+      6,
+      0
+    ],
+    "blocker": "CPU memory below 64 GiB",
+    "raw_root": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_pool_v5"
+  },
+  "recipe": {
+    "finetuning": "lora",
+    "batch_size": 8,
+    "micro_batch_size": 1,
+    "gradient_accumulation": 8,
+    "num_steps": 30000,
+    "trainable_parameters": 53509280
+  },
+  "allocator": {
+    "name": "bfc",
+    "nominal_pool_target_mib": 26624,
+    "required_actual_reserved_pool_mib": 24576,
+    "admission_gpu_free_mib_per_device": 28672,
+    "verification": "native pool_bytes before model and NAS loading",
+    "post_start_resource_termination": false,
+    "extra_large_jit_allocation": false
+  },
+  "validation": {
+    "primary_real_complete_model_cpu_tests": 10,
+    "primary_seconds": 597.75,
+    "latest_native_and_entry_recheck_tests": 4,
+    "latest_seconds": 1.73,
+    "all_four_real_gpu_smokes_passed": false,
+    "review_critical": 0,
+    "review_important_remaining": 0
+  },
+  "failures": [
+    {
+      "run": "smoke_wait_v2/M2",
+      "pid": 626949,
+      "updates": 0,
+      "error": "GPU device_put allocation failure requesting 2415919104 bytes",
+      "last_stage_cpu_peak_gib": 23.619396209716797,
+      "observed_after_exit_gpu6_free_mib": 2950,
+      "observed_external_pid": 655443,
+      "observed_external_gpu_memory_mib": 45268
+    },
+    {
+      "run": "smoke_pool_v3/M2",
+      "pid": 905700,
+      "updates": 0,
+      "error": "BFC allocation failure requesting 2146435072 bytes during pool initialization"
+    },
+    {
+      "run": "smoke_pool_v4/M2",
+      "pid": 1028899,
+      "updates": 0,
+      "error": "Single-device JIT replica/device binding mismatch during pool initialization",
+      "native_pool_bytes_per_device": [
+        27576097792,
+        27576097792
+      ],
+      "sampled_gpu_process_peak_mib": [
+        26570,
+        26564
+      ]
+    }
+  ],
+  "automation": {
+    "id": "l09-lora",
+    "status": "ACTIVE",
+    "frequency": "hourly",
+    "stop_condition": "formal M2 seed42 has at least two finite real optimizer updates; pause automation only"
+  },
+  "raw_evidence_preserved": true
+}

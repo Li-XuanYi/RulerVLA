@@ -1,13 +1,16 @@
 # Handoff
 
-## 2026-10-29 L09 LoRA运行时与真实smoke
+## 2026-10-29 L09 LoRA重启与GPU初始化
 
-- [Code] 已实现完整π0.5的两套LoRA、严格白名单、A normal std0.01/B零初始化；AdamW与EMA仅维护53,509,280个参数。共同batch8、microbatch1/累计8、30000预算与四组/三种子保持不变，旧full-FT配置拒绝。
-- [Code] 已实现基座引用加delta的Orbax保存、参数/AdamW/EMA/step哈希恢复及共享推理重建。发布审计绑定四组实际pipeline/manifest/checkpoint/原始证据、Git blob冻结协议、统计量身份与共同CPU/GPU门槛。只读审查无剩余Critical或Important。
-- [Experiment] 真实完整模型及真实batch8的CPU检查10 passed，597.75秒；最新发布入口/恢复模板复查5 passed，32.72秒。原始日志位于outputs/metric_cue_pilot/L09_lora_r5_implementation。真实GPU更新、冻结权重不变性、恢复/继续一步与推理仍待四组完整结果，training_released/evaluation_released继续为false，正式30k尚未启动。
-- [Experiment] 运行树/home/lixuanyi/XuanyiLi/work/rulervla-metric-lora-r5-runtime冻结84f2ecf5f51e4eba8ab2fea08c823b84b6ec7246。smoke_wait_v2的M2进程PID626949已在两次资源等待后自动通过准入，使用物理GPU6/0，已载入基座与LoRA优化器，正在读取真实RGB-D首批；观察RSS约15.5GiB。原始目录outputs/metric_cue_pilot/L09_lora_r5_smoke/smoke_wait_v2，队列顺序M2/M0/M1/M3。
-- [Experiment] 最初5秒输入探测超时；真实manifest读取8.45/10.37秒且哈希匹配，现改为30秒有界探测并通过。smoke_227ce16随后因CPU低于64GiB在JAX前退出，记录保留；新等待入口只在启动前选择空闲双卡并等待CPU64GiB/每卡28672MiB，不修改共同批次。
-- [Code] 共同episode缓存512MiB，本地build/metric_lora_cache保存Python/JAX/CUDA热缓存，数据和checkpoint持久写NAS。smoke仅采样当前PID显存作为证据；正式训练不采样，启动后八处资源阈值终止调用继续注释。
+- [Code] LoRA运行时已实现：PaliGemma rank/alpha16/16、Action Expert32/32，A normal std0.01/B零初始化；统一训练LoRA、六通道输入层及动作/时间投影53,509,280个参数，AdamW/EMA仅维护这些参数。四组及三个种子的batch8、microbatch1/累计8、30k保持一致。
+- [Experiment] 真实完整模型与真实batch8 CPU检查10 passed，597.75秒；新增原生allocator配置及入口复查4 passed，1.73秒。原始日志outputs/metric_cue_pilot/L09_lora_r5_implementation。四组真实GPU更新、冻结权重不变、delta恢复/推理及资源校准仍未完成，training_released/evaluation_released均false，正式30k尚未启动。
+- [Experiment] smoke_wait_v2的M2 PID626949在权重搬运申请2.25GiB时自然OOM退出，0updates；最后stage记录CPU峰23.619GiB。退出后GPU6被外部PID655443占用45268MiB，仅余2950MiB。原始status/trace保留，以原始异常和进程退出判定失败，没有主动停止训练。
+- [Experiment] smoke_pool_v3因26GiB附近的额外设备数组申请超出BFC实际池空间而在初始化失败；smoke_pool_v4已取得两卡原生池27576097792字节/卡（约25.68GiB），随后额外单卡jit发生cuda1输入与cuda0执行设备绑定错误，均0updates且模型未载入。失败status、allocator原生统计及全部日志保留。
+- [Code] 最新冻结运行时14b81870e48cdcb12d2c5e97aae28468ede0e5c8。初始化改为直接核验原生BFC pool_bytes，名义池目标26GiB、实际保留池至少24GiB、共同准入28GiB；不执行额外大数组jit。该初始化在模型和NAS读取前完成，正式训练开始后八处资源阈值终止调用继续注释。异常钩子保留原trace并记录failed；resume归档旧状态、清除旧错误、按恢复step更新计数，正式等待每轮及最终准入前重验gate。
+- [Experiment] 新队列smoke_pool_v5按M2/M0/M1/M3执行；控制进程1094997，最近M2 PID1094999第3次等待CPU64GiB，jax_imported=false、gpu_job_started=false，候选物理GPU6/0。原始目录/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_pool_v5。四组完整通过后才能发布并启动M2 seed42正式训练。
+- [Code] 审计入口scripts/metric_lora_release_audit.py绑定四组pipeline/manifest/初始状态/冻结基座/CP2恢复及CP3继续/推理/资源原始证据、Git blob冻结协议与统计量，以及实际模型和train/launch CLI源码SHA；只读复核无剩余Critical或Important。冻结protocol5原字节及SHA8c7cf7f372673d53143935a3f433134d9399189d21a4b47a0e6b0c3c50758071保持不变。
+- [Code] 共同episode缓存512MiB、同步读取；Python/JAX/CUDA缓存位于运行树本地build/metric_lora_cache，数据/checkpoint留在NAS。manifest真实读取8.45/10.37秒且哈希匹配，探测时限已从5秒改为30秒。两张卡的显存池属于启动初始化；smoke才采样显存，正式训练不采样。
+- [Code] 本聊天后续检查automation id=l09-lora，ACTIVE，每小时继续完成真实验收与正式M2启动；无变化保持安静，正式M2至少两个有限真实更新后暂停检查本身，绝不暂停训练。后续以当前原始状态为准，不复用失败记录作GPU成功证据。
 
 ## 2026-10-29 L09 revision5统一LoRA计划
 
