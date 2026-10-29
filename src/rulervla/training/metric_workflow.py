@@ -110,7 +110,8 @@ def require_cue_optimizer(state):
 def require_training_state_device(state, device):
     if device is None:
         return
-    if any(isinstance(value, jax.Array) and value.devices() != {device}
+    if any(isinstance(value, np.ndarray)
+           or (isinstance(value, jax.Array) and value.devices() != {device})
            for value in jax.tree.leaves(state)):
         raise ValueError('Training parameters or optimizer state are on the wrong device')
 
@@ -377,7 +378,7 @@ def restore_training_checkpoint(manager, state, pipeline, config, *, step, expec
             raise ValueError('LoRA delta/AdamW/EMA/step identity changed during restore')
         target = next(iter(device))
         with jax.default_device(target):
-            base = nnx.state(load_initial_model(config))
+            base = jax.device_put(nnx.state(load_initial_model(config)), target)
             validate_delta(restored.params, base.filter(config.trainable_filter))
             base.replace_by_pure_dict(restored.params.to_pure_dict())
         restored = dataclasses.replace(restored, params=base)
