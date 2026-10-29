@@ -1,5 +1,12 @@
 # Handoff
 
+## 2026-10-30 L09主机恢复与真实GPU验证重启
+
+- [Experiment] A6000 SSH恢复，当前主机启动时间为2026-10-29 15:57:45 UTC。旧smoke_cpu48_r6/M2在第20次资源等待后因nvidia-smi五字段查询8秒超时抛出RuntimeError，尚未导入JAX或启动GPU。15:53 UTC经145读取的堆栈不完整、日志SHA为a8f818de2af2766e8cb7338b071e3f57c66486f181c5b5de2ce46229f6980bab；本轮主机读取完整错误，日志SHA为412716c2c7e9fd0ec0a5910338bc4f838a75f489868b71d642d71fc1257d98d1。两次观察与原始失败均保留，旧waiting_resources不能作存活证据。
+- [Experiment] 已核实当前本人Metric train/launch/smoke作业不存在后重建队列，未停止任何作业。启动前CPU可用417.07GiB，GPU准入通过；干净运行树仍冻结6bfd12cad6a3e1622c8e55fa34dd0165d87db4d7，protocol6 SHA9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b，没有修改源码或资源门槛。
+- [Experiment] 新目录outputs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6_after_host_restart，控制354114，M2 PID354175，GPU6/7，已完成两次有限真实更新（loss0.1017892063/0.1376851201）并进入load_delta_inference_model；最后stage CPU峰30.419GiB，可训练53,509,280参数，两卡原生池各27576097792字节。独立推理与恢复后第三步尚未完整核实，不能放行；后续按M2/M0/M1/M3使用同一冻结源码。
+- [Code] 本轮补齐上次因SSH不可达而暂缓的main/dev handoff与registry；receipt为experiments/metric_cue_v1/receipts/L09_lora_host_recovery_20261030.json，原NAS观察heartbeat_20261029T154733Z.json保留。共同CPU48GiB、双卡各28GiB、LoRA/batch8/micro1累计8/30k及启动后不主动按资源阈值停止保持一致，training_released/evaluation_released均false，正式训练尚未启动；l09-lora继续完整四组验收、审计和正式M2启动。
+
 ## 2026-10-29 L09共同CPU准入降至48GiB
 
 - [Code] 用户明确要求降低CPU内存门槛。四组共同起始预算64降至48GiB，正式门槛改为max(48,ceil(四组完整真实smoke最高CPU峰值*1.25))；双卡各28672MiB、LoRA、micro1/累计8、batch8、30k、数据及评测保持一致。48GiB覆盖此前观测33.9GiB峰值加25%后的约42.4GiB，但完整资源校准尚未完成，不能视为GPU已验证。

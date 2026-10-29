@@ -1,0 +1,22 @@
+{
+  "schema": "rulervla_metric_lora_host_recovery_v1",
+  "experiment_id": "L09",
+  "recorded_utc_date": "2026-10-29",
+  "host": "vla_7_A6000 / amax",
+  "host_boot_utc": "2026-10-29 15:57:45 UTC",
+  "runtime_commit": "6bfd12cad6a3e1622c8e55fa34dd0165d87db4d7",
+  "protocol_revision": 6,
+  "protocol_sha256": "9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b",
+  "recovery": {"wsl_ssh_restored": true, "runtime_git_clean": true, "original_waiter_predates_current_boot": true, "no_existing_owned_metric_job_before_launch": true, "observed_cpu_available_gib_before_launch": 417.07019424438477},
+  "previous_queue": {"raw_root": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6", "pid": 193194, "last_wait_attempt": 20, "jax_imported": false, "gpu_job_started": false, "failure": "RuntimeError: GPU selection failed: nvidia-smi query timed out after8seconds", "complete_log_sha256": "412716c2c7e9fd0ec0a5910338bc4f838a75f489868b71d642d71fc1257d98d1", "raw_status_is_stale": true},
+  "previous_heartbeat_observation": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6/heartbeat_20261029T154733Z.json",
+  "new_validation_root": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6_after_host_restart",
+  "latest_observation": {"controller_pid": 354114, "pid": 354175, "arm": "M2", "mode": "smoke", "state": "running", "stage": "load_delta_inference_model", "optimizer_updates": 2, "losses": [0.1017892062664032, 0.1376851201057434], "gradients_finite": true, "last_stage_peak_cpu_rss_gib": 30.41925048828125, "trainable_parameters": 53509280, "selected_gpu_indices": [6, 7], "jax_imported": true, "gpu_job_started": true, "formal_training_started": false, "independent_inference_verified": null},
+  "recipe": {"finetuning": "lora", "effective_batch_size": 8, "micro_batch_size": 1, "gradient_accumulation": 8, "formal_num_steps": 30000, "shared_arm_order": ["M2", "M0", "M1", "M3"]},
+  "admission": {"cpu_min_available_gib": 48, "gpu_min_free_mib_per_device": 28672, "initial_reserved_pool_bytes_per_device": [27576097792, 27576097792]},
+  "release": {"training_released": false, "evaluation_released": false, "all_four_complete_gpu_smokes_passed": false},
+  "post_start_resource_termination": false,
+  "jobs_stopped_by_this_check": false,
+  "automation": {"id": "l09-lora", "status": "ACTIVE"},
+  "all_original_outputs_checkpoints_and_failures_preserved": true
+}
