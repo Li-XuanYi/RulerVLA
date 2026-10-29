@@ -33,9 +33,9 @@ def probe_file(path, *, parse_json=False):
                'v={"path":str(p),"bytes":len(b),"sha256":hashlib.sha256(b).hexdigest()};'
                'v.update({"json":json.loads(b)} if sys.argv[2]=="1" else {});print(json.dumps(v))')
     try:
-        result = subprocess.run(['timeout', '-k', '1', '5', sys.executable, '-c', program,
+        result = subprocess.run(['timeout', '-k', '1', '30', sys.executable, '-S', '-c', program,
                                  str(path), '1' if parse_json else '0'],
-                                text=True, capture_output=True, timeout=8)
+                                text=True, capture_output=True, timeout=35)
         if result.returncode:
             return {'path': str(path), 'error': result.stderr.strip() or f'probe exit {result.returncode}'}
         return json.loads(result.stdout)

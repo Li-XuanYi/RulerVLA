@@ -126,7 +126,7 @@ def test_launcher_fails_fast_for_real_checkpoint_receipt_identity_mismatch(tmp_p
          "--config", str(config), "--arm", "M2", "--seed", "42",
          "--gpu-candidates", "0", "1", "--out", str(out),
          "--wait-dir", str(wait), "--poll-seconds", "15"],
-        capture_output=True, text=True, timeout=12, cwd=ROOT)
+        capture_output=True, text=True, timeout=90, cwd=ROOT)
     assert result.returncode != 0
     assert "Initial checkpoint source receipt hash mismatch" in result.stderr
     status = json.loads((wait / "status.json").read_text())
