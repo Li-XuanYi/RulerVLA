@@ -1,0 +1,22 @@
+{
+  "schema": "rulervla_metric_lora_restore_device_fix_v1",
+  "experiment_id": "L09",
+  "recorded_at_utc": "2026-10-29 17:17:41 UTC",
+  "runtime_commit": "76e9b4c6c5e357b22d63d80cb4fde3847a5ca5e9",
+  "runtime_root": "/home/lixuanyi/XuanyiLi/work/rulervla-metric-lora-r5-runtime",
+  "protocol_revision": 6,
+  "protocol_sha256": "9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b",
+  "previous_run": {"raw_root": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6_after_host_restart", "pid": 354175, "controller_pid": 354114, "recorded_updates": 2, "last_stage": "continue_restored_optimizer", "last_recorded_peak_cpu_rss_gib": 35.79617691040039, "terminal_peak_unknown": true, "shell_reported_killed": true, "both_processes_absent": true, "pinned_host_registration_errors": true, "termination_source": "unknown", "proactively_stopped": false},
+  "real_independent_gpu_inference": {"shape": [1, 10, 32], "finite": true, "sha256": "b8fda554f0d235462d60a57f1be1883f02384cfe687a584945b06d2da2790a2e", "raw_file": "M2/delta_inference.json", "third_update_confirmed": false, "full_smoke_passed": false},
+  "code_finding": "LoRA恢复时重新加载的冻结基座仍为NumPy，原设备检查跳过NumPy；独立推理路径已显式放CPU，但恢复后继续训练路径尚未放置",
+  "changes": ["LoRA恢复基座先jax.device_put到目标CPU，再覆盖完整delta", "训练状态设备检查拒绝np.ndarray，保留device=None、Tracer与ShapeDtypeStruct的原行为", "参数/AdamW/EMA/step/冻结权重全部签名核验保持一致"],
+  "real_checkpoint_regression": {"checkpoint": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6_after_host_restart/M2/checkpoints/2", "trainable_parameters": 53509280, "red": "1 failed in74.21s; NumPy设备校验DID NOT RAISE", "green": "6 passed in79.82s", "byte_signatures_preserved_after_cpu_placement": true, "red_log": "outputs/metric_cue_pilot/L09_lora_r5_implementation/restore_device_red.log", "green_log": "outputs/metric_cue_pilot/L09_lora_r5_implementation/restore_device_green.log", "mock_or_fabricated_data": false},
+  "latest_observation": {"raw_root": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6_cpu_restore", "controller_pid": 901831, "pid": 901847, "arm": "M2", "state": "waiting_resources", "attempt": 2, "selected_gpu_indices": [6, 7], "jax_imported": false, "gpu_job_started": false, "formal_training_started": false, "observed_mem_available_kib": 25009756},
+  "resource_policy": {"initial_cpu_available_gib": 48, "initial_gpu_free_mib_per_device": 28672, "formal_cpu_rule": "max(48,ceil(1.25*四组完整smoke最高CPU峰值GiB))", "post_start_resource_termination": false},
+  "validation": {"ruff_passed": true, "git_diff_check_passed": true, "review_critical": 0, "review_important": 0, "complete_gpu_fix_validation": "pending_new_four_arm_smokes"},
+  "training_released": false,
+  "evaluation_released": false,
+  "formal_training_started": false,
+  "automation_id": "l09-lora",
+  "original_outputs_checkpoints_and_failures_preserved": true
+}

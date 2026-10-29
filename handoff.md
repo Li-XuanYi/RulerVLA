@@ -1,5 +1,12 @@
 # Handoff
 
+## 2026-10-30 L09恢复参数CPU放置修复
+
+- [Experiment] 恢复后的M2 PID354175已完成两次真实更新、CP2完整恢复、独立GPU推理及再次恢复CP2；delta_inference.json为[1,10,32] finite，SHA b8fda554f0d235462d60a57f1be1883f02384cfe687a584945b06d2da2790a2e。随后continue_restored_optimizer阶段再次出现pinned host注册错误，shell记录Killed，354114/354175均已不存在；只确认两次已记录更新，第三次未确认，最后stage CPU峰35.796GiB，终止前峰值和终止来源未知。未主动停止训练，全部CP2、推理及失败记录保留，不能计完整smoke通过。
+- [Code/Inference] 已发现并用真实CP2复现设备校验漏检：LoRA恢复中重新加载的冻结基座仍为NumPy，原校验只检查jax.Array。源码修复为恢复基座先显式放到目标CPU，再覆盖完整delta；设备校验拒绝np.ndarray，保留device=None、Tracer及ShapeDtypeStruct原行为，参数/AdamW/EMA/step/冻结SHA核验不变。该路径与锁页错误的关系仍待新GPU完整验证，不能报告GPU故障已解决。
+- [Experiment] 新tests/test_metric_lora_restore_device_real.py通过METRIC_LORA_RESTORE_CHECKPOINT指向本次真实M2/checkpoints/2，恢复53,509,280个实际参数；RED为DID NOT RAISE、1failed74.21s，GREEN连同原checkpoint/entry为6 passed79.82s，验证CPU放置前后全部delta字节签名一致。日志restore_device_red.log/restore_device_green.log在outputs/metric_cue_pilot/L09_lora_r5_implementation；ruff/diff通过，只读复核无Critical/Important，未使用mock或虚构数据。
+- [Code/Experiment] 已在本次GPU进程自然退出后部署干净76e9b4c6c5e357b22d63d80cb4fde3847a5ca5e9，protocol6 SHA9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b不变。新smoke_cpu48_r6_cpu_restore控制901831、M2 PID901847，最近attempt2、waiting_resources、JAXfalse/GPUfalse，CPU25009756KiB（约23.9GiB）低于48GiB，候选GPU6/7。四组必须统一新源码重跑，正式30k尚未启动，训练/评测发布仍false，八处资源终止调用保持注释；receipt为receipts/L09_lora_restore_device_fix_20261030.json，l09-lora继续本次重启。
+
 ## 2026-10-30 L09主机恢复与真实GPU验证重启
 
 - [Experiment] A6000 SSH恢复，当前主机启动时间为2026-10-29 15:57:45 UTC。旧smoke_cpu48_r6/M2在第20次资源等待后因nvidia-smi五字段查询8秒超时抛出RuntimeError，尚未导入JAX或启动GPU。15:53 UTC经145读取的堆栈不完整、日志SHA为a8f818de2af2766e8cb7338b071e3f57c66486f181c5b5de2ce46229f6980bab；本轮主机读取完整错误，日志SHA为412716c2c7e9fd0ec0a5910338bc4f838a75f489868b71d642d71fc1257d98d1。两次观察与原始失败均保留，旧waiting_resources不能作存活证据。

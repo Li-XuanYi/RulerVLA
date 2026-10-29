@@ -650,11 +650,11 @@
       "purpose": "六通道 M0/M1/M2/M3 公制提示与实测历史位移受控训练和评测",
       "details": [
         "当前revision6按用户指令将共同CPU起始门槛64降至48GiB，正式按max(48,ceil(四组完整smoke最高峰值*1.25))校准；沿用revision5的统一LoRA配方和12个run ID。四组及其他主表对照共享rank/alpha、可训练白名单、初始化、有效batch8、30k与原数据评测。原CPU64输入已归档revisions/r5_cpu64。",
-        "可训练53,509,280参数，既有CPU检查与CPU48合同测试保留，正式gates仍关闭。原CPU48队列因等待期nvidia-smi超时退出；主机再次重启后，冻结6bfd12c的新四组队列smoke_cpu48_r6_after_host_restart已开始真实GPU验证，M2最近完成两次有限更新并进入独立推理模型加载。四组完整验收仍待完成，失败、CP2与历史full-FT记录全部保留。"
+        "M2已实测两次更新、完整CP2恢复和有限GPU独立推理，但恢复后第三次更新发生pinned host错误并被终止，完整smoke未通过。现已修复恢复基座仍为NumPy及设备校验漏检，冻结76e9b4c，真实CP2回归6项通过，GPU修复效果待新四组验证。CPU48规则和全部训练数学不变，正式gates关闭，失败及checkpoint全部保留。"
       ],
       "priority": "current",
       "research_group": "六通道公制提示",
-      "current_status_note": "2026-10-30复核：SSH恢复，主机已于15:57:45 UTC再次重启。原193194在第20次资源等待后nvidia-smi查询8秒超时退出，原status陈旧。本轮先核实无现有本人Metric作业，再以干净6bfd12c/protocol6启动新队列，控制354114、M2 PID354175、GPU6/7，最近2次真实有限更新，stage=load_delta_inference_model。共同CPU48GiB/batch8/累计8/30k及评测关闭保持一致，正式训练尚未开始；见receipts/L09_lora_host_recovery_20261030.json。",
+      "current_status_note": "2026-10-30：354175已在continue_restored_optimizer阶段自然被终止，独立GPU推理[1,10,32]有限证据保留，不能计完整smoke通过。新代码76e9b4c显式将恢复基座放CPU并拒绝NumPy训练缓冲，真实CP2的设备与字节签名回归6 passed79.82s。新队列smoke_cpu48_r6_cpu_restore控制901831、M2 PID901847，最近attempt2、waiting_resources、JAXfalse/GPUfalse，CPU约23.9GiB低于48GiB，候选GPU6/7。正式30k及评测仍未发布，见receipts/L09_lora_restore_device_fix_20261030.json。",
       "current_role": "检验方向、公制刻度和 Motion Echo 的逐项增量"
     },
     {
