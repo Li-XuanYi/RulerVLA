@@ -646,15 +646,15 @@
       "display_name": "L09_公制提示",
       "classification": "large",
       "legacy_ids": ["metric_cue_v1"],
-      "status": "running_M2_seed42",
+      "status": "lora_plan_pending_implementation_and_validation",
       "purpose": "六通道 M0/M1/M2/M3 公制提示与实测历史位移受控训练和评测",
       "details": [
-        "Spatial四组、三训练种子，共十二次计划训练；当前revision4沿用正XYZ、0～15 cm、5 cm等价横刻度和有效batch8，分开训练与评测准入。revision1至revision3原输入已分别归档。",
-        "当前共同配方effective batch8、microbatch1、梯度累积8、30k updates；vla_7_6000已重新运行M2 seed42正式训练，GPU4/3、PID2296578，源码9519baf。用户要求注释启动后的资源检查，启动前每卡28 GiB、CPU160 GiB准入保留。旧13次未保存更新及原始失败输出保留；重启从已验证pi05_base开始。S29位置场景有效性作为评测门槛保持关闭。"
+        "当前revision5统一M0/M1/M2/M3及进入同一比较的其他对照采用LoRA，三个种子42/43/44共十二次计划训练；PaliGemma rank/alpha16/16、Action Expert32/32，四组共享可训练白名单、初始化、有效batch8及30k预算。revision1至revision4原输入已分别归档。",
+        "完整模型静态结构的计划可训练参数为53,509,280，包含LoRA、六通道输入层及动作/时间投影，AdamW和EMA计划仅维护这些参数。旧full-FT等待PID24503已取消，LoRA实现及真实GPU更新、冻结权重不变性、状态恢复和资源验收待完成，训练与评测发布关闭。旧13次及1547次full-FT记录保留归档，不能跨配方继承。"
       ],
       "priority": "current",
       "research_group": "六通道公制提示",
-      "current_status_note": "2026-10-28 按用户要求通过WSL连接，注释启动后资源检查并重新启动；M2 seed42运行于vla_7_6000 GPU4/3，PID2296578，已核实至少1次真实更新，目标30k。重启receipt见experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_restart_no_runtime_gate.json。S29及策略评测保持关闭。",
+      "current_status_note": "2026-10-29 用户要求统一LoRA，revision5计划已冻结；M0/M1/M2/M3全部使用相同LoRA和输入层白名单、batch8、30k及三种子。full-FT等待PID24503已取消；LoRA尚未开始训练，发布条件等待新验收。计划见experiments/metric_cue_v1/REVISION5_LORA_PLAN.zh.md。",
       "current_role": "检验方向、公制刻度和 Motion Echo 的逐项增量"
     },
     {
@@ -665,7 +665,7 @@
       "status": "blocked_scene_lock",
       "purpose": "六通道公制提示四组在黑碗目标位置变化条件下的配对评测",
       "details": [
-        "使用 L09 的相同 checkpoint；测试区域分为训练支持、内部留出与外部可行位置。",
+        "使用 L09 revision5对应的LoRA checkpoint，保持四组相同训练配方；测试区域分为训练支持、内部留出与外部可行位置。",
         "既有 S28 候选位置仍待可见性、抓取碰撞和放置稳定性核验。"
       ],
       "priority": "current",

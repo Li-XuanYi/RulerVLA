@@ -1,0 +1,31 @@
+{
+  "schema": "rulervla_metric_lora_shape_plan_v1",
+  "experiment_id": "L09",
+  "verified_date": "2026-10-29",
+  "mechanism": "jax.eval_shape_of_the_real_complete_six_channel_pi05_model",
+  "reference_commit": "50a59e3e38fbc9b9ce696591ab46c3500603551c",
+  "total_parameters": 3404098832,
+  "planned_trainable_parameters": 53509280,
+  "planned_adapter_parameters": 49987584,
+  "planned_stem_parameters": 1355904,
+  "planned_projection_parameters": 2165792,
+  "planned_trainable_fraction": 0.015719073575946048,
+  "planned_frozen_parameters": 3350589552,
+  "paligemma_variant": "gemma_2b_lora",
+  "action_expert_variant": "gemma_300m_lora",
+  "selected_stem": [
+    "PaliGemma/img/embedding/kernel",
+    "PaliGemma/img/embedding/bias"
+  ],
+  "selected_projection_modules": [
+    "action_in_proj",
+    "action_out_proj",
+    "time_mlp_in",
+    "time_mlp_out"
+  ],
+  "raw_shape_audit": "outputs/metric_cue_pilot/L09_lora_plan_r5/parameter_shapes.json",
+  "runtime_lora_implemented": false,
+  "gpu_training_validated": false,
+  "memory_peak_measured": false,
+  "observation_scope": "Full-model structural parameter count for the planned allowlist; not evidence that the runtime optimizer/filter or GPU training has been implemented."
+}

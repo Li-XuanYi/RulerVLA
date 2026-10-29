@@ -1,0 +1,71 @@
+{
+  "schema": "rulervla_metric_formal_launch_receipt_v1",
+  "experiment_id": "L09",
+  "run_id": "L09_spatial_M2_seed42",
+  "verified_date": "2026-10-29",
+  "connection": "WSL_Ubuntu_OpenSSH",
+  "protocol_revision": 4,
+  "protocol_sha256": "c924ef9cdf7ae2de11760371baf525d845edc4275020ec1eae6d68286e29e0e1",
+  "state": "waiting_resources",
+  "formal_training_started": false,
+  "gpu_job_started": false,
+  "jax_imported": false,
+  "host": "vla_7_A6000",
+  "hostname": "amax",
+  "pid": 24503,
+  "process_role": "resource_waiting_launcher",
+  "selected_gpu_indices": [
+    4,
+    6
+  ],
+  "source_commit": "50a59e3e38fbc9b9ce696591ab46c3500603551c",
+  "runtime_root": "/home/lixuanyi/XuanyiLi/work/rulervla-metric-restart-runtime",
+  "arm": "M2",
+  "seed": 42,
+  "batch_size": 8,
+  "micro_batch_size": 1,
+  "gradient_accumulation": 8,
+  "target_optimizer_updates": 30000,
+  "finetuning": "full",
+  "ema_decay": 0.999,
+  "observed_optimizer_updates": 0,
+  "restart_from": "verified_pi05_base",
+  "previous_unsaved_optimizer_updates": 1547,
+  "previous_updates_counted_in_restart_budget": false,
+  "previous_stop_receipt": "experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_nas_stop.json",
+  "config": "configs/metric_workflow_node145.yaml",
+  "startup_script": "scripts/start_metric_cue_amax.sh",
+  "startup_resource_preflight_enabled": true,
+  "runtime_resource_checks_enabled": false,
+  "initial_admission": {
+    "launch_allowed": false,
+    "input_blockers": [],
+    "resource_blockers": [
+      "CPU memory below the optimizer-offload threshold"
+    ],
+    "cpu_available_gib": 93.03448104858398,
+    "cpu_min_available_gib": 160,
+    "gpu_min_free_mib": 28672,
+    "selected_gpu_free_mib": [
+      48255,
+      48223
+    ]
+  },
+  "poll_seconds": 60,
+  "run_directory": "outputs/metric_cue_pilot/L09_restart_amax/L09_spatial_M2_seed42",
+  "launch_log": "outputs/metric_cue_pilot/L09_restart_amax/launch.log",
+  "launcher_receipts": "outputs/metric_cue_pilot/L09_restart_amax/launch",
+  "storage_root": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs",
+  "data_path_mappings": {
+    "/home/Dataset2/yqt": "/home/Dataset2/yuqiuting"
+  },
+  "native_nccl_version": 22602,
+  "evaluation_released": false,
+  "position_scene_validity_lock": false,
+  "engineering_notes": [
+    "Frozen protocol and training math are unchanged.",
+    "node147 NVML initialization fails; node145 GPU queries timed out and its root disk has no free space.",
+    "The waiting launcher validates release, inputs and actual resources on each attempt; it does not import JAX or allocate GPU training state while waiting."
+  ],
+  "observation_scope": "Verified resource-waiting snapshot. Training has not started; future status must be read from launcher or training outputs."
+}

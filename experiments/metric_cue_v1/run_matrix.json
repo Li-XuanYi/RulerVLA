@@ -1,94 +1,109 @@
 {
   "schema": "rulervla_metric_cue_run_matrix_v1",
-  "protocol_revision": 4,
-  "protocol_sha256": "c924ef9cdf7ae2de11760371baf525d845edc4275020ec1eae6d68286e29e0e1",
+  "protocol_revision": 5,
+  "protocol_sha256": "8c7cf7f372673d53143935a3f433134d9399189d21a4b47a0e6b0c3c50758071",
   "experiment_id": "L09",
-  "status": "running_M2_seed42",
+  "status": "lora_plan_pending_implementation_and_validation",
+  "finetuning": "lora",
+  "comparison_group": "L09_lora_r5",
+  "full_ft_waiter_cancelled_receipt": "experiments/metric_cue_v1/receipts/L09_full_ft_waiter_cancelled_for_lora.json",
+  "historical_full_ft_run_matrix": "experiments/metric_cue_v1/revisions/r4/frozen_inputs.tar.gz",
   "runs": [
     {
-      "run_id": "L09_spatial_M0_seed42",
+      "run_id": "L09_spatial_M0_lora_seed42",
       "arm": "M0",
       "seed": 42,
-      "status": "planned"
+      "finetuning": "lora",
+      "status": "planned_pending_lora_gates",
+      "run_directory": "outputs/metric_cue_pilot/L09_lora_r5/L09_spatial_M0_lora_seed42"
     },
     {
-      "run_id": "L09_spatial_M0_seed43",
+      "run_id": "L09_spatial_M0_lora_seed43",
       "arm": "M0",
       "seed": 43,
-      "status": "planned"
+      "finetuning": "lora",
+      "status": "planned_pending_lora_gates",
+      "run_directory": "outputs/metric_cue_pilot/L09_lora_r5/L09_spatial_M0_lora_seed43"
     },
     {
-      "run_id": "L09_spatial_M0_seed44",
+      "run_id": "L09_spatial_M0_lora_seed44",
       "arm": "M0",
       "seed": 44,
-      "status": "planned"
+      "finetuning": "lora",
+      "status": "planned_pending_lora_gates",
+      "run_directory": "outputs/metric_cue_pilot/L09_lora_r5/L09_spatial_M0_lora_seed44"
     },
     {
-      "run_id": "L09_spatial_M1_seed42",
+      "run_id": "L09_spatial_M1_lora_seed42",
       "arm": "M1",
       "seed": 42,
-      "status": "planned"
+      "finetuning": "lora",
+      "status": "planned_pending_lora_gates",
+      "run_directory": "outputs/metric_cue_pilot/L09_lora_r5/L09_spatial_M1_lora_seed42"
     },
     {
-      "run_id": "L09_spatial_M1_seed43",
+      "run_id": "L09_spatial_M1_lora_seed43",
       "arm": "M1",
       "seed": 43,
-      "status": "planned"
+      "finetuning": "lora",
+      "status": "planned_pending_lora_gates",
+      "run_directory": "outputs/metric_cue_pilot/L09_lora_r5/L09_spatial_M1_lora_seed43"
     },
     {
-      "run_id": "L09_spatial_M1_seed44",
+      "run_id": "L09_spatial_M1_lora_seed44",
       "arm": "M1",
       "seed": 44,
-      "status": "planned"
+      "finetuning": "lora",
+      "status": "planned_pending_lora_gates",
+      "run_directory": "outputs/metric_cue_pilot/L09_lora_r5/L09_spatial_M1_lora_seed44"
     },
     {
-      "run_id": "L09_spatial_M2_seed42",
+      "run_id": "L09_spatial_M2_lora_seed42",
       "arm": "M2",
       "seed": 42,
-      "status": "running",
-      "receipt": "experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_restart_no_runtime_gate.json",
-      "previous_start_receipt": "experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_start.json",
-      "previous_attempt_receipt": "experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_launch_r4.json",
-      "previous_stop_receipt": "experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_runtime_gate_stop.json",
-      "current_blockers": [],
-      "host": "vla_7_6000",
-      "gpu_indices": [4, 3],
-      "pid": 2296578,
-      "observed_optimizer_updates": 1,
-      "source_commit": "9519bafe8af1b76ebd1bb93d6b21ac0d9ba18d8a",
-      "run_directory": "outputs/metric_cue_pilot/L09_restart_no_runtime_gate/L09_spatial_M2_seed42",
-      "runtime_resource_checks_enabled": false,
-      "engineering_smoke_receipt": "experiments/metric_cue_v1/receipts/L09_gpu_smoke_node147_20261027.json"
+      "finetuning": "lora",
+      "status": "planned_pending_lora_gates",
+      "run_directory": "outputs/metric_cue_pilot/L09_lora_r5/L09_spatial_M2_lora_seed42"
     },
     {
-      "run_id": "L09_spatial_M2_seed43",
+      "run_id": "L09_spatial_M2_lora_seed43",
       "arm": "M2",
       "seed": 43,
-      "status": "planned"
+      "finetuning": "lora",
+      "status": "planned_pending_lora_gates",
+      "run_directory": "outputs/metric_cue_pilot/L09_lora_r5/L09_spatial_M2_lora_seed43"
     },
     {
-      "run_id": "L09_spatial_M2_seed44",
+      "run_id": "L09_spatial_M2_lora_seed44",
       "arm": "M2",
       "seed": 44,
-      "status": "planned"
+      "finetuning": "lora",
+      "status": "planned_pending_lora_gates",
+      "run_directory": "outputs/metric_cue_pilot/L09_lora_r5/L09_spatial_M2_lora_seed44"
     },
     {
-      "run_id": "L09_spatial_M3_seed42",
+      "run_id": "L09_spatial_M3_lora_seed42",
       "arm": "M3",
       "seed": 42,
-      "status": "planned"
+      "finetuning": "lora",
+      "status": "planned_pending_lora_gates",
+      "run_directory": "outputs/metric_cue_pilot/L09_lora_r5/L09_spatial_M3_lora_seed42"
     },
     {
-      "run_id": "L09_spatial_M3_seed43",
+      "run_id": "L09_spatial_M3_lora_seed43",
       "arm": "M3",
       "seed": 43,
-      "status": "planned"
+      "finetuning": "lora",
+      "status": "planned_pending_lora_gates",
+      "run_directory": "outputs/metric_cue_pilot/L09_lora_r5/L09_spatial_M3_lora_seed43"
     },
     {
-      "run_id": "L09_spatial_M3_seed44",
+      "run_id": "L09_spatial_M3_lora_seed44",
       "arm": "M3",
       "seed": 44,
-      "status": "planned"
+      "finetuning": "lora",
+      "status": "planned_pending_lora_gates",
+      "run_directory": "outputs/metric_cue_pilot/L09_lora_r5/L09_spatial_M3_lora_seed44"
     }
   ]
 }

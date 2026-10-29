@@ -1,12 +1,22 @@
 # L09 公制提示四组实验
 
-## 当前工程入口
+## 当前LoRA计划（revision5）
+
+[Code/Plan] 用户于2026-10-29要求暂不使用full fine-tuning，所有比较组统一使用LoRA。M0/M1/M2/M3各采用42/43/44三个种子，共12次计划训练；S29使用对应LoRA checkpoint。实施计划见[REVISION5_LORA_PLAN.zh.md](REVISION5_LORA_PLAN.zh.md)，共同配方、run ID和发布状态以protocol.json、run_matrix.json及release.json为准。
+
+四组共同使用PaliGemma rank/alpha16/16与Action Expert32/32，并训练相同的六通道输入层和动作/时间投影，其余主干冻结。完整模型静态结构的计划白名单为53,509,280个参数；LoRA运行时、真实GPU更新和delta状态恢复尚待实现与验收。effective batch8、microbatch1、累计8及30k预算保持一致。
+
+[Experiment] 旧full-FT等待PID24503已在模型载入前取消；training_released=false、evaluation_released=false。新LoRA验收完成前不启动正式训练，旧full-FT receipt不能充当LoRA验收。revision4原始输入已归档于revisions/r4/frozen_inputs.tar.gz，历史结果不混入本轮主比较。
+
+[Experiment] 原147运行在1547次记录后因旧NAS路径不存在而退出，没有完整checkpoint；数据与旧输出现位于/home/Dataset2/yuqiuting。旧等待及停止记录仍保留在receipts/和对应outputs目录。
+
+## 历史输入工程入口与full-FT记录
 
 [Code] 当前标尺为正 XYZ、0～15 cm、5 cm 等价横刻度和 EE 原点。统一配置为 `configs/metric_ruler.yaml`、`configs/metric_workflow.yaml`，代码为 `cues/metric_ruler.py` 与 `geometry/camera.py`，审计入口为 `scripts/audit_metric_ruler.py`。合同与清理证据见 `docs/metric_cue/RULER.md`、`reports/metric_ruler_cleanup/report.zh.md`。当前训练、推理共用此流程。
 
 [Code/Experiment] 2026-10-28按用户要求注释启动后的八处资源检查，保留启动前准入；原训练在第14次更新前被显存预算阈值终止，已完成13次且没有完整checkpoint。重启从已验证pi05_base重新开始，输出目录为`outputs/metric_cue_pilot/L09_restart_no_runtime_gate/L09_spatial_M2_seed42`。修订与原始失败证据见[RUNTIME_RESOURCE_POLICY.zh.md](RUNTIME_RESOURCE_POLICY.zh.md)。当前运行身份与进度以run_matrix.json引用的最新receipt为准。
 
-## 当前冻结协议 revision 4
+## revision4历史full-FT协议（归档）
 
 [Code] 四组配置对齐当前正轴标尺；revision1 的协议、运行矩阵、发布状态和五份配置原字节保存在 revisions/r1/frozen_inputs.tar.gz；revision2 的协议、运行矩阵和发布状态保存在 revisions/r2/frozen_inputs.tar.gz。修订说明见 CONFIG_ALIGNMENT_R2.zh.md 与 REVISION3_BATCH8.zh.md。正式训练仍须通过当前协议的全部 gates。
 

@@ -1,0 +1,29 @@
+{
+  "schema": "rulervla_metric_runtime_stop_receipt_v1",
+  "experiment_id": "L09",
+  "run_id": "L09_spatial_M2_seed42",
+  "verified_date": "2026-10-29",
+  "host": "vla_7_6000",
+  "hostname": "ZjuServer147",
+  "source_commit": "9519bafe8af1b76ebd1bb93d6b21ac0d9ba18d8a",
+  "pid": 2296578,
+  "state": "stopped_after_nas_path_became_unavailable",
+  "last_recorded_optimizer_updates": 1547,
+  "complete_checkpoints": 0,
+  "last_metrics": {
+    "update": 1547,
+    "seconds": 34.01018007006496,
+    "loss": 0.03384431451559067,
+    "grad_norm": 0.176832914352417,
+    "cue_grad_l2": 0.004349250812083483,
+    "gradients_finite": true
+  },
+  "error_type": "FileNotFoundError",
+  "error_operation": "append metrics.jsonl",
+  "original_storage_root": "/home/Dataset2/yqt",
+  "current_storage_root": "/home/Dataset2/yuqiuting",
+  "canonical_output_directory": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_restart_no_runtime_gate/L09_spatial_M2_seed42",
+  "canonical_launch_log": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_restart_no_runtime_gate/launch.log",
+  "previous_launch_receipt": "experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_restart_no_runtime_gate.json",
+  "observation_scope": "1547 updates were recorded; whether update 1548 completed in memory is unknown. No complete checkpoint exists for this attempt."
+}

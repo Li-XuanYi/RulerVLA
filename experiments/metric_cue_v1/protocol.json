@@ -1,7 +1,7 @@
 {
   "schema": "rulervla_metric_cue_v1",
-  "revision": 4,
-  "previous_revision_archive": "experiments/metric_cue_v1/revisions/r3/frozen_inputs.tar.gz",
+  "revision": 5,
+  "previous_revision_archive": "experiments/metric_cue_v1/revisions/r4/frozen_inputs.tar.gz",
   "method": {
     "ruler": "positive_world_xyz_0_to_15cm_equal_5cm_ticks_no_arrows",
     "direction_length_px": 28,
@@ -9,8 +9,8 @@
     "loss": "original_flow_matching"
   },
   "experiment_id": "L09",
-  "status": "training_released_evaluation_scene_lock_pending",
-  "research_plan_sha256": "de5e268fd382b1541eb0eb7a3b2ed5bf3de0e3d6b427f92203536423298238e0",
+  "status": "lora_plan_pending_implementation_and_validation",
+  "research_plan_sha256": "69cef624d77428c337133dcbeecffeb3e02ce7806c18ba85b770d3e49a464e13",
   "research_question": "六通道动作坐标方向、公制刻度和实测五步历史位移对 LIBERO Spatial 任务成功率的贡献",
   "arms": {
     "M0": "configs/rulervla_metric_cue_m0.yaml",
@@ -33,30 +33,85 @@
       "devices": 2,
       "optimizer_device": "cpu"
     },
-    "finetuning": "full",
+    "finetuning": "lora",
     "ema_decay": 0.999,
     "action_horizon": 10,
     "image_channels": 6,
     "scheduler": {
       "name": "warmup_cosine",
       "warmup_updates": 1000,
-      "peak_lr": 5e-05,
-      "end_lr": 5e-06,
+      "peak_lr": 0.00005,
+      "end_lr": 0.000005,
       "decay_updates": 30000
     },
     "optimizer": {
       "b1": 0.9,
       "b2": 0.95,
-      "eps": 1e-08,
+      "eps": 1e-8,
       "weight_decay": 1e-10,
-      "clip_gradient_norm": 1.0
+      "clip_gradient_norm": 1
     },
     "checkpoint_updates": [
       10000,
       20000,
       30000
     ],
-    "checkpoint_selection": "30000 updates for every arm and seed"
+    "checkpoint_selection": "30000 LoRA updates for every arm and seed",
+    "lora": {
+      "paligemma_variant": "gemma_2b_lora",
+      "action_expert_variant": "gemma_300m_lora",
+      "paligemma": {
+        "targets": [
+          "attn",
+          "ffn"
+        ],
+        "rank": 16,
+        "alpha": 16,
+        "rslora": false
+      },
+      "action_expert": {
+        "targets": [
+          "attn",
+          "ffn"
+        ],
+        "rank": 32,
+        "alpha": 32,
+        "rslora": false
+      },
+      "initialization": {
+        "a": "normal_std_0.01",
+        "b": "zeros",
+        "paired_across_arms_with_same_seed": true
+      },
+      "trainable_parameter_policy": "lora_plus_six_channel_stem_and_action_time_projections",
+      "trainable_stem": [
+        "PaliGemma/img/embedding/kernel",
+        "PaliGemma/img/embedding/bias"
+      ],
+      "trainable_projection_modules": [
+        "action_in_proj",
+        "action_out_proj",
+        "time_mlp_in",
+        "time_mlp_out"
+      ],
+      "frozen_parameters": "all_parameters_outside_the_trainable_allowlist",
+      "planned_total_parameters": 3404098832,
+      "planned_trainable_parameters": 53509280,
+      "planned_adapter_parameters": 49987584,
+      "planned_stem_parameters": 1355904,
+      "optimizer_state_scope": "trainable_parameters_only",
+      "ema_scope": "trainable_parameters_only",
+      "frozen_backbone_restore": "verified_pi05_base_reference",
+      "checkpoint_format": "rulervla_metric_lora_checkpoint_v1",
+      "allow_full_ft_checkpoint_resume": false
+    },
+    "resource_validation": {
+      "status": "pending_real_lora_smoke",
+      "initial_cpu_available_gib": 64,
+      "initial_gpu_free_mib_per_device": 28672,
+      "formal_cpu_rule": "max(64, ceil(1.25 * maximum_cpu_peak_gib_across_all_four_arm_smokes))",
+      "preserve_effective_batch_across_arms": true
+    }
   },
   "data": {
     "suite": "libero_spatial",
@@ -119,7 +174,10 @@
     "full_state_checkpoint_restore",
     "paired_scene_manifest_lock",
     "simulator_runtime_verified",
-    "resource_preflight"
+    "resource_preflight",
+    "lora_trainable_parameter_contract",
+    "lora_initialization_and_frozen_backbone_integrity",
+    "lora_memory_profile_validated"
   ],
   "evaluation_launch_gates": [
     "real_arm_input_contract",
@@ -130,6 +188,17 @@
     "paired_scene_manifest_lock",
     "position_scene_validity_lock",
     "simulator_runtime_verified",
-    "resource_preflight"
-  ]
+    "resource_preflight",
+    "lora_trainable_parameter_contract",
+    "lora_initialization_and_frozen_backbone_integrity",
+    "lora_memory_profile_validated"
+  ],
+  "fairness": {
+    "finetuning": "lora_for_every_arm_in_the_same_comparison",
+    "identical_lora_configuration_and_trainable_manifest": true,
+    "paired_initial_trainable_state_within_seed": true,
+    "shared_effective_batch_and_update_budget": true,
+    "exclude_historical_full_ft_from_primary_comparison": true,
+    "future_controls_use_the_same_lora_recipe": true
+  }
 }

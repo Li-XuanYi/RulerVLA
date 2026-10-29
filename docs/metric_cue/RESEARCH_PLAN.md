@@ -4,6 +4,10 @@
 
 **当前标尺定义更新日期：2026-10-26；配置：`configs/metric_ruler.yaml`。**
 
+**训练配方修订：2026-10-29，L09 revision5统一采用LoRA，当前处于计划与实现验收阶段。**
+
+[Code/Plan] M0/M1/M2/M3、三个训练种子及进入同一主结果表的其他对照均使用相同LoRA配方；S29使用对应LoRA checkpoint。full fine-tuning暂不执行，历史结果保留归档，不混入本轮主比较。实施计划见experiments/metric_cue_v1/REVISION5_LORA_PLAN.zh.md；训练/评测发布均关闭，须重新通过LoRA验收。
+
 ## 1. 研究目标与核心假设
 
 ### 研究问题
@@ -429,6 +433,18 @@ H=10
 
 训练与推理共享几何生成、六通道预处理、Prompt、状态规范化及模型输入定义。
 
+### 7.4 统一LoRA训练配方（revision5计划）
+
+[Code/Plan] PaliGemma采用gemma_2b_lora（attention/FFN rank16、alpha16），Action Expert采用gemma_300m_lora（rank32、alpha32）。LoRA A使用normal std0.01，B统一初始化为零。同一seed下四组共享相同基座和初始可训练参数。
+
+四组均训练六通道SigLIP Patch Embedding的kernel/bias，以及action_in_proj、action_out_proj、time_mlp_in、time_mlp_out；其余SigLIP和LLM原始参数冻结。输入层保留[W_RGB,0]初始化，使非零Cue能够被学习。CPU完整模型结构核验的计划白名单共53,509,280个参数，其中LoRA为49,987,584；这不是GPU训练验收结果。
+
+保持effective batch8、microbatch1、梯度累积8、30000 updates、原AdamW/warmup-cosine及EMA .999。AdamW和EMA仅维护可训练参数；checkpoint保存基座身份与可恢复的全部可训练状态。新LoRA run ID明确包含lora，拒绝跨full-FT配方恢复。
+
+资源验证以CPU可用64 GiB和原双卡每卡28 GiB为起始预算；正式门槛采用四组真实完整smoke峰值加25%余量且CPU下限64 GiB。旧full-FT的160 GiB门槛及更新/恢复receipt不直接用作LoRA资源或训练验收。
+
+所有组共享同一有效batch、LoRA/输入层白名单、训练数据、采样顺序、更新预算、checkpoint选择及评测口径。需要更改有效batch时，统一修订全部比较组，避免组间独立降低预算。
+
 ---
 
 ## 8. 实验设计
@@ -436,6 +452,8 @@ H=10
 ### 8.1 方法消融
 
 所有实验使用相同的六通道模型结构和相同的有效相机视图。
+
+[Code/Plan] 本轮M0/M1/M2/M3及其他进入同一比较的对照统一采用第7.4节LoRA配方。每组使用相同的两套rank/alpha、初始化、可训练参数白名单、optimizer/EMA范围和训练预算；已有full-FT记录作为历史工程证据单列。
 
 | 组别 | Spatial Cue | Motion Echo | 训练目标 |
 |---|---|---|---|
@@ -569,7 +587,7 @@ RulerVLA 保持单一正式工程，现有历史实验、checkpoint 和冻结运
 
 ---
 
-## 10. 当前工程状态（2026-10-26）
+## 10. 历史工程状态（截至2026-10-26）
 
 | 项目 | 已有状态 |
 |---|---|

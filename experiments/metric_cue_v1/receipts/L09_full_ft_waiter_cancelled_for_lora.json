@@ -1,0 +1,18 @@
+{
+  "schema": "rulervla_metric_launch_cancellation_v1",
+  "experiment_id": "L09",
+  "run_id": "L09_spatial_M2_seed42",
+  "verified_date": "2026-10-29",
+  "host": "vla_7_A6000",
+  "hostname": "amax",
+  "pid": 24503,
+  "state": "cancelled_full_finetuning_waiter",
+  "reason": "user_switched_all_comparison_arms_to_lora",
+  "observed_previous_state": "waiting_resources",
+  "formal_training_started": false,
+  "jax_imported": false,
+  "process_alive_after_cancellation": false,
+  "original_launch_directory": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_restart_amax/launch",
+  "original_cancellation_receipt": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_restart_amax/cancelled_for_lora.json",
+  "previous_waiting_receipt": "experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_amax_waiting.json"
+}

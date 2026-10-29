@@ -1,5 +1,34 @@
 # Handoff
 
+## 2026-10-29 L09 revision5统一LoRA计划
+
+- [Code] 用户明确要求暂不使用full fine-tuning，所有比较组统一LoRA。已修订docs/metric_cue/RESEARCH_PLAN.md，新增experiments/metric_cue_v1/REVISION5_LORA_PLAN.zh.md，并将protocol/run matrix/release更新为revision5计划状态。本次修订计划与发布状态，未实现或启动LoRA训练。
+- [Experiment] full-FT等待PID24503已在state=waiting_resources、jax_imported=false时取消，实际process_alive=false；NAS取消记录及跟踪receipt为receipts/L09_full_ft_waiter_cancelled_for_lora.json。旧等待记录、13次及1547次full-FT记录继续保留，不能自动恢复成LoRA。
+- [Code] 四组M0/M1/M2/M3各42/43/44三个种子，共12个计划run；统一PaliGemma rank/alpha16/16、Action Expert32/32，LoRA A normal std0.01、B零初始化。共同训练六通道Patch Embedding kernel/bias与action_in/out_proj、time_mlp_in/out，其余SigLIP与LLM原始权重冻结；所有进入同一主表的新增对照也必须使用同一配方，S29使用对应LoRA checkpoint。
+- [Experiment] 真实完整模型的CPU静态结构核验得到总参数3,404,098,832、计划可训练53,509,280（约1.57%），其中LoRA49,987,584、输入层1,355,904、动作/时间投影2,165,792。receipt为receipts/L09_lora_parameter_plan_r5.json，原始outputs/metric_cue_pilot/L09_lora_plan_r5/parameter_shapes.json；这不等于GPU训练或实际资源峰值。
+- [Code/Inference] 保留batch8、microbatch1、累计8、30k、原AdamW/warmup-cosine/EMA .999及10000/20000/30000保存点；数据、方法和评测等16项与r4归档语义比对一致。AdamW/EMA计划仅存可训练参数，checkpoint以严格基座身份加全部可训练状态恢复。CPU64 GiB是LoRA起始验证预算，正式门槛必须取四组真实smoke最高峰值加25%且至少64 GiB；不能直接放宽旧full-FT门槛后启动。
+- [Code] 新run ID为L09_spatial_<arm>_lora_seed<seed>，输出前缀outputs/metric_cue_pilot/L09_lora_r5。training_released=false、evaluation_released=false，LoRA参数合同、初始化/冻结权重不变性、GPU更新、delta checkpoint恢复及资源gates待新验收；旧full-FT GPU receipt作为legacy记录保留，不能代替LoRA验收。
+- [Code] r4原始输入归档revisions/r4/frozen_inputs.tar.gz，SHA-256为21d057be97bd2d1ae6d3c1de7cfec2406f7dc6a5b2f12e623062b7251bd94fed；r5 protocol SHA-256为8c7cf7f372673d53143935a3f433134d9399189d21a4b47a0e6b0c3c50758071，研究计划SHA-256为69cef624d77428c337133dcbeecffeb3e02ce7806c18ba85b770d3e49a464e13，实施计划SHA-256为494e2150d10964cc4e1268d2e337dff4445d7b66db9f1f80e5cdb0d960d71ff3。研究计划保留原有CRLF，差异检查使用cr-at-eol。
+- [Experiment] 四组真实训练CLI均因新LoRA gates关闭而PermissionError退出，未创建训练目录；原始日志outputs/metric_cue_pilot/L09_lora_plan_r5/closed_local_M*.log。首次CPU入口校验在NAS pycache发生I/O等待，已对这些尚未初始化模型的验证进程发送SIGTERM，并以本地缓存/禁写pyc重复校验通过；相关记录initial_guard_checks_cancelled.json保留。
+- [Code] 后续按LoRA计划任务1至5实现模型白名单、零B初始化、稀疏optimizer/EMA、可恢复delta状态、共同工作流及真实smoke。LoRA启动器须改用新配置，512 MiB数据缓存及本地build热缓存统一应用。不要重新启动历史full-FT等待器，不把本次计划与静态结构核验报告为LoRA训练已完成。
+
+## 2026-10-29 L09 NAS路径修复与A6000重启排队
+
+- [Experiment] 用户要求重新开始实验。已核实旧147节点PID2296578不存在；原始日志最后成功记录1547次更新，最后loss0.03384431、梯度有限，随后追加旧/home/Dataset2/yqt路径的metrics.jsonl时FileNotFoundError。checkpoint目录为空，不能继承完整状态；1548次是否在内存完成未知，不计入已保存预算。
+- [Experiment] 数据、基座和旧输出目前位于/home/Dataset2/yuqiuting。RGBD manifest、geometry manifest及pi05_base来源receipt的SHA-256分别仍为02e428d9a3735bb959cdc29c1ca415cde73c2b9f6763ce1545603f385b8e127c、f09a5d2b021058d51f54e54fb54e1222f8d1202eff805c6ba96efee00cbb0e9e、d048e7298f3cfe1687d1025ad886a28581a77f353253853aa8740e15c0793005。原输出和错误保留，停止receipt为开发树experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_nas_stop.json。
+- [Code] 新增configs/metric_workflow_node145.yaml处理已核实的NAS根目录，通过既有path_mappings映射manifest中的旧路径；实际GPU由启动器覆盖。batch8、microbatch1、累计8、full fine-tuning、EMA .999、CPU AdamW、双卡FSDP和30k不变。协议revision4 SHA-256仍为c924ef9cdf7ae2de11760371baf525d845edc4275020ec1eae6d68286e29e0e1；S29及策略评测保持关闭。
+- [Experiment] 已在vla_7_A6000/amax启动现有资源等待启动器，PID24503，候选GPU4/6，state=waiting_resources，jax_imported=false，尚未开始新训练或参数更新。首轮CPU可用93.034 GiB低于160 GiB，GPU空闲48255/48223 MiB满足每卡28672 MiB；输入blockers为空。每60秒复查，全部条件通过后自动exec正式训练CLI；不降低门槛，不占用等待期间的GPU。
+- [Code] 冻结、干净的活动运行树/home/lixuanyi/XuanyiLi/work/rulervla-metric-restart-runtime，源码50a59e3e38fbc9b9ce696591ab46c3500603551c，入口scripts/start_metric_cue_amax.sh，Python为/home/lixuanyi/XuanyiLi/code/openpi/.venv/bin/python。A6000使用原锁定环境NCCL，已通过实际ncclGetVersion核实22602；CUDA ptxas和缓存环境已配置。活动运行树的源码和Git HEAD保持冻结，后续文档提交不部署到该树。
+- [Experiment] 新输出outputs/metric_cue_pilot/L09_restart_amax/L09_spatial_M2_seed42，日志同父目录launch.log，准入记录同父目录launch/；outputs指向/home/Dataset2/yuqiuting/rulervla/metric_cue_runs，临时文件与全部缓存也位于NAS。当前snapshot receipt为开发树experiments/metric_cue_v1/receipts/L09_spatial_M2_seed42_amax_waiting.json；run matrix和registry均已改为waiting_resources。出现实际optimizer_updates后才可报告正式训练开始，不能把排队视为完成。
+- [Experiment] 147节点NVML初始化失败；145节点根磁盘可用空间为0，GPU查询超时且出现os_acquire_rwlock_read内核等待，真实preflight未通过。145的独立tmpfs运行树/dev/shm/rulervla_metric_runtime_node145冻结于9defb05，源码bundle与数据持久保存在NAS，未在该节点启动GPU训练。失败preflight位于NAS下metric_cue_pilot/L09_restart_node145/preflight/和preflight_retry/。
+- [Code] 启动后的八处资源检查继续注释，不添加资源终止监视器，也不以资源阈值主动终止已启动的训练。本轮验证了新旧训练配方相同、真实数据与发布receipt身份、实际preflight、脚本语法和Git差异；未修改训练计算实现。当前维护入口为开发树experiments/metric_cue_v1/AMAX_RESTART_QUEUE.zh.md。
+
+## 2026-10-29 L09 WSL 进度检查受访问权限限制
+
+- [Experiment] 用户要求通过WSL检查L09进度、进程和报错。WSL Ubuntu OpenSSH连接vla_7_6000成功，但远端返回文件管理限制：ps不在白名单，复合命令和脚本不支持；读取本次status.json时，解析到NAS实际路径/home/Dataset2/yqt/rulervla/metric_cue_runs/metric_cue_pilot/L09_restart_no_runtime_gate/L09_spatial_M2_seed42/status.json后返回Permission denied。
+- [Unknown] 本日训练进程是否存活、最新更新次数、checkpoint和日志错误均未取得实时证据，不能使用run matrix中的旧running快照确认当前状态。上次会话于2026-10-28直接核实3次更新、loss0.083011046、梯度有限；该记录仅为历史观察。
+- [Code] 已向用户请求可查询进程、读取本次NAS输出的WSL SSH连接或相应权限恢复。本次没有修改运行时、启动或停止训练；继续遵守启动后不因资源阈值主动终止训练的要求。
+
 ## 2026-10-28 L09 关闭启动后资源检查并重启
 
 - [Code] 用户要求使用WSL连接远程，注释启动训练后的显存检查，启动后不可因资源检查主动停止训练。已通过WSL Ubuntu OpenSSH完成修改和部署，scripts/metric_cue_train.py的八处require_current_capacity调用全部注释，CPU/GPU运行中资源阈值均不再主动终止训练；启动前数据/来源/gates及每卡28 GiB、CPU160 GiB准入保留。后续操作不得添加运行中资源终止监视器或以资源阈值主动停止该训练。
