@@ -317,20 +317,30 @@ def main():
         (args.out/'full_state_sha256.json').write_text(json.dumps(expected, indent=2))
         if frozen_signatures(state, config) != initial_frozen:
             raise ValueError('Frozen backbone changed during real LoRA updates')
+        with jax.default_device(cpu):
+            expected_inference = nnx.State(state.params)
+            expected_inference.replace_by_pure_dict(state.ema_params.to_pure_dict())
+            expected_inference_sha256 = state_signatures(expected_inference)
+        del expected_inference, state, initial_selected
+        gc.collect()
+        jax.clear_caches()
         stage('load_delta_inference_model')
         with jax.default_device(cpu):
             restored_model, restored_pipeline = load_metric_model(saved)
             inferred = nnx.state(restored_model)
-            expected_inference = nnx.State(state.params)
-            expected_inference.replace_by_pure_dict(state.ema_params.to_pure_dict())
-        if (state_signatures(inferred) != state_signatures(expected_inference)
+        if (state_signatures(inferred) != expected_inference_sha256
                 or restored_pipeline.fingerprint() != pipeline.fingerprint()):
             raise ValueError('Delta inference reconstruction differs from the full EMA model')
         measured = gpu_prediction(config, inferred, first_batch, gpu, mesh=mesh)
         (args.out/'delta_inference.json').write_text(json.dumps(measured, indent=2))
-        del inferred, expected_inference, restored_model
+        del inferred, restored_model
         gc.collect()
         jax.clear_caches()
+        stage('restore_optimizer_after_inference')
+        state = restore_training_checkpoint(manager, template, pipeline, config, step=completed_step,
+                                            expected_manifest=provenance)
+        if state_signatures(state) != expected:
+            raise ValueError('Full training state changed during inference verification')
         stage('continue_restored_optimizer')
         indices = update_indices(len(dataset), config.seed, int(state.step), batch_size=config.batch_size)
         batch = prepare_batch(dataset, indices, pipeline)
