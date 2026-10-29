@@ -1,11 +1,13 @@
 # Handoff
 
-## 2026-10-29 L09 LoRA运行时实施中
+## 2026-10-29 L09 LoRA运行时与真实smoke
 
-- [Code] 已实现完整π0.5的LoRA变体、严格参数白名单、A normal std0.01/B零初始化；AdamW与EMA仅维护53,509,280个可训练参数。正式入口要求显式LoRA及冻结的rank/预算，旧full-FT配置拒绝。
-- [Code] 已实现基座引用加delta的Orbax保存、参数/AdamW/EMA/step哈希恢复、基座20文件核验及推理重建；真实GPU验收尚待执行，training_released/evaluation_released继续为false。
-- [Experiment] 新增CPU检查已有9项通过，完整真实batch8的Flow Matching梯度结构检查正在运行。证据位于outputs/metric_cue_pilot/L09_lora_r5_implementation；没有启动正式LoRA训练。
-- [Code] LoRA运行树计划使用/home/lixuanyi/XuanyiLi/work/rulervla-metric-lora-r5-runtime；共同缓存512 MiB、microbatch1/累计8、本地build/metric_lora_cache，数据与checkpoint仍写NAS。启动后资源阈值终止调用继续注释。
+- [Code] 已实现完整π0.5的两套LoRA、严格白名单、A normal std0.01/B零初始化；AdamW与EMA仅维护53,509,280个参数。共同batch8、microbatch1/累计8、30000预算与四组/三种子保持不变，旧full-FT配置拒绝。
+- [Code] 已实现基座引用加delta的Orbax保存、参数/AdamW/EMA/step哈希恢复及共享推理重建。发布审计绑定四组实际pipeline/manifest/checkpoint/原始证据、Git blob冻结协议、统计量身份与共同CPU/GPU门槛。只读审查无剩余Critical或Important。
+- [Experiment] 真实完整模型及真实batch8的CPU检查10 passed，597.75秒；最新发布入口/恢复模板复查5 passed，32.72秒。原始日志位于outputs/metric_cue_pilot/L09_lora_r5_implementation。真实GPU更新、冻结权重不变性、恢复/继续一步与推理仍待四组完整结果，training_released/evaluation_released继续为false，正式30k尚未启动。
+- [Experiment] 运行树/home/lixuanyi/XuanyiLi/work/rulervla-metric-lora-r5-runtime冻结84f2ecf5f51e4eba8ab2fea08c823b84b6ec7246。smoke_wait_v2的M2进程PID626949已在两次资源等待后自动通过准入，使用物理GPU6/0，已载入基座与LoRA优化器，正在读取真实RGB-D首批；观察RSS约15.5GiB。原始目录outputs/metric_cue_pilot/L09_lora_r5_smoke/smoke_wait_v2，队列顺序M2/M0/M1/M3。
+- [Experiment] 最初5秒输入探测超时；真实manifest读取8.45/10.37秒且哈希匹配，现改为30秒有界探测并通过。smoke_227ce16随后因CPU低于64GiB在JAX前退出，记录保留；新等待入口只在启动前选择空闲双卡并等待CPU64GiB/每卡28672MiB，不修改共同批次。
+- [Code] 共同episode缓存512MiB，本地build/metric_lora_cache保存Python/JAX/CUDA热缓存，数据和checkpoint持久写NAS。smoke仅采样当前PID显存作为证据；正式训练不采样，启动后八处资源阈值终止调用继续注释。
 
 ## 2026-10-29 L09 revision5统一LoRA计划
 

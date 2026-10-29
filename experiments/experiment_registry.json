@@ -646,15 +646,15 @@
       "display_name": "L09_公制提示",
       "classification": "large",
       "legacy_ids": ["metric_cue_v1"],
-      "status": "lora_plan_pending_implementation_and_validation",
+      "status": "lora_gpu_validation_in_progress",
       "purpose": "六通道 M0/M1/M2/M3 公制提示与实测历史位移受控训练和评测",
       "details": [
         "当前revision5统一M0/M1/M2/M3及进入同一比较的其他对照采用LoRA，三个种子42/43/44共十二次计划训练；PaliGemma rank/alpha16/16、Action Expert32/32，四组共享可训练白名单、初始化、有效batch8及30k预算。revision1至revision4原输入已分别归档。",
-        "完整模型静态结构的计划可训练参数为53,509,280，包含LoRA、六通道输入层及动作/时间投影，AdamW和EMA计划仅维护这些参数。旧full-FT等待PID24503已取消，LoRA实现及真实GPU更新、冻结权重不变性、状态恢复和资源验收待完成，训练与评测发布关闭。旧13次及1547次full-FT记录保留归档，不能跨配方继承。"
+        "完整模型LoRA白名单、零B初始化、可训练AdamW/EMA、delta保存恢复与共同入口已实现；可训练参数53,509,280，真实完整batch8 CPU检查10项通过。M2真实smoke已启动，四组GPU更新、冻结权重不变性、恢复/推理与资源校准仍待完整结果，正式训练和评测发布关闭。旧full-FT等待PID24503及13次/1547次记录保留归档，不能跨配方继承。"
       ],
       "priority": "current",
       "research_group": "六通道公制提示",
-      "current_status_note": "2026-10-29 用户要求统一LoRA，revision5计划已冻结；M0/M1/M2/M3全部使用相同LoRA和输入层白名单、batch8、30k及三种子。full-FT等待PID24503已取消；LoRA尚未开始训练，发布条件等待新验收。计划见experiments/metric_cue_v1/REVISION5_LORA_PLAN.zh.md。",
+      "current_status_note": "2026-10-29 LoRA运行时已实现并通过完整模型/真实batch8 CPU检查及只读代码复核；A6000运行树84f2ecf的M2 smoke PID626949已在资源等待后开始载入和读取真实首批，队列为M2/M0/M1/M3。四组新GPU证据通过后才能发布并启动M2 seed42正式30k；当前training/evaluation_released均false。见receipts/L09_lora_restart_20261029.json及handoff.md。",
       "current_role": "检验方向、公制刻度和 Motion Echo 的逐项增量"
     },
     {

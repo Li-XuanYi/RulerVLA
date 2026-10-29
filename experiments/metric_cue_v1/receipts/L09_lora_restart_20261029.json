@@ -1,0 +1,74 @@
+{
+  "schema": "rulervla_metric_lora_restart_v1",
+  "observed_at_utc": "2026-10-29T11:01:04Z",
+  "experiment_id": "L09",
+  "state": "real_smoke_in_progress",
+  "training_released": false,
+  "evaluation_released": false,
+  "formal_training_started": false,
+  "runtime_root": "/home/lixuanyi/XuanyiLi/work/rulervla-metric-lora-r5-runtime",
+  "runtime_commit": "84f2ecf5f51e4eba8ab2fea08c823b84b6ec7246",
+  "protocol_sha256": "8c7cf7f372673d53143935a3f433134d9399189d21a4b47a0e6b0c3c50758071",
+  "smoke": {
+    "pid": 626949,
+    "arm": "M2",
+    "order": [
+      "M2",
+      "M0",
+      "M1",
+      "M3"
+    ],
+    "physical_gpu_indices": [
+      6,
+      0
+    ],
+    "resource_wait_attempts": 2,
+    "observed_stage": "real_first_batch_rgbd_read_after_base_and_optimizer_load",
+    "observed_rss_gib_approx": 15.5,
+    "last_reported_optimizer_updates": 0,
+    "raw_root": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_wait_v2"
+  },
+  "cpu_validation": {
+    "complete_model_and_real_batch8": {
+      "passed": 10,
+      "seconds": 597.75,
+      "log": "outputs/metric_cue_pilot/L09_lora_r5_implementation/cpu_complete.log"
+    },
+    "release_guard_recheck": {
+      "passed": 5,
+      "seconds": 32.72,
+      "log": "outputs/metric_cue_pilot/L09_lora_r5_implementation/releaseguards_cpu.log"
+    }
+  },
+  "recipe": {
+    "finetuning": "lora",
+    "batch_size": 8,
+    "micro_batch_size": 1,
+    "gradient_accumulation": 8,
+    "num_steps": 30000,
+    "trainable_parameters": 53509280,
+    "ema_scope": "trainable_parameters_only"
+  },
+  "admission": {
+    "cpu_required_gib": 64,
+    "gpu_required_mib_per_device": 28672,
+    "input_probe_seconds": 30,
+    "verified_manifest_read_seconds": [
+      8.450557917996775,
+      10.369351586035918
+    ]
+  },
+  "review": {
+    "reviewer": "review_lora_r5",
+    "critical": 0,
+    "important_remaining": 0
+  },
+  "post_start_resource_termination": false,
+  "pending": [
+    "four_arm_real_gpu_updates",
+    "frozen_backbone_integrity",
+    "delta_restore_inference_and_continuation",
+    "measured_shared_resource_release",
+    "formal_M2_seed42_start"
+  ]
+}

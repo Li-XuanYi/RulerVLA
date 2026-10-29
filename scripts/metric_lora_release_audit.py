@@ -4,6 +4,7 @@ import json
 import math
 import os
 from pathlib import Path
+import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,6 +22,7 @@ def read_json(path):
 def audit(smoke_root):
     from rulervla.adapters.metric_pipeline import MetricPipeline
     from rulervla.training.metric_protocol import require_lora_recipe
+    from rulervla.training.metric_workflow import make_training_config, training_recipe
 
     protocol_path = ROOT / 'experiments/metric_cue_v1/protocol.json'
     protocol = read_json(protocol_path)
@@ -33,6 +35,20 @@ def audit(smoke_root):
         manifest = read_json(directory / 'run_manifest.json')
         run = manifest['run_config']
         require_lora_recipe(run, protocol)
+        frozen_protocol = subprocess.check_output(
+            ['git', 'show', manifest['git_commit'] + ':experiments/metric_cue_v1/protocol.json'], cwd=ROOT)
+        if hashlib.sha256(frozen_protocol).hexdigest() != digest(protocol_path):
+            raise ValueError('Smoke runtime belongs to another frozen protocol: ' + arm)
+        if (run['norm_stats_sha256'] != protocol['data']['norm_stats_sha256']
+                or digest(Path(run['norm_stats_dir']) / 'norm_stats.json') != run['norm_stats_sha256']):
+            raise ValueError('Smoke normalization differs from the frozen data: ' + arm)
+        validation = protocol['training']['resource_validation']
+        budget = validation['initial_gpu_free_mib_per_device']
+        sampled = status['sampled_process_gpu_peak_mib']
+        if (run['resources']['min_free_mib_fsdp'] != budget or len(sampled) != 2
+                or run['resources']['min_cpu_available_gib'] != validation['initial_cpu_available_gib']
+                or status['gpu_samples'] < 1 or not all(0 < value < budget for value in sampled.values())):
+            raise ValueError('Shared LoRA resource budget was not validated: ' + arm)
         if (status['state'] != 'complete' or status['optimizer_updates'] != 3
                 or status['formal_training_started'] or run['training']['num_steps'] != 2
                 or run['training']['seed'] != 42
@@ -52,6 +68,8 @@ def audit(smoke_root):
         metadata_path = directory / 'checkpoints/3/metric_workflow.json'
         metadata = read_json(metadata_path)
         if (metadata['schema'] != protocol['training']['lora']['checkpoint_format']
+                or metadata['training_recipe'] != training_recipe(make_training_config(run))
+                or metadata['pipeline_sha256'] != manifest['pipeline_sha256']
                 or metadata['completed_updates'] != 3 or metadata['run_manifest'] != manifest):
             raise ValueError('Smoke checkpoint identity differs: ' + arm)
         expected = read_json(directory / 'full_state_expected_sha256.json')

@@ -89,8 +89,13 @@ def require_lora_recipe(run, protocol):
             raise ValueError('LoRA training recipe differs: ' + key)
     layout = protocol['training']['gradient_sharding']
     if (len(run['resources']['gpu_indices']) != layout['devices']
+            or len(set(run['resources']['gpu_indices'])) != layout['devices']
             or not run['resources']['cpu_optimizer']):
         raise ValueError('LoRA validation and training require the shared two-GPU/CPU layout')
+    validation = protocol['training']['resource_validation']
+    if (run['resources']['min_free_mib_fsdp'] != validation['initial_gpu_free_mib_per_device']
+            or run['resources']['min_cpu_available_gib'] < validation['initial_cpu_available_gib']):
+        raise ValueError('LoRA resource admission differs from the shared validated budget')
     if run['data'].get('max_cache_bytes') != 512 << 20:
         raise ValueError('LoRA runs require the shared 512 MiB dataset cache')
 
@@ -125,6 +130,7 @@ def load_formal_metric_run(root, arm, seed, run):
     if (receipt.get('schema') != 'rulervla_metric_lora_smoke_release_v1'
             or receipt['state'] != 'complete' or not receipt['full_state_restore_bitwise']
             or receipt['optimizer_updates'] < 3
+            or receipt['protocol_sha256_during_smoke'] != hashlib.sha256(protocol_bytes).hexdigest()
             or receipt['lora_recipe'] != protocol['training']['lora']
             or set(receipt['arms']) != set(protocol['arms'])):
         raise ValueError('All four real LoRA GPU updates and checkpoint recoveries are required')
