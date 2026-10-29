@@ -650,11 +650,11 @@
       "purpose": "六通道 M0/M1/M2/M3 公制提示与实测历史位移受控训练和评测",
       "details": [
         "当前revision5统一M0/M1/M2/M3及进入同一比较的其他对照采用LoRA，三个种子42/43/44共十二次计划训练；PaliGemma rank/alpha16/16、Action Expert32/32，四组共享可训练白名单、初始化、有效batch8及30k预算。revision1至revision4原输入已分别归档。",
-        "完整模型LoRA白名单、零B初始化、可训练AdamW/EMA、delta保存恢复与共同入口已实现；可训练参数53,509,280，真实完整batch8 CPU检查10项通过。GPU初始化故障均保留，最新14b8187改用原生保留池核验；smoke_pool_v5四组队列等待资源和真实验收，正式训练与评测发布关闭。旧full-FT等待PID24503及13次/1547次记录保留归档，不能跨配方继承。"
+        "完整模型LoRA白名单、零B初始化、可训练AdamW/EMA、delta保存恢复与共同入口已实现，可训练53,509,280参数。真实完整batch8 CPU检查10项及重启后相关回归5项通过。V5完成两次更新与CP2完整恢复，随后推理重建阶段被终止；a785cb6减少同时驻留的完整CPU模型副本。V6四组真实验收进行中，正式训练及评测发布关闭，全部失败和旧full-FT记录保留，不能跨配方继承。"
       ],
       "priority": "current",
       "research_group": "六通道公制提示",
-      "current_status_note": "2026-10-29 LoRA运行时已实现并复核，冻结14b8187；smoke_pool_v5的M2 PID1094999最近等待CPU64GiB，未导入JAX或启动GPU。四组相同LoRA/batch8/micro1累计8/30k；真实GPU验收通过后才发布M2 seed42正式训练，S29评测继续关闭。每小时后续检查l09-lora将继续本次重启，见experiments/metric_cue_v1/receipts/L09_lora_pool_restart_20261029.json及handoff.md。",
+      "current_status_note": "2026-10-29 冻结a785cb6，主机14:10:53 UTC重启后已启动smoke_pool_v6，控制PID14119、M2 PID14586、GPU6/7，最近完成两次真实更新和CP2保存，推理与第三步验收待核实。四组统一LoRA/batch8/micro1累计8/30k；四组完整验收通过后发布正式M2 seed42，S29评测保持关闭。automation l09-lora继续重启，见receipts/L09_lora_inference_restart_20261029.json及handoff.md。",
       "current_role": "检验方向、公制刻度和 Motion Echo 的逐项增量"
     },
     {

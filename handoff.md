@@ -1,5 +1,12 @@
 # Handoff
 
+## 2026-10-29 L09 LoRA两次更新与推理验收内存修复
+
+- [Experiment] smoke_pool_v5/M2完成两次有限更新，loss为0.1017892062664032、0.1376851201057434，LoRA B梯度均大于0，第二步LoRA A梯度大于0；CP2已保存，full_state_expected_sha256.json与full_state_sha256.json逐项一致。随后load_delta_inference_model阶段多次pinned host memory分配失败，launch.log记录PID1094999 Killed，/proc/1094999不存在。原始status的running为终止后陈旧状态；内核日志无读取权限，终止来源未知。最后stage记录CPU峰28.339GiB，不能代替终止前实际峰值。未主动停止训练，原始日志和CP2保留，V5不计为完整smoke通过。
+- [Code] 最小修复a785cb6916b33b0439f0bab698efeea867a5ccfc已前向部署到干净冻结运行树。smoke先计算完整EMA签名并释放完整训练状态，再独立重建模型和执行GPU推理；释放推理模型后从同一CP2重新恢复参数、AdamW、EMA、step，与原完整状态逐项比较，再继续第三步，减少同时驻留的完整CPU模型副本。ruff、git diff --check通过，只读复核无Critical/Important；完整模型及实际推理验收要求保持一致。
+- [Experiment] 主机于2026-10-29 14:10:53 UTC重新启动，WSL SSH短暂超时后恢复；当时追加CPU回归进程中断，inference_lifecycle.log没有最终结果。重启后以inference_lifecycle_after_reboot.log及独立basetemp重新执行五项相关CPU检查，5 passed、49.29秒。此前完整模型/真实batch8的10项及原生allocator/入口4项检查日志保留。
+- [Experiment] 新四组队列smoke_pool_v6控制PID14119，M2 PID14586已导入JAX并完成两卡原生BFC池核验，每卡27576097792字节；物理GPU6/7，最近已完成两次更新并保存CP2，完整推理与第三步验收待核实。冻结a785，顺序M2/M0/M1/M3；原始根目录/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_pool_v6。training_released/evaluation_released均false，正式30k尚未开始。CPU64GiB、双卡各28672MiB准入及启动后不主动按资源阈值终止保持一致；四组完整通过后由l09-lora继续审计和正式M2启动。
+
 ## 2026-10-29 L09 LoRA重启与GPU初始化
 
 - [Code] LoRA运行时已实现：PaliGemma rank/alpha16/16、Action Expert32/32，A normal std0.01/B零初始化；统一训练LoRA、六通道输入层及动作/时间投影53,509,280个参数，AdamW/EMA仅维护这些参数。四组及三个种子的batch8、microbatch1/累计8、30k保持一致。

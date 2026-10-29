@@ -1,0 +1,20 @@
+{
+  "schema": "rulervla_metric_lora_restart_v3",
+  "observation_utc_date": "2026-10-29",
+  "experiment_id": "L09",
+  "runtime_commit": "a785cb6916b33b0439f0bab698efeea867a5ccfc",
+  "runtime_root": "/home/lixuanyi/XuanyiLi/work/rulervla-metric-lora-r5-runtime",
+  "protocol_sha256": "8c7cf7f372673d53143935a3f433134d9399189d21a4b47a0e6b0c3c50758071",
+  "state": "gpu_validation_in_progress",
+  "formal_training_started": false,
+  "training_released": false,
+  "evaluation_released": false,
+  "recipe": {"finetuning": "lora", "batch_size": 8, "micro_batch_size": 1, "gradient_accumulation": 8, "num_steps": 30000, "trainable_parameters": 53509280},
+  "latest_observation": {"controller_pid": 14119, "pid": 14586, "arm": "M2", "mode": "smoke", "selected_gpu_indices": [6, 7], "optimizer_updates": 2, "stage": "save_full_training_state", "native_pool_bytes_per_device": [27576097792, 27576097792], "raw_root": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_pool_v6"},
+  "previous_partial_failure": {"run": "smoke_pool_v5/M2", "pid": 1094999, "optimizer_updates": 2, "losses": [0.1017892062664032, 0.1376851201057434], "gradients_finite": true, "checkpoint_2_saved": true, "complete_state_restore_signatures_identical": true, "last_stage_cpu_peak_gib": 28.339351654052734, "last_stage": "load_delta_inference_model", "raw_status_stale_running": true, "process_absent": true, "shell_reported_killed": true, "pinned_host_memory_allocation_errors": true, "termination_source": "unknown; kernel log access denied", "proactively_stopped": false, "full_smoke_passed": false},
+  "changes": ["释放完整训练状态后再执行独立完整推理模型重建与GPU推理", "释放推理模型后从同一CP2重新恢复参数/AdamW/EMA/step，并再次校验全部状态签名后继续第三步", "所有组的训练配方、完整验收和启动后不主动按资源阈值终止要求保持一致"],
+  "validation": {"ruff_passed": true, "git_diff_check_passed": true, "review_critical": 0, "review_important": 0, "related_cpu_tests_after_reboot": 5, "related_cpu_test_seconds": 49.29, "cpu_log": "outputs/metric_cue_pilot/L09_lora_r5_implementation/inference_lifecycle_after_reboot.log", "all_four_real_gpu_smokes_passed": false},
+  "host_reboot_utc": "2026-10-29 14:10:53 UTC",
+  "automation": {"id": "l09-lora", "status": "ACTIVE", "frequency": "hourly", "stop_condition": "formal M2 seed42 has at least two finite real updates; pause automation only"},
+  "raw_evidence_and_checkpoints_preserved": true
+}
