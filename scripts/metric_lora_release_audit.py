@@ -112,7 +112,7 @@ def audit(smoke_root):
         if ({key: allocation[key] for key in policy} != policy
                 or read_json(directory / 'gpu_allocator.json') != allocation
                 or allocation['initial_reservation_array_bytes_per_device'] != [
-                    (policy['pool_target_mib_per_device'] - 1) << 20] * 2):
+                    policy['initial_reservation_mib_per_device'] << 20] * 2):
             raise ValueError('LoRA GPU pool initialization is unverified: ' + arm)
         common = dict(git_commit=manifest['git_commit'], sources=manifest['loaded_source_sha256'],
                       runtime_sources=runtime_source_hashes(manifest['git_commit'], manifest['loaded_source_sha256']),

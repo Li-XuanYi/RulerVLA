@@ -22,6 +22,7 @@ def test_real_gpu_allocator_configuration_matches_the_installed_native_plugin():
     native = xla_client.generate_pjrt_gpu_plugin_options()
     assert native['allocator'] == 'bfc' and native['preallocate']
     assert contract['pool_target_mib_per_device'] == 26624
+    assert contract['initial_reservation_mib_per_device'] == 24576
     assert contract['gpu_budget_mib_per_device'] == 28672
     assert native['memory_fraction'] == pytest.approx(contract['memory_fraction'])
     assert contract['selected_gpu_uuids'] == [gpu['uuid'] for gpu in selected]

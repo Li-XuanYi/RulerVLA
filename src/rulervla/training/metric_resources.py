@@ -18,7 +18,8 @@ def lora_gpu_pool_policy(budget):
     if budget <= 2048:
         raise ValueError('LoRA GPU budget is too small for the external-library allowance')
     return dict(allocator='bfc', preallocate=True, gpu_budget_mib_per_device=budget,
-                pool_target_mib_per_device=budget - 2048, external_library_allowance_mib=2048)
+                pool_target_mib_per_device=budget - 2048, external_library_allowance_mib=2048,
+                initial_reservation_mib_per_device=budget - 4096)
 
 
 def configure_lora_gpu_allocator(run, gpu_snapshot):

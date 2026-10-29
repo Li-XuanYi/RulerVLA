@@ -125,6 +125,8 @@ def main():
         sys.__excepthook__(error_type, error, traceback)
         path = args.out/'status.json'
         failed = json.loads(path.read_text()) if path.exists() else {}
+        failed.pop('blockers', None)
+        failed.pop('attempt', None)
         failed.update(state='failed', error_type=error_type.__name__, error=str(error),
                       pid=os.getpid(), jax_imported='jax' in sys.modules,
                       selected_gpu_indices=run['resources']['gpu_indices'],
@@ -134,6 +136,8 @@ def main():
                       peak_cpu_rss_gib=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 2**20)
         if memory_sampler is not None:
             failed.update(memory_sampler.finish())
+        if gpu_context_started:
+            failed['gpu_allocator_stats'] = [device.memory_stats() for device in gpu_devices]
         path.write_text(json.dumps(failed, indent=2, allow_nan=False))
     sys.excepthook = record_failure
     from rulervla.training.metric_resources import configure_lora_gpu_allocator
