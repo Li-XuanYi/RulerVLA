@@ -87,6 +87,10 @@ def require_lora_recipe(run, protocol):
                 'scheduler', 'optimizer', 'lora'):
         if training.get(key) != protocol['training'][key]:
             raise ValueError('LoRA training recipe differs: ' + key)
+    layout = protocol['training']['gradient_sharding']
+    if (len(run['resources']['gpu_indices']) != layout['devices']
+            or not run['resources']['cpu_optimizer']):
+        raise ValueError('LoRA validation and training require the shared two-GPU/CPU layout')
     if run['data'].get('max_cache_bytes') != 512 << 20:
         raise ValueError('LoRA runs require the shared 512 MiB dataset cache')
 
@@ -115,9 +119,21 @@ def load_formal_metric_run(root, arm, seed, run):
     if receipt_path is None:
         raise ValueError('Full model GPU receipt is required')
     receipt = json.loads((root / receipt_path).read_text())
-    if (receipt['state'] != 'complete' or not receipt['full_state_restore_bitwise']
-            or receipt['optimizer_updates'] < 1):
-        raise ValueError('Full model GPU update and checkpoint recovery are unverified')
+    if (receipt.get('schema') != 'rulervla_metric_lora_smoke_release_v1'
+            or receipt['state'] != 'complete' or not receipt['full_state_restore_bitwise']
+            or receipt['optimizer_updates'] < 3
+            or receipt['lora_recipe'] != protocol['training']['lora']
+            or set(receipt['arms']) != set(protocol['arms'])):
+        raise ValueError('All four real LoRA GPU updates and checkpoint recoveries are required')
+    for measured in receipt['arms'].values():
+        if (measured['state'] != 'complete' or measured['optimizer_updates'] != 3
+                or measured['trainable_parameters'] != 53509280
+                or not all(measured[key] for key in ('full_state_restore_bitwise',
+                    'frozen_backbone_unchanged', 'delta_inference_verified',
+                    'restored_optimizer_continued', 'resource_profile_valid'))):
+            raise ValueError('LoRA arm smoke receipt is incomplete')
+    if run['resources']['min_cpu_available_gib'] != receipt['formal_min_cpu_available_gib']:
+        raise ValueError('LoRA CPU admission differs from the measured shared threshold')
     training = protocol['training']
     if (training['batch_size'] != training['micro_batch_size'] * training['gradient_accumulation']
             or training['finetuning'] != 'lora' or training['image_channels'] != 6

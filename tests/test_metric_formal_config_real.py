@@ -49,9 +49,9 @@ def test_protocol_and_release_match_saved_sources():
 
 @pytest.mark.parametrize("arm", ["M0", "M1", "M2", "M3"])
 def test_training_admits_audited_spatial_data_before_s29_evaluation(arm):
-    run = load_run_config(ROOT / "configs/metric_workflow.yaml")
+    run = load_run_config(ROOT / "configs/metric_workflow_lora.yaml")
     actual, protocol = load_formal_metric_run(ROOT, arm, 42, run)
-    assert actual["formal_run_id"] == f"L09_spatial_{arm}_seed42"
+    assert actual["formal_run_id"] == f"L09_spatial_{arm}_lora_seed42"
     assert actual["training"]["batch_size"] == 8
     assert actual["training"]["num_steps"] == 30000
     assert actual["training"]["ema_decay"] == .999
@@ -78,12 +78,10 @@ def test_batch8_real_inputs_and_full_model_gradient_shapes():
     from rulervla.training.main_data import SpatialDataset, update_indices
     from rulervla.training.metric_workflow import MetricTrainer, make_training_config, prepare_batch
 
-    run = load_run_config(ROOT / "configs/metric_workflow.yaml")
-    cache = ROOT / "outputs/metric_cue_pilot/g2_engineering/segmented_data_cache"
+    run = load_run_config(ROOT / "configs/metric_workflow_lora.yaml")
     dataset = SpatialDataset(
-        cache / Path(run["data"]["rgbd_root"]).relative_to("/"),
-        cache / Path(run["data"]["geometry_root"]).relative_to("/"),
-        path_mappings={"/home/Dataset2": str(cache / "home/Dataset2")},
+        run["data"]["rgbd_root"], run["data"]["geometry_root"],
+        max_cache_bytes=run["data"]["max_cache_bytes"], path_mappings=run["path_mappings"],
     )
     protocol = json.loads((FAMILY / "protocol.json").read_text())
     training = dict(protocol["training"], seed=42, batch_size=8, gradient_accumulation=8)
@@ -117,11 +115,11 @@ def test_launcher_fails_fast_for_real_checkpoint_receipt_identity_mismatch(tmp_p
     import sys
     import yaml
 
-    run = yaml.safe_load((ROOT / "configs/metric_workflow.yaml").read_text())
+    run = yaml.safe_load((ROOT / "configs/metric_workflow_lora.yaml").read_text())
     run["checkpoint_receipt_sha256"] = run["norm_stats_sha256"]
     config = tmp_path / "receipt_mismatch.yaml"
     config.write_text(yaml.safe_dump(run))
-    out = tmp_path / "L09_spatial_M2_seed42"
+    out = tmp_path / "L09_spatial_M2_lora_seed42"
     wait = tmp_path / "launch"
     result = subprocess.run(
         [sys.executable, str(ROOT / "scripts/metric_cue_launch.py"),

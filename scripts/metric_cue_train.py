@@ -20,10 +20,20 @@ def main():
     parser.add_argument('--arm', choices=('M0', 'M1', 'M2', 'M3'))
     parser.add_argument('--seed', type=int)
     parser.add_argument('--resume', action='store_true')
-    parser.add_argument('--gpu-indices', type=int, nargs='+')
+    gpu_selection = parser.add_mutually_exclusive_group()
+    gpu_selection.add_argument('--gpu-indices', type=int, nargs='+')
+    gpu_selection.add_argument('--auto-gpus', action='store_true')
     args = parser.parse_args()
-    from rulervla.training.metric_resources import load_run_config, preflight, runtime_capacity
+    from rulervla.training.metric_resources import load_run_config, preflight, query_gpus, runtime_capacity
     run = load_run_config(args.config)
+    if args.auto_gpus:
+        gpus = query_gpus()
+        if isinstance(gpus, dict):
+            raise RuntimeError('GPU selection failed: ' + gpus['error'])
+        selected = sorted(gpus, key=lambda gpu: gpu['free_mib'], reverse=True)[:2]
+        if len(selected) != 2:
+            raise ValueError('LoRA requires two available GPUs')
+        run['resources']['gpu_indices'] = [gpu['index'] for gpu in selected]
     if args.gpu_indices is not None:
         if len(set(args.gpu_indices)) != len(args.gpu_indices) or any(index < 0 for index in args.gpu_indices):
             raise ValueError('GPU indices must be distinct nonnegative integers')
@@ -62,6 +72,10 @@ def main():
     steps = args.steps if args.steps is not None else run['training']['num_steps']
     if steps < 1 or (args.mode == 'smoke' and steps != 2):
         raise ValueError('LoRA smoke requires two updates plus one checkpoint continuation')
+    if args.mode == 'smoke' and args.arm is None:
+        raise ValueError('LoRA smoke requires an explicit comparison arm')
+    if args.mode != 'train' and args.seed is not None:
+        raise ValueError('--seed is reserved for formal runs; smoke uses the shared configured seed')
     run['training']['num_steps'] = steps
     (args.out/'workflow_config.json').write_text(json.dumps(run, indent=2))
     os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(map(str, run['resources']['gpu_indices']))
@@ -71,6 +85,11 @@ def main():
     cache_dir = ROOT/'build/metric_lora_cache/jax_compilation_cache'
     cache_dir.mkdir(parents=True, exist_ok=True)
     os.environ['JAX_COMPILATION_CACHE_DIR'] = str(cache_dir)
+    memory_sampler = None
+    if args.mode == 'smoke':
+        from rulervla.training.metric_resources import SmokeGpuMemory
+        memory_sampler = SmokeGpuMemory(os.getpid(), admission['gpu_snapshot'],
+                                         run['resources']['gpu_indices'])
     import shutil
     if cache_dir.stat().st_dev != ROOT.stat().st_dev or shutil.disk_usage(cache_dir).free < 8 << 30:
         raise ValueError('LoRA compilation cache requires 8 GiB on the local runtime filesystem')
@@ -171,8 +190,7 @@ def main():
         indices = update_indices(len(dataset), config.seed, update, batch_size=config.batch_size)
         batch = first_batch if update == 0 and first_batch is not None else prepare_batch(dataset, indices, pipeline)
         started = time.monotonic()
-        micro_batch_size = (protocol['training']['micro_batch_size'] if args.mode == 'train'
-                            else 1 if mesh is not None else None)
+        micro_batch_size = protocol['training']['micro_batch_size']
         # require_current_capacity(f'before_update_{update + 1}')
         state, metrics = trainer.step(state, batch, micro_batch_size=micro_batch_size)
         # require_current_capacity(f'after_update_{int(state.step)}')
@@ -243,6 +261,8 @@ def main():
                       gpu_memory_stats=[device.memory_stats() for device in jax.devices('gpu')])
         saved = save_training_checkpoint(manager, state, pipeline, config, provenance)
     manager.close()
+    if memory_sampler is not None:
+        status.update(memory_sampler.finish())
     stage('complete', state='complete', full_state_restore_bitwise=args.mode == 'smoke',
           checkpoint=str(saved if saved is not None else args.out/'checkpoints'/str(int(state.step))))
     return 0

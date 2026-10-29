@@ -21,6 +21,6 @@ mkdir -p "$TMPDIR" "$CUDA_CACHE_PATH" "$XDG_CACHE_HOME" "$PYTHONPYCACHEPREFIX"
 for metric_arm in M2 M0 M1 M3; do
     /home/lixuanyi/XuanyiLi/code/openpi/.venv/bin/python scripts/metric_cue_train.py \
         --config configs/metric_workflow_lora.yaml --mode smoke --steps 2 \
-        --arm "$metric_arm" --gpu-indices 4 6 \
+        --arm "$metric_arm" --auto-gpus \
         --out "outputs/metric_cue_pilot/L09_lora_r5_smoke/$metric_smoke_key/$metric_arm"
 done

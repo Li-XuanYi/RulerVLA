@@ -1,5 +1,6 @@
 """Linux resource/data admission checks. This module never imports JAX or CUDA."""
 import csv
+from datetime import datetime, timezone
 import io
 import json
 from pathlib import Path
@@ -85,6 +86,48 @@ def runtime_capacity(value):
         blockers.append('CPU available budget is below the optimizer threshold')
     return dict(pid=process.pid, gpu_snapshot=gpus, cpu_available_gib=available,
                 cpu_rss_gib=rss, cpu_budget_available_gib=available + rss, blockers=blockers)
+
+
+class SmokeGpuMemory:
+    def __init__(self, pid, gpu_snapshot, selected):
+        import threading
+        self.pid = pid
+        self.indices = {gpu['uuid']: gpu['index'] for gpu in gpu_snapshot if gpu['index'] in selected}
+        self.peak_mib = {index: 0 for index in selected}
+        self.errors = []
+        self.samples = 0
+        self.started_at = datetime.now(timezone.utc).isoformat()
+        self.stop_event = threading.Event()
+        self.thread = threading.Thread(target=self._sample, daemon=True)
+        self.thread.start()
+
+    def _sample(self):
+        while not self.stop_event.is_set():
+            try:
+                result = subprocess.run(
+                    ['nvidia-smi', '--query-compute-apps=pid,gpu_uuid,used_memory',
+                     '--format=csv,noheader,nounits'],
+                    text=True, capture_output=True, check=True, timeout=8)
+                self.samples += 1
+                current = {}
+                for row in csv.reader(io.StringIO(result.stdout)):
+                    if int(row[0]) == self.pid and row[1].strip() in self.indices:
+                        index = self.indices[row[1].strip()]
+                        current[index] = current.get(index, 0) + int(row[2])
+                for index, used in current.items():
+                    self.peak_mib[index] = max(self.peak_mib[index], used)
+            except (OSError, subprocess.SubprocessError, ValueError) as error:
+                self.errors.append(str(error))
+            self.stop_event.wait(2)
+
+    def finish(self):
+        self.stop_event.set()
+        self.thread.join(timeout=10)
+        valid = not self.errors and not self.thread.is_alive() and all(self.peak_mib.values())
+        return dict(sampled_process_gpu_peak_mib=self.peak_mib, sampling_errors=self.errors,
+                    resource_profile_valid=bool(valid), gpu_sampling_interval_seconds=2,
+                    gpu_samples=self.samples, gpu_sampling_started_at=self.started_at,
+                    gpu_sampling_finished_at=datetime.now(timezone.utc).isoformat())
 
 
 def preflight(value, *, gpu_query=query_gpus, file_probe=probe_file):

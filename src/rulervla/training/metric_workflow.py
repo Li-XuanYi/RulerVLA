@@ -204,8 +204,14 @@ class MetricTrainer:
                 argnums=nnx.DiffState(0, config.trainable_filter))(policy)
             cue = flat_params(gradients)[STEM][..., 3:, :]
             finite = jnp.all(jnp.stack([jnp.all(jnp.isfinite(x)) for x in jax.tree.leaves(gradients)]))
-            return gradients, dict(loss=loss, grad_norm=optax.global_norm(gradients),
-                                   cue_grad_l2=jnp.linalg.norm(cue), gradients_finite=finite)
+            info = dict(loss=loss, grad_norm=optax.global_norm(gradients),
+                        cue_grad_l2=jnp.linalg.norm(cue), gradients_finite=finite)
+            if is_lora(config):
+                flat = flat_params(gradients)
+                for suffix in ('a', 'b'):
+                    info['lora_' + suffix + '_grad_l2'] = optax.global_norm(
+                        [value for name, value in flat.items() if name.endswith('lora_' + suffix)])
+            return gradients, info
         self._backward = jax.jit(backward)
         def accumulated_backward(params, observation, actions, step):
             gradients, info = accumulated_gradients(config, jax.random.key(config.seed), model_def,
