@@ -109,10 +109,11 @@ def audit(smoke_root):
             raise ValueError('Real restored policy inference is unverified: ' + arm)
         policy = lora_gpu_pool_policy(budget)
         allocation = manifest['gpu_allocator']
+        reserved = allocation['initial_reserved_pool_bytes_per_device']
         if ({key: allocation[key] for key in policy} != policy
-                or read_json(directory / 'gpu_allocator.json') != allocation
-                or allocation['initial_reservation_array_bytes_per_device'] != [
-                    policy['initial_reservation_mib_per_device'] << 20] * 2):
+                or read_json(directory / 'gpu_allocator.json') != allocation or len(reserved) != 2
+                or any(value < policy['minimum_reserved_pool_mib_per_device'] << 20 for value in reserved)
+                or reserved != [value['pool_bytes'] for value in allocation['initial_bfc_memory_stats']]):
             raise ValueError('LoRA GPU pool initialization is unverified: ' + arm)
         common = dict(git_commit=manifest['git_commit'], sources=manifest['loaded_source_sha256'],
                       runtime_sources=runtime_source_hashes(manifest['git_commit'], manifest['loaded_source_sha256']),
