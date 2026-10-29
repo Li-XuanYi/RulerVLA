@@ -23,17 +23,12 @@ def main():
     gpu_selection = parser.add_mutually_exclusive_group()
     gpu_selection.add_argument('--gpu-indices', type=int, nargs='+')
     gpu_selection.add_argument('--auto-gpus', action='store_true')
+    parser.add_argument('--wait-for-resources', action='store_true')
     args = parser.parse_args()
+    if args.wait_for_resources and (args.mode != 'smoke' or args.arm is None or args.steps != 2):
+        raise ValueError('Resource waiting requires an explicit two-update smoke arm')
     from rulervla.training.metric_resources import load_run_config, preflight, query_gpus, runtime_capacity
     run = load_run_config(args.config)
-    if args.auto_gpus:
-        gpus = query_gpus()
-        if isinstance(gpus, dict):
-            raise RuntimeError('GPU selection failed: ' + gpus['error'])
-        selected = sorted(gpus, key=lambda gpu: gpu['free_mib'], reverse=True)[:2]
-        if len(selected) != 2:
-            raise ValueError('LoRA requires two available GPUs')
-        run['resources']['gpu_indices'] = [gpu['index'] for gpu in selected]
     if args.gpu_indices is not None:
         if len(set(args.gpu_indices)) != len(args.gpu_indices) or any(index < 0 for index in args.gpu_indices):
             raise ValueError('GPU indices must be distinct nonnegative integers')
@@ -56,9 +51,32 @@ def main():
     if args.mode == 'train' and args.out.name != run['formal_run_id']:
         raise ValueError('Formal output directory must be named ' + run['formal_run_id'])
     args.out.mkdir(parents=True, exist_ok=args.resume)
-    admission = preflight(run)
-    (args.out/'preflight.json').write_text(json.dumps(admission, indent=2))
-    (args.out/'workflow_config.json').write_text(json.dumps(run, indent=2))
+    attempt = 0
+    while True:
+        if args.auto_gpus:
+            gpus = query_gpus()
+            if isinstance(gpus, dict):
+                raise RuntimeError('GPU selection failed: ' + gpus['error'])
+            selected = sorted(gpus, key=lambda gpu: gpu['free_mib'], reverse=True)[:2]
+            if len(selected) != 2:
+                raise ValueError('LoRA requires two available GPUs')
+            run['resources']['gpu_indices'] = [gpu['index'] for gpu in selected]
+        admission = preflight(run)
+        attempt += 1
+        (args.out/'preflight.json').write_text(json.dumps(admission, indent=2))
+        (args.out/'workflow_config.json').write_text(json.dumps(run, indent=2))
+        if not args.wait_for_resources or admission['launch_allowed'] or admission['input_blockers']:
+            break
+        if 'jax' in sys.modules:
+            raise RuntimeError('Resource waiting must not initialize JAX')
+        waiting = dict(state='waiting_resources', mode=args.mode, attempt=attempt,
+                       pid=os.getpid(), gpu_job_started=False, formal_training_started=False,
+                       jax_imported=False, blockers=admission['resource_blockers'],
+                       selected_gpu_indices=run['resources']['gpu_indices'])
+        (args.out/f'preflight_wait_{attempt:04d}.json').write_text(json.dumps(admission, indent=2))
+        (args.out/'status.json').write_text(json.dumps(waiting, indent=2))
+        print(json.dumps(waiting), flush=True)
+        time.sleep(60)
     if args.mode == 'preflight' or not admission['launch_allowed']:
         result = dict(state='ready' if admission['launch_allowed'] else 'blocked',
                       mode=args.mode, gpu_job_started=False, formal_training_started=False,
