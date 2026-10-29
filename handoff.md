@@ -1,5 +1,12 @@
 # Handoff
 
+## 2026-10-29 L09 LoRA CPU参数传输验证排队
+
+- [Experiment] V6 M2也完成两次真实更新、CP2保存及恢复，之后load_delta_inference_model阶段连续出现pinned host注册错误，launch.log记录14586 Killed，控制14119及14586均不存在。原始status的running为陈旧状态，终止来源未知；V5/V6均不满足完整GPU验收。数据、两份CP2和所有失败日志保留，未主动停止任何训练。
+- [Code/Inference] 冻结提交81ecdbb3c162a5c16f07e70e124a34a6d3c9c690已部署。独立checkpoint模型返回NumPy参数，而已成功的训练与零Cue检查使用CPU jax.Array；现在先将独立推理参数放到CPU并逐叶核验，释放NumPy模型引用，再执行同样FSDP传输，并用delta_gpu_prediction阶段区分加载与预测。该差异是待验证原因，尚不能报告GPU故障已修复；先释放训练状态及完整恢复/推理/第三步要求继续保留。
+- [Experiment] 最新五项相关CPU回归5 passed、78.95秒，日志outputs/metric_cue_pilot/L09_lora_r5_implementation/inference_cpu_placement.log；ruff与git diff --check通过，只读代码复核无Critical/Important。147节点仍NVML Unknown Error；145的NVML查询恢复，但六卡空闲13616至20222MiB，均不满足共同28672MiB准入。
+- [Experiment] 新smoke_pool_v7顺序M2/M0/M1/M3，控制117574、M2 PID117578，最近state=waiting_resources、attempt1、jax_imported=false、gpu_job_started=false，候选GPU6/7。CPU可用23648284KiB（约22.6GiB）低于64GiB，等待期不占用GPU。原始根目录/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_pool_v7。四组完整验收、聚合审计和正式30k均未完成，training_released/evaluation_released保持false；l09-lora每小时继续本次重启，正式M2至少两次有限真实更新后仅暂停automation，不能停止训练。最新receipt为experiments/metric_cue_v1/receipts/L09_lora_inference_restart_20261029.json。
+
 ## 2026-10-29 L09 LoRA两次更新与推理验收内存修复
 
 - [Experiment] smoke_pool_v5/M2完成两次有限更新，loss为0.1017892062664032、0.1376851201057434，LoRA B梯度均大于0，第二步LoRA A梯度大于0；CP2已保存，full_state_expected_sha256.json与full_state_sha256.json逐项一致。随后load_delta_inference_model阶段多次pinned host memory分配失败，launch.log记录PID1094999 Killed，/proc/1094999不存在。原始status的running为终止后陈旧状态；内核日志无读取权限，终止来源未知。最后stage记录CPU峰28.339GiB，不能代替终止前实际峰值。未主动停止训练，原始日志和CP2保留，V5不计为完整smoke通过。
