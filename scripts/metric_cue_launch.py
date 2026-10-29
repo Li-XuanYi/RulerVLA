@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 def main():
     parser = argparse.ArgumentParser(description="等待真实资源准入后启动一次L09正式训练")
-    parser.add_argument("--config", type=Path, default=ROOT / "configs/metric_workflow.yaml")
+    parser.add_argument("--config", type=Path, default=ROOT / "configs/metric_workflow_lora.yaml")
     parser.add_argument("--arm", choices=("M0", "M1", "M2", "M3"), required=True)
     parser.add_argument("--seed", type=int, required=True)
     parser.add_argument("--gpu-candidates", type=int, nargs="+", required=True)

@@ -1,5 +1,12 @@
 # Handoff
 
+## 2026-10-29 L09 LoRA运行时实施中
+
+- [Code] 已实现完整π0.5的LoRA变体、严格参数白名单、A normal std0.01/B零初始化；AdamW与EMA仅维护53,509,280个可训练参数。正式入口要求显式LoRA及冻结的rank/预算，旧full-FT配置拒绝。
+- [Code] 已实现基座引用加delta的Orbax保存、参数/AdamW/EMA/step哈希恢复、基座20文件核验及推理重建；真实GPU验收尚待执行，training_released/evaluation_released继续为false。
+- [Experiment] 新增CPU检查已有9项通过，完整真实batch8的Flow Matching梯度结构检查正在运行。证据位于outputs/metric_cue_pilot/L09_lora_r5_implementation；没有启动正式LoRA训练。
+- [Code] LoRA运行树计划使用/home/lixuanyi/XuanyiLi/work/rulervla-metric-lora-r5-runtime；共同缓存512 MiB、microbatch1/累计8、本地build/metric_lora_cache，数据与checkpoint仍写NAS。启动后资源阈值终止调用继续注释。
+
 ## 2026-10-29 L09 revision5统一LoRA计划
 
 - [Code] 用户明确要求暂不使用full fine-tuning，所有比较组统一LoRA。已修订docs/metric_cue/RESEARCH_PLAN.md，新增experiments/metric_cue_v1/REVISION5_LORA_PLAN.zh.md，并将protocol/run matrix/release更新为revision5计划状态。本次修订计划与发布状态，未实现或启动LoRA训练。

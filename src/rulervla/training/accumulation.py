@@ -44,7 +44,7 @@ def apply_gradients(config, state, gradients):
     new_params = nnx.state(policy)
     ema = None if state.ema_decay is None else jax.tree.map(
         lambda old, new: state.ema_decay * old + (1 - state.ema_decay) * new,
-        state.ema_params, new_params)
+        state.ema_params, new_params.filter(config.trainable_filter))
     return dataclasses.replace(state, step=state.step + 1, params=new_params,
         opt_state=opt_state, ema_params=ema)
 

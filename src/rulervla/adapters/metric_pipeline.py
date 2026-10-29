@@ -24,9 +24,13 @@ def tokenizer_from_asset(path, max_len):
     return tokenizer
 
 
-def metric_model_config():
-    """The G1-validated architecture; no alternate input/model recipe."""
-    return Pi0Config(pi05=True, action_horizon=10, discrete_state_input=False, image_channels=6)
+def metric_model_config(*, finetuning='full'):
+    if finetuning not in ('full', 'lora'):
+        raise ValueError('Unknown Metric Cue finetuning mode: ' + finetuning)
+    variants = (dict(paligemma_variant='gemma_2b_lora', action_expert_variant='gemma_300m_lora')
+                if finetuning == 'lora' else {})
+    return Pi0Config(pi05=True, action_horizon=10, discrete_state_input=False, image_channels=6,
+                     **variants)
 
 
 class MetricPipeline:

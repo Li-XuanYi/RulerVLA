@@ -27,6 +27,9 @@ def main():
     validate_data_audit(ROOT, protocol, release)
     checkpoint = args.checkpoint.resolve()
     metadata = json.loads((checkpoint / 'metric_workflow.json').read_text())
+    if (metadata.get('schema') != protocol['training']['lora']['checkpoint_format']
+            or metadata['run_manifest']['run_config']['training'].get('lora') != protocol['training']['lora']):
+        raise ValueError('Evaluation requires the matching LoRA checkpoint recipe')
     if metadata['completed_updates'] != protocol['training']['num_steps']:
         raise ValueError('Evaluation checkpoint differs from the fixed training update')
     run_id = metadata['run_manifest']['run_config']['formal_run_id']

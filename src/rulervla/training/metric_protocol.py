@@ -79,6 +79,18 @@ def require_evaluation_release(protocol, release):
         raise PermissionError('Metric Cue evaluation gates remain closed: ' + ', '.join(missing))
 
 
+def require_lora_recipe(run, protocol):
+    training = run['training']
+    if training.get('finetuning') != 'lora' or protocol['training']['finetuning'] != 'lora':
+        raise ValueError('Active Metric Cue runs require explicit LoRA finetuning')
+    for key in ('batch_size', 'micro_batch_size', 'gradient_accumulation', 'ema_decay',
+                'scheduler', 'optimizer', 'lora'):
+        if training.get(key) != protocol['training'][key]:
+            raise ValueError('LoRA training recipe differs: ' + key)
+    if run['data'].get('max_cache_bytes') != 512 << 20:
+        raise ValueError('LoRA runs require the shared 512 MiB dataset cache')
+
+
 def load_formal_metric_run(root, arm, seed, run):
     root = Path(root).resolve()
     protocol_path = root / 'experiments/metric_cue_v1/protocol.json'
@@ -92,6 +104,7 @@ def load_formal_metric_run(root, arm, seed, run):
         raise ValueError('Metric Cue release belongs to another protocol revision')
     if arm not in protocol['arms'] or seed not in protocol['training']['seeds']:
         raise ValueError('Unknown formal arm or training seed')
+    require_lora_recipe(run, protocol)
     require_arm_ruler(root, arm, run, protocol)
     missing = [gate for gate in protocol['launch_gates'] if not release['gate_status'].get(gate)]
     if not release['training_released'] or missing:
@@ -107,7 +120,7 @@ def load_formal_metric_run(root, arm, seed, run):
         raise ValueError('Full model GPU update and checkpoint recovery are unverified')
     training = protocol['training']
     if (training['batch_size'] != training['micro_batch_size'] * training['gradient_accumulation']
-            or training['finetuning'] != 'full' or training['image_channels'] != 6
+            or training['finetuning'] != 'lora' or training['image_channels'] != 6
             or training['action_horizon'] != 10
             or training['checkpoint_updates'][-1] != training['num_steps']):
         raise ValueError('Formal Metric Cue training recipe is inconsistent')
@@ -123,6 +136,6 @@ def load_formal_metric_run(root, arm, seed, run):
     run = dict(run)
     run['training'] = dict(training, seed=seed)
     run['cue_config'] = str(root / protocol['arms'][arm])
-    run['formal_run_id'] = f'L09_spatial_{arm}_seed{seed}'
+    run['formal_run_id'] = f'L09_spatial_{arm}_lora_seed{seed}'
     run['protocol_sha256'] = hashlib.sha256(protocol_bytes).hexdigest()
     return run, protocol

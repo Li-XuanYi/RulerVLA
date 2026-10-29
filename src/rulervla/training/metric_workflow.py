@@ -24,9 +24,14 @@ from rulervla.adapters.metric_pipeline import MetricPipeline, metric_model_confi
 from rulervla.cues.metric_ruler import MetricRulerConfig
 from rulervla.cues.motion_echo import ECHO_RENDER_CONTRACT, MetricInferenceHistory, MotionEchoConfig
 from rulervla.training.accumulation import accumulated_gradients, apply_gradients
+from rulervla.training.metric_lora import (
+    base_reference, initialize_lora_parameters, is_lora, lora_freeze_filter,
+    parameter_contract, validate_delta, verify_base_reference,
+)
 
 STEM = 'PaliGemma/img/embedding/kernel'
 CHECKPOINT_SCHEMA = 'rulervla_metric_checkpoint_v1'
+LORA_CHECKPOINT_SCHEMA = 'rulervla_metric_lora_checkpoint_v1'
 
 
 @dataclasses.dataclass(frozen=True)
@@ -38,8 +43,9 @@ class ConstantLearningRate:
 
 
 def make_training_config(run):
-    policy = metric_model_config()
     training = run['training']
+    mode = training.get('finetuning', 'full')
+    policy = metric_model_config(finetuning=mode)
     schedule = training.get('scheduler')
     if schedule is None:
         lr_schedule = ConstantLearningRate(training['learning_rate'])
@@ -52,13 +58,14 @@ def make_training_config(run):
     return dataclasses.replace(config_lib.get_config('pi05_libero'), model=policy,
         batch_size=training['batch_size'], seed=training['seed'],
         ema_decay=training.get('ema_decay'),
-        freeze_filter=policy.get_freeze_filter(), wandb_enabled=False,
+        freeze_filter=lora_freeze_filter() if mode == 'lora' else policy.get_freeze_filter(),
+        wandb_enabled=False,
         num_train_steps=training['num_steps'],
         fsdp_devices=len(run['resources']['gpu_indices']),
         optimizer=optimizer.AdamW(**training['optimizer']),
         lr_schedule=lr_schedule,
         weight_loader=weight_loaders.SixChannelCheckpointWeightLoader(run['initial_checkpoint'],
-                                                                       missing_regex='(?!)'))
+            missing_regex=r'.*lora_[ab]' if mode == 'lora' else '(?!)'))
 
 
 def flat_params(state):
@@ -109,8 +116,12 @@ def require_training_state_device(state, device):
 
 
 def load_initial_model(config):
+    if is_lora(config):
+        base_reference(config)
     reference = nnx.state(nnx.eval_shape(config.model.create, jax.random.key(config.seed))).to_pure_dict()
     params = config.weight_loader.load(reference)
+    if is_lora(config):
+        params = initialize_lora_parameters(params, seed=config.seed)
     return config.model.load(params, remove_extra_params=False)
 
 
@@ -119,12 +130,14 @@ def _make_training_state(config, policy, *, optimizer_device=None):
     if optimizer_device is not None:
         params = jax.device_put(params, optimizer_device)
     selected = require_trainable_cue(params, config.trainable_filter)
+    if is_lora(config):
+        parameter_contract(selected)
     tx = config.optimizer.create(config.lr_schedule.create())
     opt_state = jax.jit(tx.init, device=optimizer_device)(selected)
     require_cue_optimizer(opt_state)
     step = jax.device_put(jnp.asarray(0, jnp.int32), optimizer_device)
     # EMA与参数使用独立缓冲，允许后续CPU更新复用输入状态。
-    ema_params = (jax.tree.map(lambda value: value.copy(), params)
+    ema_params = (jax.tree.map(lambda value: value.copy(), selected)
                   if config.ema_decay is not None else None)
     state = TrainState(step=step, params=params, model_def=graph, tx=tx,
                        opt_state=opt_state, ema_decay=config.ema_decay, ema_params=ema_params)
@@ -201,6 +214,11 @@ class MetricTrainer:
             info['cue_grad_l2'] = jnp.linalg.norm(cue)
             info['gradients_finite'] = jnp.all(jnp.stack(
                 [jnp.all(jnp.isfinite(x)) for x in jax.tree.leaves(gradients)]))
+            if is_lora(config):
+                flat = flat_params(gradients)
+                for suffix in ('a', 'b'):
+                    info['lora_' + suffix + '_grad_l2'] = optax.global_norm(
+                        [value for name, value in flat.items() if name.endswith('lora_' + suffix)])
             return gradients, info
         self._accumulated_backward_fn = accumulated_backward
         self._accumulated_backward = jax.jit(accumulated_backward)
@@ -269,7 +287,23 @@ def training_recipe(config):
     return dict(model=dataclasses.asdict(config.model), optimizer=dataclasses.asdict(config.optimizer),
                 learning_rate=dataclasses.asdict(config.lr_schedule), seed=config.seed,
                 batch_size=config.batch_size, ema_decay=config.ema_decay,
-                trainable_policy='full_finetuning_including_visual_patch_kernel')
+                trainable_policy=('lora_plus_six_channel_stem_and_action_time_projections'
+                                  if is_lora(config) else 'full_finetuning_including_visual_patch_kernel'),
+                ema_scope='trainable_parameters_only')
+
+
+def compact_training_state(state, config):
+    if not is_lora(config):
+        return state
+    selected = state.params.filter(config.trainable_filter)
+    parameter_contract(selected)
+    validate_delta(state.ema_params, selected)
+    with at.disable_typechecking():
+        return dataclasses.replace(state, params=selected)
+
+
+def frozen_signatures(state, config):
+    return state_signatures(state.params.filter(nnx.Not(config.trainable_filter)))
 
 
 def save_training_checkpoint(manager, state, pipeline, config, run_manifest):
@@ -277,13 +311,20 @@ def save_training_checkpoint(manager, state, pipeline, config, run_manifest):
         def data_config(self):
             return SimpleNamespace(norm_stats=pipeline.norm_stats, asset_id='physical-intelligence/libero')
     step = int(state.step)
-    checkpoints.save_state(manager, state, Assets(), step)
+    stored = compact_training_state(state, config)
+    checkpoints.save_state(manager, stored, Assets(), step)
     manager.wait_until_finished()
     directory = Path(manager.directory)/str(step)
     (directory/'assets/paligemma_tokenizer.model').write_bytes(pipeline.tokenizer_bytes)
     contract = dict(schema=CHECKPOINT_SCHEMA, completed_updates=step,
                     pipeline=pipeline.contract(), pipeline_sha256=pipeline.fingerprint(),
                     training_recipe=training_recipe(config), run_manifest=run_manifest)
+    if is_lora(config):
+        contract.update(schema=LORA_CHECKPOINT_SCHEMA, base_reference=base_reference(config, verify_files=False),
+                        trainable_parameter_contract=parameter_contract(stored.params),
+                        frozen_sha256=frozen_signatures(state, config),
+                        delta_state_sha256=state_signatures(stored),
+                        inference_sha256=state_signatures(stored.ema_params))
     (directory/'metric_workflow.json').write_text(json.dumps(contract, indent=2, allow_nan=False)+'\n')
     return directory
 
@@ -302,7 +343,8 @@ def checkpoint_restore_arguments(state):
 def restore_training_checkpoint(manager, state, pipeline, config, *, step, expected_manifest=None):
     directory = Path(manager.directory)/str(step)
     metadata = json.loads((directory/'metric_workflow.json').read_text())
-    if (metadata.get('schema') != CHECKPOINT_SCHEMA or metadata['pipeline_sha256'] != pipeline.fingerprint()
+    schema = LORA_CHECKPOINT_SCHEMA if is_lora(config) else CHECKPOINT_SCHEMA
+    if (metadata.get('schema') != schema or metadata['pipeline_sha256'] != pipeline.fingerprint()
             or metadata['training_recipe'] != training_recipe(config)):
         raise ValueError('Checkpoint pipeline/model/optimizer recipe differs from the current six-channel run')
     if metadata['pipeline']['model']['image_channels'] != 6:
@@ -312,13 +354,29 @@ def restore_training_checkpoint(manager, state, pipeline, config, *, step, expec
                     'dependency_lock_sha256'):
             if metadata['run_manifest'].get(key) != expected_manifest.get(key):
                 raise ValueError('Checkpoint data/source identity differs: '+key)
+    template = compact_training_state(state, config)
+    if is_lora(config):
+        if (metadata['base_reference'] != base_reference(config)
+                or metadata['trainable_parameter_contract'] != parameter_contract(template.params)):
+            raise ValueError('LoRA checkpoint base or parameter contract differs')
     with at.disable_typechecking():
-        items, restore_kwargs = checkpoint_restore_arguments(state)
+        items, restore_kwargs = checkpoint_restore_arguments(template)
         values = manager.restore(step, items=items, restore_kwargs=restore_kwargs)
         restored = checkpoints._merge_params(values["train_state"], values["params"])
     device = jax.tree.leaves(state.params)[0].sharding.device_set
     if len(device) != 1:
         raise ValueError("Checkpoint restore requires one optimizer device")
+    if is_lora(config):
+        if state_signatures(restored) != metadata['delta_state_sha256']:
+            raise ValueError('LoRA delta/AdamW/EMA/step identity changed during restore')
+        target = next(iter(device))
+        with jax.default_device(target):
+            base = nnx.state(load_initial_model(config))
+            validate_delta(restored.params, base.filter(config.trainable_filter))
+            base.replace_by_pure_dict(restored.params.to_pure_dict())
+        restored = dataclasses.replace(restored, params=base)
+        if frozen_signatures(restored, config) != metadata['frozen_sha256']:
+            raise ValueError('LoRA frozen backbone differs from the verified base')
     require_training_state_device(restored, next(iter(device)))
     require_trainable_cue(restored.params, config.trainable_filter)
     require_cue_optimizer(restored.opt_state)
@@ -328,7 +386,7 @@ def restore_training_checkpoint(manager, state, pipeline, config, *, step, expec
 def pipeline_from_checkpoint(directory):
     directory = Path(directory)
     metadata = json.loads((directory/'metric_workflow.json').read_text())
-    if metadata.get('schema') != CHECKPOINT_SCHEMA:
+    if metadata.get('schema') not in (CHECKPOINT_SCHEMA, LORA_CHECKPOINT_SCHEMA):
         raise ValueError('Unsupported metric checkpoint schema')
     contract = metadata['pipeline']
     if contract['model'] != dataclasses.asdict(metric_model_config()):
@@ -395,16 +453,42 @@ class MetricPolicy:
         return dict(actions=self.pipeline.postprocess_actions(normalized), normalized_actions=normalized)
 
 
-def load_metric_policy(directory, *, explicit_pipeline=None, sampling_steps=10, seed=42):
+def load_metric_model(directory, *, explicit_pipeline=None, seed=42):
     directory = Path(directory)
     if (directory/'metric_workflow.json').exists():
-        pipeline, _ = pipeline_from_checkpoint(directory)
+        pipeline, metadata = pipeline_from_checkpoint(directory)
         if explicit_pipeline is not None and explicit_pipeline.fingerprint() != pipeline.fingerprint():
             raise ValueError('Caller preprocessing differs from checkpoint preprocessing')
     else:
         raise ValueError('A checkpoint with saved preprocessing is required')
     params = model_lib.restore_params(directory/'params', restore_type=np.ndarray)
-    policy = pipeline.model_config.load(params, remove_extra_params=False)
+    model_config = pipeline.model_config
+    if metadata['schema'] == LORA_CHECKPOINT_SCHEMA:
+        model_config = metric_model_config(finetuning='lora')
+        if metadata['training_recipe']['model'] != dataclasses.asdict(model_config):
+            raise ValueError('LoRA inference model recipe differs')
+        reference = verify_base_reference(metadata['base_reference'])
+        shaped = nnx.state(nnx.eval_shape(model_config.create, jax.random.key(seed))).to_pure_dict()
+        loader = weight_loaders.SixChannelCheckpointWeightLoader(
+            reference['params_path'], missing_regex=r'.*lora_[ab]')
+        full = initialize_lora_parameters(loader.load(shaped), seed)
+        base = nnx.state(model_config.load(full, remove_extra_params=False))
+        selected = base.filter(nnx.Not(lora_freeze_filter()))
+        validate_delta(params, selected)
+        if parameter_contract(selected) != metadata['trainable_parameter_contract']:
+            raise ValueError('LoRA inference parameter contract differs')
+        if state_signatures(base.filter(lora_freeze_filter())) != metadata['frozen_sha256']:
+            raise ValueError('LoRA inference frozen backbone differs from the checkpoint')
+        base.replace_by_pure_dict(params)
+        if state_signatures(base.filter(nnx.Not(lora_freeze_filter()))) != metadata['inference_sha256']:
+            raise ValueError('LoRA inference EMA delta identity differs')
+        params = base.to_pure_dict()
+    policy = model_config.load(params, remove_extra_params=False)
+    return policy, pipeline
+
+
+def load_metric_policy(directory, *, explicit_pipeline=None, sampling_steps=10, seed=42):
+    policy, pipeline = load_metric_model(directory, explicit_pipeline=explicit_pipeline, seed=seed)
     return MetricPolicy(policy, pipeline, sampling_steps=sampling_steps, seed=seed)
 
 
@@ -442,6 +526,30 @@ def source_provenance(root):
                 git_status=subprocess.check_output(['git', 'status', '--porcelain=v1'], cwd=root, text=True),
                 loaded_source_sha256=loaded,
                 dependency_lock_sha256=hashlib.sha256((root/'requirements/metric-cue-linux.lock').read_bytes()).hexdigest())
+
+
+def gpu_prediction(config, params, batch, device, *, mesh=None):
+    observation = jax.tree.map(lambda value: value[:1], batch.observation)
+    graph = nnx.split(nnx.eval_shape(config.model.create, jax.random.key(config.seed)))[0]
+    def predict(current, inputs):
+        policy = nnx.merge(graph, current)
+        policy.eval()
+        return policy.sample_actions(jax.random.key(123), inputs, num_steps=10)
+    if mesh is None:
+        values = jax.jit(predict)(jax.device_put(params, device), jax.device_put(observation, device))
+    else:
+        param_sharding = sharding.fsdp_sharding(jax.eval_shape(lambda: params), mesh)
+        replicated = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec())
+        compiled = jax.jit(predict, in_shardings=(param_sharding, replicated),
+                           out_shardings=replicated)
+        with sharding.set_mesh(mesh):
+            values = compiled(jax.device_put(params, param_sharding),
+                              jax.device_put(observation, replicated))
+    result = np.asarray(jax.block_until_ready(values))
+    if result.shape != (1, 10, 32) or not np.isfinite(result).all():
+        raise ValueError('Restored LoRA inference did not produce finite action chunks')
+    return dict(shape=list(result.shape), finite=True,
+                sha256=hashlib.sha256(result.tobytes()).hexdigest())
 
 
 def gpu_equivalence(config, params6, batch, device, tolerances, *, mesh=None):

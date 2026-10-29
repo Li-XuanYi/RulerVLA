@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT/'src'))
 
 def main():
     parser = argparse.ArgumentParser(description='六通道 Metric Cue 资源核验、完整模型检查与训练')
-    parser.add_argument('--config', type=Path, default=ROOT/'configs/metric_workflow.yaml')
+    parser.add_argument('--config', type=Path, default=ROOT/'configs/metric_workflow_lora.yaml')
     parser.add_argument('--mode', choices=('preflight', 'smoke', 'train'), default='preflight')
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--steps', type=int)
@@ -28,7 +28,9 @@ def main():
         if len(set(args.gpu_indices)) != len(args.gpu_indices) or any(index < 0 for index in args.gpu_indices):
             raise ValueError('GPU indices must be distinct nonnegative integers')
         run['resources']['gpu_indices'] = args.gpu_indices
-    protocol = None
+    protocol = json.loads((ROOT/'experiments/metric_cue_v1/protocol.json').read_text())
+    from rulervla.training.metric_protocol import require_lora_recipe
+    require_lora_recipe(run, protocol)
     if args.mode == 'train':
         if args.arm is None or args.seed is None or args.steps is not None:
             raise ValueError('Formal training requires --arm and --seed and uses the fixed update budget')
@@ -58,28 +60,32 @@ def main():
     if not run['resources']['gpu_indices'] or not run['resources']['cpu_optimizer']:
         raise ValueError('Training requires GPU gradients and a CPU AdamW optimizer')
     steps = args.steps if args.steps is not None else run['training']['num_steps']
-    if steps < 1 or (args.mode == 'smoke' and steps > 3):
-        raise ValueError('Smoke requires 1..3 updates; larger runs need explicit --mode train')
+    if steps < 1 or (args.mode == 'smoke' and steps != 2):
+        raise ValueError('LoRA smoke requires two updates plus one checkpoint continuation')
     run['training']['num_steps'] = steps
     (args.out/'workflow_config.json').write_text(json.dumps(run, indent=2))
     os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(map(str, run['resources']['gpu_indices']))
     os.environ['JAX_PLATFORMS'] = 'cuda,cpu'
     os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = 'false'
     os.environ['XLA_PYTHON_CLIENT_ALLOCATOR'] = 'platform'
-    cache_dir = ROOT/'outputs/metric_cue_pilot/jax_compilation_cache'
+    cache_dir = ROOT/'build/metric_lora_cache/jax_compilation_cache'
     cache_dir.mkdir(parents=True, exist_ok=True)
     os.environ['JAX_COMPILATION_CACHE_DIR'] = str(cache_dir)
+    import shutil
+    if cache_dir.stat().st_dev != ROOT.stat().st_dev or shutil.disk_usage(cache_dir).free < 8 << 30:
+        raise ValueError('LoRA compilation cache requires 8 GiB on the local runtime filesystem')
     import jax
     from openpi.training import checkpoints, sharding
     from rulervla.adapters.metric_pipeline import MetricPipeline
     from rulervla.training.main_data import SpatialDataset, update_indices
     from rulervla.training.metric_workflow import (MetricTrainer, abstract_training_state,
-        create_training_state, gpu_equivalence,
+        create_training_state, gpu_equivalence, frozen_signatures, flat_params, load_metric_model,
+        gpu_prediction,
         load_initial_model, make_training_config, prepare_batch, restore_training_checkpoint,
         save_training_checkpoint, source_provenance, state_signatures, training_state_template)
     pipeline = MetricPipeline.from_files(run['cue_config'], run['norm_stats_dir'])
     dataset = SpatialDataset(run['data']['rgbd_root'], run['data']['geometry_root'],
-                             max_cache_bytes=2 << 30, path_mappings=run['path_mappings'])
+                             max_cache_bytes=run['data']['max_cache_bytes'], path_mappings=run['path_mappings'])
     config = make_training_config(run)
     provenance = source_provenance(ROOT)
     provenance.update(command=sys.argv, run_config=run,
@@ -137,7 +143,20 @@ def main():
         if int(state.step) != latest:
             raise ValueError('Restored optimizer step differs from checkpoint directory')
     first_batch = None
+    initial_frozen = None
     if args.mode == 'smoke':
+        import flax.nnx as nnx
+        import numpy as np
+        initial_frozen = frozen_signatures(state, config)
+        initial_selected = state.params.filter(config.trainable_filter)
+        for name, value in flat_params(initial_selected).items():
+            if name.endswith('lora_b') and np.count_nonzero(np.asarray(value)):
+                raise ValueError('LoRA B initialization is not zero: ' + name)
+        if np.count_nonzero(np.asarray(flat_params(state.params)['PaliGemma/img/embedding/kernel'])[..., 3:, :]):
+            raise ValueError('New Cue stem is not zero initialized')
+        (args.out/'initial_trainable_sha256.json').write_text(
+            json.dumps(state_signatures(initial_selected), indent=2))
+        status['trainable_parameters'] = sum(value.size for value in jax.tree.leaves(initial_selected))
         indices = update_indices(len(dataset), config.seed, 0, batch_size=config.batch_size)
         first_batch = prepare_batch(dataset, indices, pipeline)
         stage('gpu_zero_cue_equivalence')
@@ -157,8 +176,13 @@ def main():
         # require_current_capacity(f'before_update_{update + 1}')
         state, metrics = trainer.step(state, batch, micro_batch_size=micro_batch_size)
         # require_current_capacity(f'after_update_{int(state.step)}')
-        if args.mode == 'smoke' and metrics['cue_grad_l2'] <= 0:
-            raise ValueError('Real action loss did not produce nonzero Cue kernel gradients')
+        if args.mode == 'smoke':
+            if metrics['lora_b_grad_l2'] <= 0:
+                raise ValueError('Real action loss did not produce nonzero LoRA B gradients')
+            if args.arm == 'M0' and metrics['cue_grad_l2'] != 0:
+                raise ValueError('Blank M0 Cue produced nonzero Cue kernel gradients')
+            if args.arm != 'M0' and metrics['cue_grad_l2'] <= 0:
+                raise ValueError('Real action loss did not produce nonzero Cue kernel gradients')
         record = dict(update=int(state.step), seconds=time.monotonic()-started,
                       sample_identities=batch.identities, **metrics)
         if args.mode == 'smoke':
@@ -189,6 +213,35 @@ def main():
             raise ValueError('Full six-channel parameter/optimizer state changed during recovery')
         # require_current_capacity('after_checkpoint_restore')
         (args.out/'full_state_sha256.json').write_text(json.dumps(expected, indent=2))
+        if frozen_signatures(state, config) != initial_frozen:
+            raise ValueError('Frozen backbone changed during real LoRA updates')
+        stage('load_delta_inference_model')
+        with jax.default_device(cpu):
+            restored_model, restored_pipeline = load_metric_model(saved)
+            inferred = nnx.state(restored_model)
+            expected_inference = nnx.State(state.params)
+            expected_inference.replace_by_pure_dict(state.ema_params.to_pure_dict())
+        if (state_signatures(inferred) != state_signatures(expected_inference)
+                or restored_pipeline.fingerprint() != pipeline.fingerprint()):
+            raise ValueError('Delta inference reconstruction differs from the full EMA model')
+        measured = gpu_prediction(config, inferred, first_batch, gpu, mesh=mesh)
+        (args.out/'delta_inference.json').write_text(json.dumps(measured, indent=2))
+        del inferred, expected_inference, restored_model
+        gc.collect()
+        jax.clear_caches()
+        stage('continue_restored_optimizer')
+        indices = update_indices(len(dataset), config.seed, int(state.step), batch_size=config.batch_size)
+        batch = prepare_batch(dataset, indices, pipeline)
+        started = time.monotonic()
+        state, metrics = trainer.step(state, batch, micro_batch_size=1)
+        status['metrics'].append(dict(update=int(state.step), seconds=time.monotonic()-started,
+                                      sample_identities=batch.identities, **metrics))
+        if frozen_signatures(state, config) != initial_frozen:
+            raise ValueError('Frozen backbone changed after checkpoint continuation')
+        status.update(optimizer_updates=int(state.step), frozen_backbone_unchanged=True,
+                      delta_inference_verified=True, restored_optimizer_continued=True,
+                      gpu_memory_stats=[device.memory_stats() for device in jax.devices('gpu')])
+        saved = save_training_checkpoint(manager, state, pipeline, config, provenance)
     manager.close()
     stage('complete', state='complete', full_state_restore_bitwise=args.mode == 'smoke',
           checkpoint=str(saved if saved is not None else args.out/'checkpoints'/str(int(state.step))))
