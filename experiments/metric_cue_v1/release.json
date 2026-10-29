@@ -1,7 +1,7 @@
 {
   "schema": "rulervla_metric_cue_release_v1",
-  "protocol_revision": 5,
-  "protocol_sha256": "8c7cf7f372673d53143935a3f433134d9399189d21a4b47a0e6b0c3c50758071",
+  "protocol_revision": 6,
+  "protocol_sha256": "9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b",
   "training_released": false,
   "evaluation_released": false,
   "gate_status": {
@@ -28,7 +28,8 @@
   "simulator_runtime_receipt": "outputs/metric_cue_pilot/simulator_gate_task2_scene0_20261026/receipt.json",
   "simulator_runtime_receipt_sha256": "1cc6ba376368747b3afea973af119782390097df30213be2372fb7ad4dce5a52",
   "position_scene_manifest": null,
-  "status": "lora_plan_pending_implementation_and_validation",
+  "status": "lora_cpu48_pending_real_gpu_validation",
+  "resource_amendment": "experiments/metric_cue_v1/REVISION6_CPU48_PLAN.zh.md",
   "legacy_full_ft_gpu_smoke_receipt": "experiments/metric_cue_v1/receipts/L09_gpu_smoke_node147_20261027.json",
   "lora_plan": "experiments/metric_cue_v1/REVISION5_LORA_PLAN.zh.md",
   "lora_plan_sha256": "494e2150d10964cc4e1268d2e337dff4445d7b66db9f1f80e5cdb0d960d71ff3",

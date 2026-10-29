@@ -146,7 +146,9 @@ def audit(smoke_root):
                 gpu_allocator_policy=shared['allocator_policy'], dependency_lock_sha256=shared['dependency'],
                 lora_recipe=protocol['training']['lora'], optimizer_updates=3,
                 full_state_restore_bitwise=True, arms=arms,
-                formal_min_cpu_available_gib=max(64, math.ceil(max(peaks) * 1.25)),
+                formal_min_cpu_available_gib=max(
+                    protocol['training']['resource_validation']['initial_cpu_available_gib'],
+                    math.ceil(max(peaks) * 1.25)),
                 gpu_peak_measurement='two_second_current_process_samples',
                 base_reference=shared['base'])
 

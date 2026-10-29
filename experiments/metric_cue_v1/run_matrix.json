@@ -1,9 +1,9 @@
 {
   "schema": "rulervla_metric_cue_run_matrix_v1",
-  "protocol_revision": 5,
-  "protocol_sha256": "8c7cf7f372673d53143935a3f433134d9399189d21a4b47a0e6b0c3c50758071",
+  "protocol_revision": 6,
+  "protocol_sha256": "9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b",
   "experiment_id": "L09",
-  "status": "lora_plan_pending_implementation_and_validation",
+  "status": "lora_cpu48_pending_real_gpu_validation",
   "finetuning": "lora",
   "comparison_group": "L09_lora_r5",
   "full_ft_waiter_cancelled_receipt": "experiments/metric_cue_v1/receipts/L09_full_ft_waiter_cancelled_for_lora.json",

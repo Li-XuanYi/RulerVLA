@@ -15,7 +15,11 @@ def test_explicit_lora_profile_matches_frozen_recipe_and_low_memory_data_cache()
     protocol = json.loads((ROOT / 'experiments/metric_cue_v1/protocol.json').read_text())
     require_lora_recipe(run, protocol)
     assert run['data']['max_cache_bytes'] == 512 << 20
-    assert run['resources']['min_cpu_available_gib'] >= 64
+    assert run['resources']['min_cpu_available_gib'] == 48
+    assert protocol['training']['resource_validation']['initial_cpu_available_gib'] == 48
+    run['resources']['min_cpu_available_gib'] = 47
+    with pytest.raises(ValueError, match='resource'):
+        require_lora_recipe(run, protocol)
 
 
 def test_old_full_tuning_and_mismatched_lora_rank_are_rejected():

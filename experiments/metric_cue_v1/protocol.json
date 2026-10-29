@@ -1,7 +1,7 @@
 {
   "schema": "rulervla_metric_cue_v1",
-  "revision": 5,
-  "previous_revision_archive": "experiments/metric_cue_v1/revisions/r4/frozen_inputs.tar.gz",
+  "revision": 6,
+  "previous_revision_archive": "experiments/metric_cue_v1/revisions/r5_cpu64/frozen_inputs.tar.gz",
   "method": {
     "ruler": "positive_world_xyz_0_to_15cm_equal_5cm_ticks_no_arrows",
     "direction_length_px": 28,
@@ -9,7 +9,8 @@
     "loss": "original_flow_matching"
   },
   "experiment_id": "L09",
-  "status": "lora_plan_pending_implementation_and_validation",
+  "status": "lora_cpu48_pending_real_gpu_validation",
+  "resource_amendment": "experiments/metric_cue_v1/REVISION6_CPU48_PLAN.zh.md",
   "research_plan_sha256": "69cef624d77428c337133dcbeecffeb3e02ce7806c18ba85b770d3e49a464e13",
   "research_question": "六通道动作坐标方向、公制刻度和实测五步历史位移对 LIBERO Spatial 任务成功率的贡献",
   "arms": {
@@ -107,9 +108,9 @@
     },
     "resource_validation": {
       "status": "pending_real_lora_smoke",
-      "initial_cpu_available_gib": 64,
+      "initial_cpu_available_gib": 48,
       "initial_gpu_free_mib_per_device": 28672,
-      "formal_cpu_rule": "max(64, ceil(1.25 * maximum_cpu_peak_gib_across_all_four_arm_smokes))",
+      "formal_cpu_rule": "max(48, ceil(1.25 * maximum_cpu_peak_gib_across_all_four_arm_smokes))",
       "preserve_effective_batch_across_arms": true
     }
   },
