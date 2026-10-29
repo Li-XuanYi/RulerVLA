@@ -138,6 +138,12 @@ def load_formal_metric_run(root, arm, seed, run):
             or len({item['evidence']['run_manifest.json']['sha256']
                     for item in receipt['arms'].values()}) != 4):
         raise ValueError('Four LoRA arms require distinct input pipelines and run manifests')
+    from rulervla.training.metric_resources import lora_gpu_pool_policy
+    if receipt['gpu_allocator_policy'] != lora_gpu_pool_policy(run['resources']['min_free_mib_fsdp']):
+        raise ValueError('LoRA GPU allocator differs from the shared validated policy')
+    for relative, expected_hash in receipt['runtime_source_sha256'].items():
+        if hashlib.sha256((root / relative).read_bytes()).hexdigest() != expected_hash:
+            raise ValueError('LoRA runtime source differs from the four-arm smoke: ' + relative)
     for arm, measured in receipt['arms'].items():
         if measured['arm'] != arm or measured['cue_config'] != protocol['arms'][arm]:
             raise ValueError('LoRA smoke receipt belongs to another arm: ' + arm)

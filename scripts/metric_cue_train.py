@@ -23,10 +23,16 @@ def main():
     gpu_selection = parser.add_mutually_exclusive_group()
     gpu_selection.add_argument('--gpu-indices', type=int, nargs='+')
     gpu_selection.add_argument('--auto-gpus', action='store_true')
+    gpu_selection.add_argument('--gpu-candidates', type=int, nargs='+')
     parser.add_argument('--wait-for-resources', action='store_true')
     args = parser.parse_args()
-    if args.wait_for_resources and (args.mode != 'smoke' or args.arm is None or args.steps != 2):
-        raise ValueError('Resource waiting requires an explicit two-update smoke arm')
+    if args.wait_for_resources and (args.mode == 'preflight' or args.arm is None):
+        raise ValueError('Resource waiting requires an explicit smoke or formal arm')
+    if args.wait_for_resources and args.mode == 'smoke' and args.steps != 2:
+        raise ValueError('LoRA smoke requires two updates plus checkpoint continuation')
+    if args.gpu_candidates is not None and (len(set(args.gpu_candidates)) != len(args.gpu_candidates)
+                                           or any(index < 0 for index in args.gpu_candidates)):
+        raise ValueError('GPU candidates must be distinct nonnegative integers')
     from rulervla.training.metric_resources import load_run_config, preflight, query_gpus, runtime_capacity
     run = load_run_config(args.config)
     if args.gpu_indices is not None:
@@ -51,13 +57,23 @@ def main():
     if args.mode == 'train' and args.out.name != run['formal_run_id']:
         raise ValueError('Formal output directory must be named ' + run['formal_run_id'])
     args.out.mkdir(parents=True, exist_ok=args.resume)
+    if args.resume:
+        previous_status = (args.out/'status.json').read_text()
+        (args.out/f'status_before_resume_{time.time_ns()}.json').write_text(previous_status)
     attempt = 0
     while True:
-        if args.auto_gpus:
+        if args.mode == 'train':
+            run, protocol = load_formal_metric_run(
+                ROOT, args.arm, args.seed, load_run_config(args.config))
+            if args.gpu_indices is not None:
+                run['resources']['gpu_indices'] = args.gpu_indices
+        if args.auto_gpus or args.gpu_candidates is not None:
             gpus = query_gpus()
             if isinstance(gpus, dict):
                 raise RuntimeError('GPU selection failed: ' + gpus['error'])
-            selected = sorted(gpus, key=lambda gpu: gpu['free_mib'], reverse=True)[:2]
+            eligible = [gpu for gpu in gpus if args.gpu_candidates is None
+                        or gpu['index'] in args.gpu_candidates]
+            selected = sorted(eligible, key=lambda gpu: gpu['free_mib'], reverse=True)[:2]
             if len(selected) != 2:
                 raise ValueError('LoRA requires two available GPUs')
             run['resources']['gpu_indices'] = [gpu['index'] for gpu in selected]
@@ -77,6 +93,12 @@ def main():
         (args.out/'status.json').write_text(json.dumps(waiting, indent=2))
         print(json.dumps(waiting), flush=True)
         time.sleep(60)
+    if args.mode == 'train' and admission['launch_allowed']:
+        verified_run, verified_protocol = load_formal_metric_run(
+            ROOT, args.arm, args.seed, load_run_config(args.config))
+        verified_run['resources']['gpu_indices'] = run['resources']['gpu_indices']
+        if verified_run != run or verified_protocol != protocol:
+            raise ValueError('Formal recipe changed during input/resource admission')
     if args.mode == 'preflight' or not admission['launch_allowed']:
         result = dict(state='ready' if admission['launch_allowed'] else 'blocked',
                       mode=args.mode, gpu_job_started=False, formal_training_started=False,
@@ -96,14 +118,30 @@ def main():
         raise ValueError('--seed is reserved for formal runs; smoke uses the shared configured seed')
     run['training']['num_steps'] = steps
     (args.out/'workflow_config.json').write_text(json.dumps(run, indent=2))
-    os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(map(str, run['resources']['gpu_indices']))
+    memory_sampler = None
+    gpu_context_started = False
+    gpu_initialization_attempted = False
+    def record_failure(error_type, error, traceback):
+        sys.__excepthook__(error_type, error, traceback)
+        path = args.out/'status.json'
+        failed = json.loads(path.read_text()) if path.exists() else {}
+        failed.update(state='failed', error_type=error_type.__name__, error=str(error),
+                      pid=os.getpid(), jax_imported='jax' in sys.modules,
+                      selected_gpu_indices=run['resources']['gpu_indices'],
+                      mode=args.mode, gpu_job_started=gpu_context_started,
+                      gpu_initialization_attempted=gpu_initialization_attempted,
+                      formal_training_started=args.mode == 'train' and gpu_context_started,
+                      peak_cpu_rss_gib=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 2**20)
+        if memory_sampler is not None:
+            failed.update(memory_sampler.finish())
+        path.write_text(json.dumps(failed, indent=2, allow_nan=False))
+    sys.excepthook = record_failure
+    from rulervla.training.metric_resources import configure_lora_gpu_allocator
+    allocation_contract = configure_lora_gpu_allocator(run, admission['gpu_snapshot'])
     os.environ['JAX_PLATFORMS'] = 'cuda,cpu'
-    os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = 'false'
-    os.environ['XLA_PYTHON_CLIENT_ALLOCATOR'] = 'platform'
     cache_dir = ROOT/'build/metric_lora_cache/jax_compilation_cache'
     cache_dir.mkdir(parents=True, exist_ok=True)
     os.environ['JAX_COMPILATION_CACHE_DIR'] = str(cache_dir)
-    memory_sampler = None
     if args.mode == 'smoke':
         from rulervla.training.metric_resources import SmokeGpuMemory
         memory_sampler = SmokeGpuMemory(os.getpid(), admission['gpu_snapshot'],
@@ -112,6 +150,24 @@ def main():
     if cache_dir.stat().st_dev != ROOT.stat().st_dev or shutil.disk_usage(cache_dir).free < 8 << 30:
         raise ValueError('LoRA compilation cache requires 8 GiB on the local runtime filesystem')
     import jax
+    gpu_initialization_attempted = True
+    gpu_devices = jax.devices('gpu')
+    gpu_context_started = True
+    if len(gpu_devices) != len(run['resources']['gpu_indices']):
+        raise ValueError('JAX did not expose every selected GPU')
+    from rulervla.training.metric_gpu_allocator import reserve_lora_gpu_pools
+    allocation_contract.update(reserve_lora_gpu_pools(
+        gpu_devices, allocation_contract['pool_target_mib_per_device']))
+    gc.collect()
+    (args.out/'gpu_allocator.json').write_text(json.dumps(allocation_contract, indent=2))
+    initial_status = dict(state='running', stage='gpu_pool_reserved', pid=os.getpid(),
+        jax_imported=True, gpu_initialization_attempted=True, gpu_job_started=True,
+        selected_gpu_indices=run['resources']['gpu_indices'], mode=args.mode,
+        formal_training_started=args.mode == 'train',
+        optimizer_updates=None if args.resume else 0)
+    (args.out/'status.json').write_text(json.dumps(initial_status, indent=2))
+    print(json.dumps(dict(stage='gpu_pool_reserved', **allocation_contract)), flush=True)
+    gpu, cpu = gpu_devices[0], jax.devices('cpu')[0]
     from openpi.training import checkpoints, sharding
     from rulervla.adapters.metric_pipeline import MetricPipeline
     from rulervla.training.main_data import SpatialDataset, update_indices
@@ -127,7 +183,8 @@ def main():
     provenance = source_provenance(ROOT)
     provenance.update(command=sys.argv, run_config=run,
                       pipeline_sha256=pipeline.fingerprint(), dataset_manifests=dataset.manifest_hashes,
-                      checkpoint_receipt=admission['checkpoint_receipt'], resource_admission=admission)
+                      checkpoint_receipt=admission['checkpoint_receipt'], resource_admission=admission,
+                      gpu_allocator=allocation_contract)
     manifest_path = args.out/'run_manifest.json'
     if args.resume:
         previous = json.loads(manifest_path.read_text())
@@ -137,9 +194,16 @@ def main():
                 raise ValueError('Full-state resume identity differs: ' + key)
         provenance = previous
         status = json.loads((args.out/'status.json').read_text())
+        status.update(state='running', gpu_job_started=True, formal_training_started=True,
+                      gpu_initialization_attempted=True, jax_imported=True, pid=os.getpid(),
+                      selected_gpu_indices=run['resources']['gpu_indices'], mode=args.mode)
+        for key in ('error', 'error_type', 'last_metrics', 'blockers', 'attempt'):
+            status.pop(key, None)
     else:
         manifest_path.write_text(json.dumps(provenance, indent=2))
-        status = dict(state='running', gpu_job_started=True, formal_training_started=args.mode == 'train',
+        status = dict(state='running', gpu_job_started=True, gpu_initialization_attempted=True,
+                      jax_imported=True, pid=os.getpid(), selected_gpu_indices=run['resources']['gpu_indices'],
+                      formal_training_started=args.mode == 'train',
                       mode=args.mode, optimizer_updates=0, metrics=[] if args.mode == 'smoke' else None)
     def stage(name, **values):
         status.update(stage=name, peak_cpu_rss_gib=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 2**20,
@@ -153,9 +217,6 @@ def main():
             stage('resource_gate_closed', state='blocked', blockers=measured['blockers'],
                   resources=measured)
             raise RuntimeError('; '.join(measured['blockers']))
-    if len(jax.devices('gpu')) != len(run['resources']['gpu_indices']):
-        raise ValueError('JAX did not expose every selected GPU')
-    gpu, cpu = jax.devices('gpu')[0], jax.devices('cpu')[0]
     mesh = (sharding.make_mesh(len(run['resources']['gpu_indices']))
             if len(run['resources']['gpu_indices']) > 1 else None)
     # 用户要求：保留启动前准入；启动后不因资源查询或阈值主动终止训练。
@@ -179,6 +240,7 @@ def main():
                                             expected_manifest=provenance)
         if int(state.step) != latest:
             raise ValueError('Restored optimizer step differs from checkpoint directory')
+        stage('restored_training_state', optimizer_updates=int(state.step), resumed_checkpoint=latest)
     first_batch = None
     initial_frozen = None
     if args.mode == 'smoke':

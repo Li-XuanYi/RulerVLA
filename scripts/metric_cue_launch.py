@@ -77,9 +77,9 @@ def main():
                 raise RuntimeError("Resource waiting must not initialize JAX")
             command = [
                 sys.executable, str(ROOT / "scripts/metric_cue_train.py"),
-                "--config", str(args.config.resolve()), "--mode", "train",
+                "--config", str(args.config.resolve()), "--mode", "train", "--wait-for-resources",
                 "--arm", args.arm, "--seed", str(args.seed),
-                "--out", str(args.out.resolve()), "--gpu-indices", *map(str, selected)]
+                "--out", str(args.out.resolve()), "--gpu-candidates", *map(str, args.gpu_candidates)]
             (args.wait_dir / "command.json").write_text(json.dumps(command, indent=2))
             os.execv(sys.executable, command)
         time.sleep(args.poll_seconds)

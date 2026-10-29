@@ -1,11 +1,13 @@
 import argparse
 import hashlib
+import io
 import json
 import math
 import os
 from pathlib import Path
 import subprocess
 import sys
+import tarfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
@@ -19,9 +21,19 @@ def read_json(path):
     return json.loads(Path(path).read_text())
 
 
+def runtime_source_hashes(commit, loaded):
+    paths = sorted(set(loaded) | {
+        'src/openpi/models', 'scripts/metric_cue_train.py', 'scripts/metric_cue_launch.py'})
+    data = subprocess.check_output(['git', 'archive', '--format=tar', commit, *paths], cwd=ROOT)
+    with tarfile.open(fileobj=io.BytesIO(data), mode='r:') as archive:
+        return {member.name: hashlib.sha256(archive.extractfile(member).read()).hexdigest()
+                for member in archive.getmembers() if member.isfile()}
+
+
 def audit(smoke_root):
     from rulervla.adapters.metric_pipeline import MetricPipeline
     from rulervla.training.metric_protocol import require_lora_recipe
+    from rulervla.training.metric_resources import lora_gpu_pool_policy
     from rulervla.training.metric_workflow import make_training_config, training_recipe
 
     protocol_path = ROOT / 'experiments/metric_cue_v1/protocol.json'
@@ -95,7 +107,16 @@ def audit(smoke_root):
         inference = read_json(directory / 'delta_inference.json')
         if not inference['finite'] or inference['shape'] != [1, 10, 32]:
             raise ValueError('Real restored policy inference is unverified: ' + arm)
+        policy = lora_gpu_pool_policy(budget)
+        allocation = manifest['gpu_allocator']
+        if ({key: allocation[key] for key in policy} != policy
+                or read_json(directory / 'gpu_allocator.json') != allocation
+                or allocation['initial_reservation_array_bytes_per_device'] != [
+                    (policy['pool_target_mib_per_device'] - 1) << 20] * 2):
+            raise ValueError('LoRA GPU pool initialization is unverified: ' + arm)
         common = dict(git_commit=manifest['git_commit'], sources=manifest['loaded_source_sha256'],
+                      runtime_sources=runtime_source_hashes(manifest['git_commit'], manifest['loaded_source_sha256']),
+                      allocator_policy=policy,
                       dependency=manifest['dependency_lock_sha256'], initial=initial,
                       frozen=metadata['frozen_sha256'], base=metadata['base_reference'],
                       trainable=metadata['trainable_parameter_contract'])
@@ -107,7 +128,7 @@ def audit(smoke_root):
             raise ValueError('CPU peak is invalid: ' + arm)
         peaks.append(cpu_peak)
         names = ('status.json', 'run_manifest.json', 'initial_trainable_sha256.json',
-                 'gpu_equivalence.json', 'full_state_expected_sha256.json',
+                 'gpu_equivalence.json', 'gpu_allocator.json', 'full_state_expected_sha256.json',
                  'full_state_sha256.json', 'delta_inference.json',
                  'checkpoints/2/metric_workflow.json', 'checkpoints/3/metric_workflow.json')
         evidence = {name: dict(path=str(directory / name), sha256=digest(directory / name)) for name in names}
@@ -120,7 +141,8 @@ def audit(smoke_root):
                          pipeline_sha256=pipeline.fingerprint(), evidence=evidence)
     return dict(schema='rulervla_metric_lora_smoke_release_v1', state='complete',
                 protocol_sha256_during_smoke=digest(protocol_path), runtime_commit=shared['git_commit'],
-                loaded_source_sha256=shared['sources'], dependency_lock_sha256=shared['dependency'],
+                loaded_source_sha256=shared['sources'], runtime_source_sha256=shared['runtime_sources'],
+                gpu_allocator_policy=shared['allocator_policy'], dependency_lock_sha256=shared['dependency'],
                 lora_recipe=protocol['training']['lora'], optimizer_updates=3,
                 full_state_restore_bitwise=True, arms=arms,
                 formal_min_cpu_available_gib=max(64, math.ceil(max(peaks) * 1.25)),

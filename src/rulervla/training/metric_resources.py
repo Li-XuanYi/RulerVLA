@@ -3,6 +3,7 @@ import csv
 from datetime import datetime, timezone
 import io
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -11,6 +12,33 @@ import psutil
 import yaml
 
 ROOT = Path(__file__).resolve().parents[3]
+
+
+def lora_gpu_pool_policy(budget):
+    if budget <= 2048:
+        raise ValueError('LoRA GPU budget is too small for the external-library allowance')
+    return dict(allocator='bfc', preallocate=True, gpu_budget_mib_per_device=budget,
+                pool_target_mib_per_device=budget - 2048, external_library_allowance_mib=2048)
+
+
+def configure_lora_gpu_allocator(run, gpu_snapshot):
+    resources = run['resources']
+    indexed = {gpu['index']: gpu for gpu in gpu_snapshot}
+    selected = [indexed[index] for index in resources['gpu_indices']]
+    budget = resources['min_free_mib_fsdp']
+    totals = {gpu['total_mib'] for gpu in selected}
+    if len(selected) != 2 or len(totals) != 1 or any(gpu['free_mib'] < budget for gpu in selected):
+        raise ValueError('LoRA GPU pool requires two equal-memory devices with the admitted free budget')
+    policy = lora_gpu_pool_policy(budget)
+    total = totals.pop()
+    fraction = policy['pool_target_mib_per_device'] / total
+    uuids = [gpu['uuid'] for gpu in selected]
+    os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(uuids)
+    os.environ['XLA_PYTHON_CLIENT_ALLOCATOR'] = 'bfc'
+    os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = 'true'
+    os.environ.pop('XLA_PYTHON_CLIENT_MEM_FRACTION', None)
+    os.environ['XLA_CLIENT_MEM_FRACTION'] = str(fraction)
+    return dict(policy, memory_fraction=fraction, device_total_mib=total, selected_gpu_uuids=uuids)
 
 
 def load_run_config(path):
