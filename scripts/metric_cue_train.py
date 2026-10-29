@@ -327,13 +327,18 @@ def main():
         stage('load_delta_inference_model')
         with jax.default_device(cpu):
             restored_model, restored_pipeline = load_metric_model(saved)
-            inferred = nnx.state(restored_model)
+            inferred = jax.device_put(nnx.state(restored_model), cpu)
+        del restored_model
+        if any(not isinstance(value, jax.Array) or value.devices() != {cpu}
+               for value in jax.tree.leaves(inferred)):
+            raise ValueError('Restored inference parameters must be on the CPU before FSDP transfer')
         if (state_signatures(inferred) != expected_inference_sha256
                 or restored_pipeline.fingerprint() != pipeline.fingerprint()):
             raise ValueError('Delta inference reconstruction differs from the full EMA model')
+        stage('delta_gpu_prediction')
         measured = gpu_prediction(config, inferred, first_batch, gpu, mesh=mesh)
         (args.out/'delta_inference.json').write_text(json.dumps(measured, indent=2))
-        del inferred, restored_model
+        del inferred
         gc.collect()
         jax.clear_caches()
         stage('restore_optimizer_after_inference')
