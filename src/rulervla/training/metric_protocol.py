@@ -118,14 +118,23 @@ def load_formal_metric_run(root, arm, seed, run):
     receipt_path = release['gpu_smoke_receipt']
     if receipt_path is None:
         raise ValueError('Full model GPU receipt is required')
-    receipt = json.loads((root / receipt_path).read_text())
+    receipt_bytes = (root / receipt_path).read_bytes()
+    if hashlib.sha256(receipt_bytes).hexdigest() != release.get('gpu_smoke_receipt_sha256'):
+        raise ValueError('LoRA smoke release receipt identity differs')
+    receipt = json.loads(receipt_bytes)
     if (receipt.get('schema') != 'rulervla_metric_lora_smoke_release_v1'
             or receipt['state'] != 'complete' or not receipt['full_state_restore_bitwise']
             or receipt['optimizer_updates'] < 3
             or receipt['lora_recipe'] != protocol['training']['lora']
             or set(receipt['arms']) != set(protocol['arms'])):
         raise ValueError('All four real LoRA GPU updates and checkpoint recoveries are required')
-    for measured in receipt['arms'].values():
+    if (len({item['pipeline_sha256'] for item in receipt['arms'].values()}) != 4
+            or len({item['evidence']['run_manifest.json']['sha256']
+                    for item in receipt['arms'].values()}) != 4):
+        raise ValueError('Four LoRA arms require distinct input pipelines and run manifests')
+    for arm, measured in receipt['arms'].items():
+        if measured['arm'] != arm or measured['cue_config'] != protocol['arms'][arm]:
+            raise ValueError('LoRA smoke receipt belongs to another arm: ' + arm)
         if (measured['state'] != 'complete' or measured['optimizer_updates'] != 3
                 or measured['trainable_parameters'] != 53509280
                 or not all(measured[key] for key in ('full_state_restore_bitwise',
