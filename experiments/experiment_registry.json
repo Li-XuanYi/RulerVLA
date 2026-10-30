@@ -654,7 +654,7 @@
       ],
       "priority": "current",
       "research_group": "六通道公制提示",
-      "current_status_note": "2026-10-30 01:10 UTC通过WSL复查：干净运行树仍冻结76e9b4c，protocol6/CPU48GiB一致；原M2第462次等待，waiting_resources、JAXfalse/GPUfalse，CPU15790676KiB约15.1GiB不足48GiB。01:14 UTC实际ps确认控制901831和M2 PID901847连续存活7小时59分；145仍仅一张卡达到共同28GiB准入。保留原队列，未重复启动、停止作业或热更新源码，训练/评测发布仍关闭。原始观察见outputs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6_cpu_restore/heartbeat_20261030T010614Z.json，前次完整连接复查见receipts/L09_lora_vpn_recheck_20261030.json。",
+      "current_status_note": "2026-10-30 05:58 UTC通过WSL核实：原控制901831、M2 PID901847仍实际存活，命令/工作目录吻合；等待计数740，JAXfalse/GPUfalse。CPU9899484KiB约9.4GiB不足共同48GiB；GPU6/7各空闲48538MiB，145当前无卡达到28GiB，147 NVML仍Unknown Error。运行树76e9b4c干净，protocol6身份一致；训练/评测发布关闭，正式status及本轮metrics/checkpoint均不存在。保留原队列，未重复启动、停止作业或热更新源码；见receipts/L09_lora_resource_wait_20261030T055749Z.json。",
       "current_role": "检验方向、公制刻度和 Motion Echo 的逐项增量"
     },
     {

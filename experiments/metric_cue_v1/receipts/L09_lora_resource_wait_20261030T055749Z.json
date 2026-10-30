@@ -1,0 +1,18 @@
+{
+  "schema": "rulervla_metric_lora_resource_wait_v1",
+  "experiment_id": "L09",
+  "automation_id": "l09-lora",
+  "heartbeat_trigger_utc": "2026-10-30T05:57:49.684Z",
+  "observed_at_utc": "2026-10-30T05:58:45.605709+00:00",
+  "runtime": {"commit": "76e9b4c6c5e357b22d63d80cb4fde3847a5ca5e9", "git_clean": true},
+  "protocol": {"revision": 6, "sha256": "9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b", "release_and_matrix_identity_matches": true},
+  "queue": {"controller_pid": 901831, "pid": 901847, "actual_process_command_cwd_verified": true, "state": "waiting_resources", "attempt": 740, "jax_imported": false, "gpu_job_started": false, "formal_training_started": false},
+  "resources": {"cpu_available_kib": 9899484, "cpu_min_available_gib": 48, "selected_gpu_indices": [6, 7], "selected_gpu_free_mib": [48538, 48538], "gpu_min_free_mib_per_device": 28672},
+  "alternative_nodes": {"checked_at_utc": "2026-10-30T05:57:52Z", "node145_gpu_free_mib": [4533, 19641, 6288, 16523, 5816, 6629], "node145_eligible_gpu_count": 0, "node147_nvml_error": "Unknown Error", "ssh_timed_out_after_resource_output": true},
+  "raw_observation": "outputs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6_cpu_restore/heartbeat_20261030T055749Z.json",
+  "preflight_sha256": "916b6dd141879912d6209b935fd0557300574800f6451d92c3e1b49228606331",
+  "current_smoke_artifacts": {"metrics_exists": false, "checkpoint_directory_exists": false},
+  "release": {"training_released": false, "evaluation_released": false, "formal_status_exists": false, "new_four_arm_gpu_validation_complete": false},
+  "actions": {"kept_existing_waiter": true, "new_jobs_started": false, "jobs_stopped": false, "runtime_hot_updated": false},
+  "code_changes": false
+}
