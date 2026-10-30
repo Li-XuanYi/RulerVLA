@@ -1,0 +1,141 @@
+{
+  "schema": "rulervla_metric_lora_node147_only_v1",
+  "experiment_id": "L09",
+  "automation_id": "l09-lora",
+  "observed_at_utc": "2026-10-30T12:36:05.889495+00:00",
+  "user_instruction": "禁止使用145；后续仅使用147的GPU",
+  "allowed_compute_hosts": [
+    "10.82.1.147"
+  ],
+  "prohibited_compute_and_proxy_hosts": [
+    "10.82.1.145"
+  ],
+  "node147": {
+    "ssh_connected": true,
+    "login": "lixuanyi@10.82.1.147:8864",
+    "hostname": "ZjuServer147",
+    "uid": 1060,
+    "gid": 1060,
+    "supplementary_groups": [
+      1060
+    ],
+    "required_resource_group": {
+      "name": "omniai",
+      "gid": 2000
+    },
+    "gpu_device_owner": "root:omniai",
+    "gpu_device_mode": "0660",
+    "nas_path": "/home/Dataset2",
+    "nas_owner": "root:omniai",
+    "nas_mode": "0770",
+    "gpu_and_nas_access": false,
+    "nvidia_smi_error": "Failed to initialize NVML: Unknown Error",
+    "gpu_launch_started": false,
+    "environment_prepared": false
+  },
+  "node145_stop": {
+    "requested_by_latest_user_instruction": true,
+    "owner_login": "yqt@10.82.1.145:8864",
+    "direct_ssh_result": "Permission denied (publickey)",
+    "a6000_stop_only_jump_result": "Permission denied (publickey)",
+    "stop_command_executed": false,
+    "stopped_verified": false,
+    "live_process_state": "unknown",
+    "old_cohort": "smoke_cpu48_r6_node145_nccl2289",
+    "no_new_jobs_started": true
+  },
+  "historical_node145_disk_evidence": {
+    "observer_host": "vla_7_A6000",
+    "source": "shared_NAS",
+    "evidence_file": "outputs/metric_cue_pilot/L09_lora_node147_only_20261030/node145_disk_observation.json",
+    "sha256": "3c1282a4d923145d4aa336068a0061f38ce28226b0bc243e8365aa213f8b2e93",
+    "launch_log_sha256": "efd53c765bff41f5e6f10d0d34e38591a505b20ea5e5489cbf98fe5c9304d53a",
+    "arms": {
+      "M2": {
+        "disk_state": "complete",
+        "recorded_updates": 3,
+        "losses": [
+          0.10170970112085342,
+          0.1376684159040451,
+          0.08358106017112732
+        ]
+      },
+      "M0": {
+        "disk_state": "complete",
+        "recorded_updates": 3,
+        "losses": [
+          0.09515649080276489,
+          0.11452488601207733,
+          0.09193500131368637
+        ]
+      },
+      "M1": {
+        "disk_state": "complete",
+        "recorded_updates": 3,
+        "losses": [
+          0.09797004610300064,
+          0.12837429344654083,
+          0.08520901948213577
+        ]
+      },
+      "M3": {
+        "disk_state": "running",
+        "recorded_updates": 1,
+        "last_status_mtime_utc": "2026-10-30T12:08:34.202321+00:00",
+        "losses": [
+          0.09840017557144165
+        ]
+      }
+    },
+    "live_process_confirmed": false,
+    "complete_four_arm_validation_confirmed": false,
+    "valid_as_node147_gpu_acceptance": false
+  },
+  "protocol": {
+    "revision": 6,
+    "sha256": "9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b",
+    "changed": false,
+    "initial_cpu_available_gib": 48,
+    "gpu_count": 2,
+    "gpu_min_free_mib_per_device": 28672,
+    "formal_cpu_rule": "max(48,ceil(1.25*maximum_complete_four_arm_smoke_cpu_peak_gib))"
+  },
+  "recipe": {
+    "finetuning": "lora",
+    "batch_size": 8,
+    "micro_batch_size": 1,
+    "gradient_accumulation": 8,
+    "num_steps": 30000,
+    "trainable_parameters": 53509280,
+    "training_math_changed": false
+  },
+  "deployment": {
+    "plan": "experiments/metric_cue_v1/NODE147_ONLY_PLAN.zh.md",
+    "config": "configs/metric_workflow_lora_node147.yaml",
+    "prepared_on_node147": false,
+    "proposed_runtime_root": "/home/lixuanyi/XuanyiLi/metric_cue_runtime/RulerVLA_lora_r6_node147",
+    "openpi_root": "not_prepared",
+    "nccl_version": 22809,
+    "nccl_sha256": "1792291e26d2b27fe51e59cf4dbd361dbfa84cbfe8ee8196c087c7ebf5146d48"
+  },
+  "blockers": [
+    "node147 account lacks GPU/NAS resource group access",
+    "node147 matching Python environment not prepared",
+    "node145 existing task stop not verified because owner SSH authentication rejected"
+  ],
+  "actions": {
+    "automation_restricted_to_node147": true,
+    "used_node145_as_proxy": false,
+    "started_new_node145_job": false,
+    "reset_gpu_or_rebooted": false,
+    "changed_resource_permissions": false,
+    "hot_updated_runtime": false,
+    "preserved_all_outputs_and_checkpoints": true
+  },
+  "release": {
+    "training_released": false,
+    "evaluation_released": false,
+    "node147_four_arm_validation_complete": false,
+    "formal_training_started": false
+  }
+}

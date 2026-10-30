@@ -1,5 +1,13 @@
 # Handoff
 
+## 2026-10-30 L09按用户指令仅使用147
+
+- [User] 最新指令禁止使用145，后续GPU验证及正式训练仅在147；145从计算、等待、备用和SSH转发中移除，自动检查已同步。只允许为结束本次既有145任务进行必要停止控制。
+- [Experiment] 147可通过WSL SSH登录ZjuServer147，但lixuanyi仅在自身1060组，未加入GPU/NAS所属omniai(2000)；GPU设备0660、NAS入口0770，当前均无访问权限，nvidia-smi报NVML Unknown Error。需管理员恢复合法资源组权限并重新登录核验；147匹配venv也尚未准备，没有启动147 GPU任务。
+- [Experiment] 145原属主yqt的直连与经A6000的stop-only连接均被publickey认证拒绝，停止命令未执行，旧任务停止状态未知。12:36 UTC经A6000读取NAS：M2/M0/M1各记录complete、3次有限更新、完整恢复及独立推理标志；M3最后status为12:08:34的running/1次更新。磁盘记录不证明当前进程存活或退出，不能冒称145已停止，也不能放行147。
+- [Code] 新147配置与node145配置原字节一致；部署计划为experiments/metric_cue_v1/NODE147_ONLY_PLAN.zh.md，receipt为experiments/metric_cue_v1/receipts/L09_lora_node147_only_20261030.json。protocol6 SHA9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b、LoRA/batch8/micro1累计8/30k、CPU48GiB、双卡各28GiB及NCCL2.28.9固定SHA不变，训练/评测发布保持false。
+- [Experiment] 先完成145本次进程停止核验和147合法资源访问，再部署独立干净运行树、匹配环境并在147重新验收全部四组。没有在145启动新作业、以145作跳板、修改ACL、重置GPU或热更新活动运行树；所有原始产物保留。
+
 ## 2026-10-30 L09首次NCCL通信失败与新库验证
 
 - [Experiment] 2026-10-30 10:37 UTC定时复查：原控制2344109及M2 PID2344133实际身份、工作目录和启动时间吻合，干净冻结bf96eef不变，NCCL2.28.9映射保持；attempt17 waiting_resources、JAXfalse/GPUfalse，CPU439767484KiB约419GiB，GPU4/1中GPU1仍不足28672MiB。A6000 CPU可用约7.26GiB，当前保留145唯一等待器。无新metrics/checkpoint/正式status；未启动、停止作业或热更新源码。原始观察在/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6_node145_nccl2289/heartbeat_20261030T103533Z.json。

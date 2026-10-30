@@ -646,7 +646,7 @@
       "display_name": "L09_公制提示",
       "classification": "large",
       "legacy_ids": ["metric_cue_v1"],
-      "status": "lora_gpu_validation_in_progress",
+      "status": "blocked_node147_access_and_node145_stop_verification",
       "purpose": "六通道 M0/M1/M2/M3 公制提示与实测历史位移受控训练和评测",
       "details": [
         "当前revision6按用户指令将共同CPU起始门槛64降至48GiB，正式按max(48,ceil(四组完整smoke最高峰值*1.25))校准；沿用revision5的统一LoRA配方和12个run ID。四组及其他主表对照共享rank/alpha、可训练白名单、初始化、有效batch8、30k与原数据评测。原CPU64输入已归档revisions/r5_cpu64。",
@@ -654,7 +654,7 @@
       ],
       "priority": "current",
       "research_group": "六通道公制提示",
-      "current_status_note": "2026-10-30 10:37 UTC复查：145原控制2344109、M2 PID2344133实际身份/启动时间/工作目录吻合，bf96eef干净冻结，2.28.9库映射保持；attempt17 waiting_resources、JAXfalse/GPUfalse，CPU439767484KiB约419GiB满足48GiB，GPU4/1中GPU1不足28672MiB。A6000 CPU约7.26GiB，保留145唯一等待器，无新增metrics/checkpoint/正式status，未启动或停止作业、未热更新源码。protocol6及LoRA预算不变，GPU修复效果仍待完整四组验证，训练/评测发布关闭。原始观察为smoke_cpu48_r6_node145_nccl2289/heartbeat_20261030T103533Z.json，修订依据仍见receipts/L09_lora_nccl2289_restart_20261030.json。",
+      "current_status_note": "2026-10-30用户最新指令仅使用147，禁止145计算、等待、备用及SSH转发，自动检查已同步。147可登录但lixuanyi未加入omniai(2000)，GPU/NAS权限缺失，NVML Unknown Error，匹配venv未准备；145属主SSH认证拒绝，停止命令未执行，旧任务是否退出未知。12:36 UTC共享NAS记录M2/M0/M1各3次有限更新并complete，M3最后为12:08 running/1次更新，不能据此证明实时进程或147验收。先完成权限及停止核验，再在147按同一LoRA配方/CPU48GiB/双卡28GiB/NCCL2.28.9重新验收四组，训练和评测发布关闭。见receipts/L09_lora_node147_only_20261030.json及NODE147_ONLY_PLAN.zh.md。",
       "current_role": "检验方向、公制刻度和 Motion Echo 的逐项增量"
     },
     {
