@@ -1,5 +1,13 @@
 # Handoff
 
+
+## 2026-10-30 L09暂停与完整交接
+
+- [User] 用户明确要求暂停。l09-lora自动检查已保存并验证为PAUSED；本轮只整理文档和元数据，没有发送训练停止命令、启动GPU任务、重置GPU或修改权限。
+- [Experiment] 14:09:49 UTC的147新SSH检查仍为groups=[1060]，GPU/NAS均无访问权限，nvidia-smi exit255/NVML Unknown Error；匹配venv和运行树尚未部署。145旧任务停止仍未知，本轮未查询或控制其进程。正式M2至少两个有限更新的目标尚未完成，训练/评测发布保持false。
+- [Code] 完整交接为experiments/metric_cue_v1/HANDOFF_L09_LORA_20261030.zh.md，包含实际M0/M1/M2/M3设计、统一LoRA配方、修复和测试、145历史GPU结果、147阻塞、路径/SHA以及明确恢复后的验收和启动顺序；暂停receipt为experiments/metric_cue_v1/receipts/L09_lora_pause_handoff_20261030.json。
+- [User] 恢复必须由用户明确指示；后续只使用147，禁止145计算、等待、备用及SSH转发。保持protocol6、CPU48GiB、双卡各28GiB和统一batch8/micro1累计8/30k；保留全部原始产物。
+
 ## 2026-10-30 L09按用户指令仅使用147
 
 - [Experiment] 2026-10-30 13:12 UTC复查：147新SSH会话仍仅1060组，GPU设备和NAS访问均被拒绝，nvidia-smi exit255/NVML Unknown Error；权限阻塞未变。本轮没有连接或使用145，旧任务停止仍未知，没有启动GPU任务或修改运行树及资源权限。protocol/release/run_matrix三份SHA保持一致；本次receipt为experiments/metric_cue_v1/receipts/L09_lora_node147_access_recheck_20261030T131201Z.json，保持安静检查。
