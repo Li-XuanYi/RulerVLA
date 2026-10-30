@@ -2,12 +2,13 @@ set -euo pipefail
 metric_runtime_root="${METRIC_RUNTIME_ROOT:-/home/lixuanyi/XuanyiLi/work/rulervla-metric-lora-r5-runtime}"
 metric_openpi_root="${METRIC_OPENPI_ROOT:-/home/lixuanyi/XuanyiLi/code/openpi}"
 metric_workflow_config="${METRIC_WORKFLOW_CONFIG:-configs/metric_workflow_lora.yaml}"
+metric_nccl_root="${METRIC_NCCL_ROOT:-$metric_openpi_root/.venv/lib/python3.11/site-packages/nvidia/nccl/lib}"
 cd "$metric_runtime_root"
-export LD_PRELOAD="$metric_openpi_root/.venv/lib/python3.11/site-packages/nvidia/nccl/lib/libnccl.so.2"
-export LD_LIBRARY_PATH="$metric_openpi_root/.venv/lib/python3.11/site-packages/nvidia/nccl/lib"
+export LD_PRELOAD="$metric_nccl_root/libnccl.so.2"
+export LD_LIBRARY_PATH="$metric_nccl_root"
 export PATH="$metric_openpi_root/.venv/lib/python3.11/site-packages/nvidia/cuda_nvcc/bin:$PATH"
 export CUDA_CACHE_MAXSIZE=4294967296
-export NCCL_DEBUG=WARN
+export NCCL_DEBUG="${NCCL_DEBUG:-WARN}"
 export PYTHONUNBUFFERED=1
 export OMP_NUM_THREADS=4
 export OPENBLAS_NUM_THREADS=1
@@ -16,6 +17,7 @@ export CUDA_CACHE_PATH="$metric_runtime_root/build/metric_lora_cache/cuda"
 export XDG_CACHE_HOME="$metric_runtime_root/build/metric_lora_cache/xdg"
 export PYTHONPYCACHEPREFIX="$metric_runtime_root/build/metric_lora_cache/pycache"
 mkdir -p "$TMPDIR" "$CUDA_CACHE_PATH" "$XDG_CACHE_HOME" "$PYTHONPYCACHEPREFIX"
+"$metric_openpi_root/.venv/bin/python" scripts/metric_nccl_runtime.py
 exec "$metric_openpi_root/.venv/bin/python" scripts/metric_cue_launch.py \
     --config "$metric_workflow_config" \
     --arm M2 --seed 42 --gpu-candidates 0 1 2 3 4 5 6 7 \
