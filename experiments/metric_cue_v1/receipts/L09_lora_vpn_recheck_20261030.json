@@ -1,0 +1,17 @@
+{
+  "schema": "rulervla_metric_lora_vpn_recheck_v1",
+  "experiment_id": "L09",
+  "checked_on_beijing_date": "2026-10-30",
+  "wsl_connection_restored": true,
+  "runtime": {"commit": "76e9b4c6c5e357b22d63d80cb4fde3847a5ca5e9", "git_clean": true, "root": "/home/lixuanyi/XuanyiLi/work/rulervla-metric-lora-r5-runtime"},
+  "protocol": {"revision": 6, "sha256": "9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b", "matrix_identity_matches": true, "planned_run_count": 12},
+  "queue": {"raw_root": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6_cpu_restore", "controller_pid": 901831, "pid": 901847, "observed_process_elapsed": "07:31:22", "actual_process_and_command_verified": true, "state": "waiting_resources", "attempt": 439, "selected_gpu_indices": [6, 7], "jax_imported": false, "gpu_job_started": false, "formal_training_started": false, "survived_local_connection_outage": true},
+  "resources": {"cpu_available_kib": 15329960, "cpu_min_available_gib": 48, "gpu6_free_mib": 48538, "gpu7_free_mib": 48538, "gpu_min_free_mib_per_device": 28672, "remaining_blocker": "CPU memory below the optimizer-offload threshold"},
+  "alternative_nodes": {"matching_two_gpu_windows_found": 0, "node145_eligible_gpu_count": 1, "node145_gpu_min_free_mib": 28672, "node147_nvml_error": "Unknown Error"},
+  "actions": {"kept_existing_waiter": true, "started_duplicate_job": false, "stopped_any_job": false, "hot_updated_runtime": false},
+  "code_changes": false,
+  "release": {"training_released": false, "evaluation_released": false, "formal_status_exists": false, "new_four_arm_gpu_validation_complete": false},
+  "source_fix_receipt": "experiments/metric_cue_v1/receipts/L09_lora_restore_device_fix_20261030.json",
+  "checks": {"runtime_cpu_threshold_verified": true, "raw_wait_log_advancing": true, "data_or_training_recipe_changed": false},
+  "automation_id": "l09-lora"
+}

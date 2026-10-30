@@ -654,7 +654,7 @@
       ],
       "priority": "current",
       "research_group": "六通道公制提示",
-      "current_status_note": "2026-10-30：354175已在continue_restored_optimizer阶段自然被终止，独立GPU推理[1,10,32]有限证据保留，不能计完整smoke通过。新代码76e9b4c显式将恢复基座放CPU并拒绝NumPy训练缓冲，真实CP2的设备与字节签名回归6 passed79.82s。新队列smoke_cpu48_r6_cpu_restore控制901831、M2 PID901847，最近attempt2、waiting_resources、JAXfalse/GPUfalse，CPU约23.9GiB低于48GiB，候选GPU6/7。正式30k及评测仍未发布，见receipts/L09_lora_restore_device_fix_20261030.json。",
+      "current_status_note": "2026-10-30用户恢复VPN后通过WSL复查：干净运行树仍冻结76e9b4c，protocol6/CPU48GiB一致。控制901831、M2 PID901847实际存活7小时31分，日志已到attempt439、waiting_resources、JAXfalse/GPUfalse。GPU6/7各空闲48538MiB满足准入，CPU15329960KiB约14.6GiB不足48GiB；保留原等待器，未重复启动或停止作业。当前未找到合格双卡替代窗口，正式输出status不存在，训练/评测发布仍关闭；见receipts/L09_lora_vpn_recheck_20261030.json。",
       "current_role": "检验方向、公制刻度和 Motion Echo 的逐项增量"
     },
     {

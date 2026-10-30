@@ -1,5 +1,12 @@
 # Handoff
 
+## 2026-10-30 VPN恢复后核实LoRA等待器存活
+
+- [Experiment] 用户恢复VPN后，WSL连接amax成功。实际ps确认控制901831、M2 PID901847仍为原smoke_cpu48_r6_cpu_restore进程，已存活7小时31分，日志更新至第439次等待，JAXfalse/GPUfalse；本地连接中断期间等待器持续运行。当前主机boot仍为2026-10-29 15:57:45 UTC，没有按失联重建或重复启动。
+- [Experiment] 本轮CPU可用15329960KiB（约14.6GiB）低于48GiB；GPU6/7各空闲48538MiB，显存满足共同28672MiB准入。当前阻塞仍为CPU，其他节点没有同时满足共同双卡条件的窗口；保留现有等待器自动复查，没有停止任何作业。
+- [Code] 干净运行树仍冻结76e9b4c6c5e357b22d63d80cb4fde3847a5ca5e9，protocol6、release及run matrix的SHA9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b一致，共12个正式run。48GiB门槛、LoRA/batch8/micro1累计8/30k不变；没有修改运行源码或热更新活动运行树，已有回归检查未重复运行。
+- [Experiment] training_released/evaluation_released仍false，正式M2 status不存在，新四组GPU验收尚未开始；上一轮独立推理部分成功不能放行。复查receipt为experiments/metric_cue_v1/receipts/L09_lora_vpn_recheck_20261030.json，l09-lora更新为已恢复连接的实际状态，继续等待资源并执行完整验收与正式启动。
+
 ## 2026-10-30 L09恢复参数CPU放置修复
 
 - [Experiment] 恢复后的M2 PID354175已完成两次真实更新、CP2完整恢复、独立GPU推理及再次恢复CP2；delta_inference.json为[1,10,32] finite，SHA b8fda554f0d235462d60a57f1be1883f02384cfe687a584945b06d2da2790a2e。随后continue_restored_optimizer阶段再次出现pinned host注册错误，shell记录Killed，354114/354175均已不存在；只确认两次已记录更新，第三次未确认，最后stage CPU峰35.796GiB，终止前峰值和终止来源未知。未主动停止训练，全部CP2、推理及失败记录保留，不能计完整smoke通过。
