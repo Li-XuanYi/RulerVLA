@@ -1,0 +1,23 @@
+{
+  "schema": "rulervla_metric_lora_nccl2289_restart_v1",
+  "experiment_id": "L09",
+  "automation_id": "l09-lora",
+  "observed_at_utc": "2026-10-30T10:23:18.120716+00:00",
+  "failed_cohort": {"runtime_commit":"1c06f6df8f4787e0c47cafea0609be8297fe4917","raw_root":"/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6_node145","pid":1693359,"controller_pid":1693357,"both_processes_absent":true,"stage":"gpu_zero_cue_equivalence","optimizer_updates_recorded":0,"shell_reported_aborted":true,"direct_error":"NCCL Cuda failure 2 out of memory; XLA replicated execution abort","launch_log_sha256":"5d42c23b70bcc0322dc8a0b89b81c6946f0857a67508a74470977d3ee7019a64","initial_cpu_available_gib":423.44690704345703,"selected_gpu_indices":[3,5],"initial_gpu_free_mib":[49990,48870],"initial_pool_bytes_per_device":[27735597056,27735597056],"last_recorded_cpu_peak_gib":25.240283966064453,"terminal_cpu_and_gpu_peaks_unknown":true,"checkpoint_directory_empty":true,"proactively_stopped":false,"failure_observation":"failure_observation_20261030T090157Z.json"},
+  "runtime": {"host":"10.82.1.145","user":"yqt","root":"/home/yqt/XuanyiLi/rulervla-metric-lora-r6-runtime","commit":"bf96eef96f3447d51ce837829ce22dfc356fde2d","git_clean":true,"src_and_training_cli_unchanged_from_76e9b4c":true},
+  "protocol": {"revision":6,"sha256":"9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b","unchanged":true,"initial_cpu_available_gib":48,"gpu_min_free_mib_per_device":28672,"formal_cpu_rule":"max(48,ceil(1.25*maximum_complete_four_arm_smoke_cpu_peak_gib))"},
+  "code_bundle": {"file":"runtime_node145_nccl2289.bundle","sha256":"32e88eb6a506cb5a77b13b7fdbb4edfa669f4e3dba7622a204fe02a2c7e57022"},
+  "installed_python_environment_unchanged": true,
+  "nccl_preload_override": {"version":22809,"library_root":"/home/yqt/XuanyiLi/rulervla-metric-lora-r6-runtime/build/nccl2289/nvidia/nccl/lib","library_sha256":"1792291e26d2b27fe51e59cf4dbd361dbfa84cbfe8ee8196c087c7ebf5146d48","official_wheel_sha256":"485776daa8447da5da39681af455aa3b2c2586ddcf4af8772495e7c532c7e5ab","official_wheel_verified":true,"native_sm120_cubin_verified":true,"original_library_version":22602,"original_library_sha256":"e4a7aee9c3eecf53fac780441d2f03b578ab8db8874b71f8e391bcec7adb2899","original_library_native_cubin_highest_sm":90,"causal_link_to_gpu_oom":"hypothesis_pending_real_gpu_validation"},
+  "cpu_binding_validation": {"red":"2 failed in38.35s: required runtime profile absent while original guard rejection worked","green":"2 passed in2.47s","deployed_node145":"2 passed in1.29s","default_version_22602_preserved":true,"wrong_real_old_library_hash_rejected":true,"ruff_passed":true,"bash_syntax_passed":true,"diff_check_passed":true,"review_critical":0,"review_important":0,"does_not_count_as_gpu_acceptance":true,"log_root":"outputs/metric_cue_pilot/L09_lora_r6_nccl_implementation"},
+  "queue": {"raw_root":"/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6_node145_nccl2289","controller_pid":2344109,"pid":2344133,"process_started_epoch":1793355648.93,"actual_process_identity_verified":true,"arms":["M2","M0","M1","M3"],"state":"waiting_resources","attempt":3,"jax_imported":false,"gpu_job_started":false,"selected_gpu_indices":[3,1]},
+  "current_resources": {"cpu_available_kib":392503080,"admission_cpu_available_gib":377.4181442260742,"input_blockers":[],"resource_blockers":["GPU 1 requires 28672 MiB free"]},
+  "current_observation": "restart_observation_20261030.json",
+  "actual_trainer_nccl_mapping_verified": true,
+  "actual_gpu_communication_version_verified": false,
+  "required_dependency_audit": "Each arm and formal must explicitly use identical METRIC_NCCL_ROOT and METRIC_NCCL_SHA256; verify both CPU profile and NCCL INFO version2.28.9. Existing core release audit does not automatically compare this extra profile.",
+  "recipe": {"finetuning":"lora","batch_size":8,"micro_batch_size":1,"gradient_accumulation":8,"num_steps":30000,"changed_training_math_or_budget":false},
+  "release": {"training_released":false,"evaluation_released":false,"formal_training_started":false,"formal_status_exists":false,"new_smoke_metrics_exists":false,"new_smoke_checkpoint_directory_exists":false,"complete_four_arm_gpu_validation":false},
+  "evidence_root": "/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r6_node145_deployment",
+  "actions": {"preserved_all_failures":true,"changed_shared_venv":false,"proactively_stopped_started_training":false,"forward_deployed_only_after_prior_jobs_exited":true,"hot_updated_active_runtime":false}
+}

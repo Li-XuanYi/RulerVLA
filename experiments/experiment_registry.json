@@ -654,7 +654,7 @@
       ],
       "priority": "current",
       "research_group": "六通道公制提示",
-      "current_status_note": "2026-10-30 08:06 UTC：唯一LoRA等待队列已迁移145，干净冻结源码1c06f6df8f4787e0c47cafea0609be8297fe4917，src/训练CLI与76e9b4c原字节一致。四组输入preflight通过，protocol6/CPU48GiB/双卡各28GiB及LoRA预算不变。实际控制1693357、M2 PID1693359，attempt2 waiting_resources、JAXfalse/GPUfalse；CPU约193GiB满足，GPU4/2中GPU2不足28GiB。A6000旧901847/901831已在未启动GPU且身份核实后退出，原status为历史记录。新NAS队列smoke_cpu48_r6_node145无metrics/checkpoint，正式status不存在，训练/评测发布关闭；见receipts/L09_lora_node145_migration_20261030.json。",
+      "current_status_note": "2026-10-30 10:23 UTC：原145 M2 1693359在首次NCCL通信GPU OOM后自然abort，0updates，1693357/1693359消失，旧running为陈旧记录。已核验官方NCCL2.28.9库及SM120原生内核，真实CPU绑定检查RED2 failed/GREEN2 passed、145部署后2 passed；GPU因果及修复效果仍待验证。已前向部署干净bf96eef96f3447d51ce837829ce22dfc356fde2d，核心src/训练CLI不变，新唯一队列smoke_cpu48_r6_node145_nccl2289控制2344109、M2 PID2344133真实存活，attempt3 waiting、JAXfalse/GPUfalse，CPU约374GiB满足48GiB，GPU3/1中GPU1不足28GiB。四组及正式必须同一NCCL库SHA并核对INFO日志，LoRA和protocol6原字节不变；无新GPU更新或正式status，训练/评测发布关闭，见receipts/L09_lora_nccl2289_restart_20261030.json。",
       "current_role": "检验方向、公制刻度和 Motion Echo 的逐项增量"
     },
     {
