@@ -1,5 +1,12 @@
 # Handoff
 
+## 2026-10-30 L09 LoRA等待队列迁移145
+
+- [Experiment] 145已部署干净冻结提交1c06f6df8f4787e0c47cafea0609be8297fe4917，运行树/home/yqt/XuanyiLi/rulervla-metric-lora-r6-runtime。08:06 UTC实际进程/命令/工作目录核验：控制1693357、M2 PID1693359，attempt2、waiting_resources、JAXfalse/GPUfalse，CPU可用202850732KiB约193GiB；候选GPU4/2，目前GPU2不足28672MiB。新队列NAS目录metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6_node145，顺序M2/M0/M1/M3，尚无metrics或checkpoint。
+- [Experiment] A6000原等待器901847及控制901831已在08:03 UTC退出。取消前核实原进程身份、attempt853 waiting、JAXfalse/GPUfalse、未加载JAX/CUDA库且无本人GPU记录，CPU仅7004436KiB；只取消尚未启动GPU的等待器，没有停止已启动训练。旧NAS status仍是历史waiting记录，后续不得据此重复启动旧队列；guard/result记录保存在原队列目录。
+- [Code] 两个启动器增加三个环境路径覆盖；node145配置只改同一基座/receipt的NAS绝对路径。四组输入preflight无阻塞、CPU约190GiB，配方语义及基座身份通过；bash语法/diff及只读复核通过，无Critical/Important；正式release gate仍关闭。新冻结提交的src及训练CLI与76e9b4c原字节一致，protocol6 SHA9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b、CPU48GiB/双卡各28GiB及全部LoRA预算保持一致。
+- [Experiment] 部署期间145显存窗口收窄，工程决定改为在CPU充足的145继续无GPU资源等待，原CLI准入保持不变。receipt为experiments/metric_cue_v1/receipts/L09_lora_node145_migration_20261030.json，计划见NODE145_LORA_R6_PLAN.zh.md；完整四组GPU验收和正式M2两个有限更新仍待完成，训练/评测发布保持false。自动检查需追踪145新队列，活动期间禁止热更新其运行树。
+
 ## 2026-10-30 VPN恢复后核实LoRA等待器存活
 
 - [Experiment] 2026-10-30 05:58 UTC复查：实际进程、工作目录和命令确认原控制901831、M2 PID901847仍存活，等待计数740，JAXfalse/GPUfalse；CPU可用9899484KiB（约9.4GiB）低于48GiB，GPU6/7各空闲48538MiB。145当前六张卡均不足28672MiB，147 NVML仍Unknown Error。保持现有等待器；冻结运行树76e9b4c干净、protocol6身份一致，训练/评测发布关闭，正式status及本轮metrics/checkpoint均不存在。原始观察为outputs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6_cpu_restore/heartbeat_20261030T055749Z.json，索引receipt为experiments/metric_cue_v1/receipts/L09_lora_resource_wait_20261030T055749Z.json；没有启动新作业、停止作业或热更新源码。

@@ -654,7 +654,7 @@
       ],
       "priority": "current",
       "research_group": "六通道公制提示",
-      "current_status_note": "2026-10-30 05:58 UTC通过WSL核实：原控制901831、M2 PID901847仍实际存活，命令/工作目录吻合；等待计数740，JAXfalse/GPUfalse。CPU9899484KiB约9.4GiB不足共同48GiB；GPU6/7各空闲48538MiB，145当前无卡达到28GiB，147 NVML仍Unknown Error。运行树76e9b4c干净，protocol6身份一致；训练/评测发布关闭，正式status及本轮metrics/checkpoint均不存在。保留原队列，未重复启动、停止作业或热更新源码；见receipts/L09_lora_resource_wait_20261030T055749Z.json。",
+      "current_status_note": "2026-10-30 08:06 UTC：唯一LoRA等待队列已迁移145，干净冻结源码1c06f6df8f4787e0c47cafea0609be8297fe4917，src/训练CLI与76e9b4c原字节一致。四组输入preflight通过，protocol6/CPU48GiB/双卡各28GiB及LoRA预算不变。实际控制1693357、M2 PID1693359，attempt2 waiting_resources、JAXfalse/GPUfalse；CPU约193GiB满足，GPU4/2中GPU2不足28GiB。A6000旧901847/901831已在未启动GPU且身份核实后退出，原status为历史记录。新NAS队列smoke_cpu48_r6_node145无metrics/checkpoint，正式status不存在，训练/评测发布关闭；见receipts/L09_lora_node145_migration_20261030.json。",
       "current_role": "检验方向、公制刻度和 Motion Echo 的逐项增量"
     },
     {
