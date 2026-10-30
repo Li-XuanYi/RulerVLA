@@ -654,7 +654,7 @@
       ],
       "priority": "current",
       "research_group": "六通道公制提示",
-      "current_status_note": "2026-10-30 10:23 UTC：原145 M2 1693359在首次NCCL通信GPU OOM后自然abort，0updates，1693357/1693359消失，旧running为陈旧记录。已核验官方NCCL2.28.9库及SM120原生内核，真实CPU绑定检查RED2 failed/GREEN2 passed、145部署后2 passed；GPU因果及修复效果仍待验证。已前向部署干净bf96eef96f3447d51ce837829ce22dfc356fde2d，核心src/训练CLI不变，新唯一队列smoke_cpu48_r6_node145_nccl2289控制2344109、M2 PID2344133真实存活，attempt3 waiting、JAXfalse/GPUfalse，CPU约374GiB满足48GiB，GPU3/1中GPU1不足28GiB。四组及正式必须同一NCCL库SHA并核对INFO日志，LoRA和protocol6原字节不变；无新GPU更新或正式status，训练/评测发布关闭，见receipts/L09_lora_nccl2289_restart_20261030.json。",
+      "current_status_note": "2026-10-30 10:37 UTC复查：145原控制2344109、M2 PID2344133实际身份/启动时间/工作目录吻合，bf96eef干净冻结，2.28.9库映射保持；attempt17 waiting_resources、JAXfalse/GPUfalse，CPU439767484KiB约419GiB满足48GiB，GPU4/1中GPU1不足28672MiB。A6000 CPU约7.26GiB，保留145唯一等待器，无新增metrics/checkpoint/正式status，未启动或停止作业、未热更新源码。protocol6及LoRA预算不变，GPU修复效果仍待完整四组验证，训练/评测发布关闭。原始观察为smoke_cpu48_r6_node145_nccl2289/heartbeat_20261030T103533Z.json，修订依据仍见receipts/L09_lora_nccl2289_restart_20261030.json。",
       "current_role": "检验方向、公制刻度和 Motion Echo 的逐项增量"
     },
     {

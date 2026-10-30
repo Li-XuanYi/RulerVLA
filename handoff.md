@@ -2,6 +2,7 @@
 
 ## 2026-10-30 L09首次NCCL通信失败与新库验证
 
+- [Experiment] 2026-10-30 10:37 UTC定时复查：原控制2344109及M2 PID2344133实际身份、工作目录和启动时间吻合，干净冻结bf96eef不变，NCCL2.28.9映射保持；attempt17 waiting_resources、JAXfalse/GPUfalse，CPU439767484KiB约419GiB，GPU4/1中GPU1仍不足28672MiB。A6000 CPU可用约7.26GiB，当前保留145唯一等待器。无新metrics/checkpoint/正式status；未启动、停止作业或热更新源码。原始观察在/home/Dataset2/yuqiuting/rulervla/metric_cue_runs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6_node145_nccl2289/heartbeat_20261030T103533Z.json。
 - [Experiment] 原145队列smoke_cpu48_r6_node145的M2在gpu_zero_cue_equivalence阶段0次更新自然Aborted，1693357/1693359均已消失；status的running是陈旧记录。直接错误为NCCL2.26.2首次通信CUDA out of memory，随后XLA主动abort。准入CPU423.447GiB、GPU3/5空闲49990/48870MiB、每卡原生BFC池27735597056 bytes均满足共同门槛；终末峰值与外部分配未知，不归咎其他作业，没有主动停止训练。
 - [Code/Hypothesis] 原NCCL库原生cubin最高SM90，官方2.28.9含SM120原生cubin，wheel/库SHA已验证。旧PTX可向新架构运行时编译，缺少SM120原生cubin不等于完全不支持Blackwell；库版本与本次OOM的因果关系仍待实际GPU验证。两个启动器支持METRIC_NCCL_ROOT，并打印全局实际加载版本及SHA，指定METRIC_NCCL_SHA256不匹配立即拒绝。CPU RED2 failed38.35s、GREEN2 passed2.47s、145部署后2 passed1.29s；默认22602及错误旧SHA拒绝已验证，ruff/diff/bash和复核通过，无Critical/Important。核心src/训练CLI/allocator原字节不变。
 - [Experiment] 已在所有旧进程退出后前向部署干净bf96eef96f3447d51ce837829ce22dfc356fde2d，并于10:20 UTC启动唯一新队列smoke_cpu48_r6_node145_nccl2289，顺序M2/M0/M1/M3。10:23 UTC实际核实控制2344109、M2 PID2344133，attempt3 waiting_resources、JAXfalse/GPUfalse；CPU392503080KiB约374GiB，候选GPU3/1中GPU1不足28672MiB。实际训练进程已映射2.28.9库，profile版本22809、SHA1792291e26d2b27fe51e59cf4dbd361dbfa84cbfe8ee8196c087c7ebf5146d48匹配，但实际GPU通信版本仍须NCCL INFO日志确认。
