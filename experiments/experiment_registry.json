@@ -647,6 +647,7 @@
       "classification": "large",
       "legacy_ids": ["metric_cue_v1"],
       "status": "blocked_node147_access_and_node145_stop_verification",
+      "latest_access_check_receipt": "experiments/metric_cue_v1/receipts/L09_lora_node147_access_recheck_20261030T131201Z.json",
       "purpose": "六通道 M0/M1/M2/M3 公制提示与实测历史位移受控训练和评测",
       "details": [
         "当前revision6按用户指令将共同CPU起始门槛64降至48GiB，正式按max(48,ceil(四组完整smoke最高峰值*1.25))校准；沿用revision5的统一LoRA配方和12个run ID。四组及其他主表对照共享rank/alpha、可训练白名单、初始化、有效batch8、30k与原数据评测。原CPU64输入已归档revisions/r5_cpu64。",

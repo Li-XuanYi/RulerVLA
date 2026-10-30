@@ -1,0 +1,65 @@
+{
+  "schema": "rulervla_metric_lora_node147_access_recheck_v1",
+  "experiment_id": "L09",
+  "automation_id": "l09-lora",
+  "heartbeat_at_utc": "2026-10-30T13:12:01.506Z",
+  "node147_probe": {
+    "observed_at_utc": "2026-10-30T13:11:51.505043+00:00",
+    "hostname": "ZjuServer147",
+    "uid": 1060,
+    "gid": 1060,
+    "groups": [
+      1060
+    ],
+    "resource_group_gid": 2000,
+    "paths": {
+      "/dev/nvidia0": {
+        "uid": 0,
+        "gid": 2000,
+        "mode": "0o660",
+        "read": false,
+        "write": false,
+        "search": false
+      },
+      "/dev/nvidia1": {
+        "uid": 0,
+        "gid": 2000,
+        "mode": "0o660",
+        "read": false,
+        "write": false,
+        "search": false
+      },
+      "/home/Dataset2": {
+        "uid": 0,
+        "gid": 2000,
+        "mode": "0o770",
+        "read": false,
+        "write": false,
+        "search": false
+      }
+    },
+    "nvidia_smi": {
+      "exit_code": 255,
+      "stdout": "Failed to initialize NVML: Unknown Error\n",
+      "stderr": ""
+    }
+  },
+  "conclusion": "unchanged_access_blockers",
+  "source_receipt": "experiments/metric_cue_v1/receipts/L09_lora_node147_only_20261030.json",
+  "allowed_compute_hosts": [
+    "10.82.1.147"
+  ],
+  "node145_control_attempted_this_check": false,
+  "node145_stop_verified": false,
+  "node145_live_process_state": "unknown_not_rechecked",
+  "node147_gpu_jobs_started_this_check": false,
+  "resource_permissions_changed": false,
+  "active_runtime_updated": false,
+  "protocol_sha256": "9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b",
+  "release_sha256": "55a4324d3c29ca97b4cd8c2908c065ead1d1f12c28b027ac74696d37dc6eaee5",
+  "run_matrix_sha256": "8c8da9c06fa63c68c11c78b9c5c84441179230a913b4509d390401d056d268b3",
+  "training_released": false,
+  "evaluation_released": false,
+  "formal_training_started_this_check": false,
+  "notification": "unchanged_blockers_previously_reported_no_repeat_notification"
+}

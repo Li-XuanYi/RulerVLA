@@ -2,6 +2,7 @@
 
 ## 2026-10-30 L09按用户指令仅使用147
 
+- [Experiment] 2026-10-30 13:12 UTC复查：147新SSH会话仍仅1060组，GPU设备和NAS访问均被拒绝，nvidia-smi exit255/NVML Unknown Error；权限阻塞未变。本轮没有连接或使用145，旧任务停止仍未知，没有启动GPU任务或修改运行树及资源权限。protocol/release/run_matrix三份SHA保持一致；本次receipt为experiments/metric_cue_v1/receipts/L09_lora_node147_access_recheck_20261030T131201Z.json，保持安静检查。
 - [User] 最新指令禁止使用145，后续GPU验证及正式训练仅在147；145从计算、等待、备用和SSH转发中移除，自动检查已同步。只允许为结束本次既有145任务进行必要停止控制。
 - [Experiment] 147可通过WSL SSH登录ZjuServer147，但lixuanyi仅在自身1060组，未加入GPU/NAS所属omniai(2000)；GPU设备0660、NAS入口0770，当前均无访问权限，nvidia-smi报NVML Unknown Error。需管理员恢复合法资源组权限并重新登录核验；147匹配venv也尚未准备，没有启动147 GPU任务。
 - [Experiment] 145原属主yqt的直连与经A6000的stop-only连接均被publickey认证拒绝，停止命令未执行，旧任务停止状态未知。12:36 UTC经A6000读取NAS：M2/M0/M1各记录complete、3次有限更新、完整恢复及独立推理标志；M3最后status为12:08:34的running/1次更新。磁盘记录不证明当前进程存活或退出，不能冒称145已停止，也不能放行147。
