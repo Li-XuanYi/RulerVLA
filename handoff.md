@@ -2,6 +2,7 @@
 
 ## 2026-10-30 VPN恢复后核实LoRA等待器存活
 
+- [Experiment] 2026-10-30 01:10 UTC定时复查：原M2等待器第462次等待，CPU可用15790676KiB（约15.1GiB）低于共同48GiB；JAXfalse/GPUfalse，运行树76e9b4c仍干净，训练/评测发布关闭。01:14 UTC的实际ps再次确认控制901831和M2 PID901847连续存活7小时59分；145仍仅一张卡满足28GiB准入。原始观察保存于outputs/metric_cue_pilot/L09_lora_r5_smoke/smoke_cpu48_r6_cpu_restore/heartbeat_20261030T010614Z.json；没有重复启动、停止作业或热更新源码，继续保留现有队列等待资源。
 - [Experiment] 用户恢复VPN后，WSL连接amax成功。实际ps确认控制901831、M2 PID901847仍为原smoke_cpu48_r6_cpu_restore进程，已存活7小时31分，日志更新至第439次等待，JAXfalse/GPUfalse；本地连接中断期间等待器持续运行。当前主机boot仍为2026-10-29 15:57:45 UTC，没有按失联重建或重复启动。
 - [Experiment] 本轮CPU可用15329960KiB（约14.6GiB）低于48GiB；GPU6/7各空闲48538MiB，显存满足共同28672MiB准入。当前阻塞仍为CPU，其他节点没有同时满足共同双卡条件的窗口；保留现有等待器自动复查，没有停止任何作业。
 - [Code] 干净运行树仍冻结76e9b4c6c5e357b22d63d80cb4fde3847a5ca5e9，protocol6、release及run matrix的SHA9d35dbd9cd94c1ff1e380a7bcef3a37d1a5643e7d41c2f32683e3084b9cb4c5b一致，共12个正式run。48GiB门槛、LoRA/batch8/micro1累计8/30k不变；没有修改运行源码或热更新活动运行树，已有回归检查未重复运行。
